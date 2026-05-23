@@ -42,7 +42,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
             href="/agents"
             className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-violet-200"
           >
-            ← The stable
+            ← The team
           </Link>
 
           <motion.div
@@ -54,7 +54,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
             <AgentAvatar agent={agent.slug} size={64} />
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.22em] agent-tint-text">
-                {agent.glyph} · {agent.tracks.join(" · ")}
+                {agent.role}
               </p>
               <h1 className="text-3xl font-semibold tracking-tight text-zinc-50 md:text-5xl">
                 {agent.name}
@@ -88,12 +88,12 @@ export function AgentHero({ agent }: AgentHeroProps) {
           >
             <Link href={`/allocate?agent=${agent.slug}`}>
               <Button variant="violet" size="pill">
-                Allocate to {agent.name}
+                Fund {agent.name}
                 <ArrowRight01Icon size={14} />
               </Button>
             </Link>
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-              Currently {agent.stats.allocatorsCount} allocators
+              {agent.stats.allocatorsCount} people backing {agent.name}
             </span>
           </motion.div>
         </div>
@@ -111,7 +111,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
               hint={`${agent.stats.matchesActedOn} matches`}
             />
             <Stat
-              label={agent.slug === "scout" ? "Allocators" : "Capital assigned"}
+              label={agent.slug === "scout" ? "Backers" : "Money funded"}
               value={
                 agent.slug === "scout"
                   ? agent.stats.allocatorsCount.toString()
@@ -119,7 +119,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
               }
             />
             <Stat
-              label={agent.slug === "scout" ? "Significance avg" : "Volume"}
+              label={agent.slug === "scout" ? "Avg. highlight score" : "Total volume"}
               value={
                 agent.slug === "scout"
                   ? "0.84"
@@ -127,7 +127,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
               }
             />
             <Stat
-              label={agent.slug === "scout" ? "Mints / match" : "Win rate"}
+              label={agent.slug === "scout" ? "Moments / match" : "Win rate"}
               value={
                 agent.slug === "scout"
                   ? (agent.stats.totalDecisions / Math.max(agent.stats.matchesActedOn, 1)).toFixed(1)
@@ -146,7 +146,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
                 </span>
               ) : (
                 <span className="font-mono text-[12px] text-zinc-400">
-                  {agent.stats.totalDecisions} mints
+                  {agent.stats.totalDecisions} moments saved
                 </span>
               )}
             </div>

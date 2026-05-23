@@ -23,40 +23,36 @@ const instrumentSerif = Instrument_Serif({
   style: ["normal", "italic"],
 });
 
-const SITE_URL = "https://xdev-agents.xyz";
-const APP_NAME = "xdev — AI Agent Stable";
+const SITE_URL = "https://whistle-agents.xyz";
+const APP_NAME = "whistle — AI helpers for football";
 const APP_DESCRIPTION =
-  "Three onchain agents. Every World Cup match. Acting on X Layer. Scout mints the moments. Bookie takes the edge. Manager drafts the eleven. The user is the allocator, not the picker.";
+  "Three AI helpers for World Cup matches. Emma saves great moments. Jack places bets. Tom picks your players. You fund who you trust — they do the work.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: APP_NAME,
-    template: "%s · xdev",
+    template: "%s · whistle",
   },
   description: APP_DESCRIPTION,
   keywords: [
-    "X Layer",
-    "OKX",
-    "AI agents onchain",
-    "World Cup onchain",
-    "prediction agent",
-    "fantasy onchain",
-    "NFT moments",
-    "session keys",
-    "agent stable",
-    "xdev",
+    "World Cup",
+    "AI football",
+    "football bets",
+    "pick players",
+    "football highlights",
+    "whistle",
   ],
-  authors: [{ name: "xdev" }],
-  creator: "xdev",
-  publisher: "xdev",
-  applicationName: "xdev",
+  authors: [{ name: "whistle" }],
+  creator: "whistle",
+  publisher: "whistle",
+  applicationName: "whistle",
   category: "DeFi",
   referrer: "origin-when-cross-origin",
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "xdev",
+    siteName: "whistle",
     title: APP_NAME,
     description: APP_DESCRIPTION,
     locale: "en_US",
@@ -65,7 +61,7 @@ export const metadata: Metadata = {
         url: "/icon.svg",
         width: 512,
         height: 512,
-        alt: "xdev — AI Agent Stable",
+        alt: "whistle — AI helpers for football",
       },
     ],
   },
@@ -74,7 +70,7 @@ export const metadata: Metadata = {
     title: APP_NAME,
     description: APP_DESCRIPTION,
     images: ["/icon.svg"],
-    creator: "@xdev_agents",
+    creator: "@whistle_agents",
   },
   robots: {
     index: true,
@@ -105,24 +101,24 @@ const structuredData = {
     {
       "@type": "Organization",
       "@id": `${SITE_URL}#organization`,
-      name: "xdev",
-      alternateName: "xdev Agents",
+      name: "whistle",
+      alternateName: "whistle Agents",
       url: SITE_URL,
       logo: `${SITE_URL}/icon.svg`,
       description:
-        "AI Agent Stable for live sport on X Layer — three autonomous agents acting onchain across every World Cup match.",
+        "AI helpers for live World Cup matches — Emma, Jack, and Tom act on your behalf.",
       foundingDate: "2026",
-      sameAs: ["https://x.com/xdev_agents"],
+      sameAs: ["https://x.com/whistle_agents"],
     },
     {
       "@type": "SoftwareApplication",
       "@id": `${SITE_URL}#software`,
-      name: "xdev Agent Stable",
-      applicationCategory: "FinanceApplication",
-      applicationSubCategory: "DeFi / AI Agent",
+      name: "whistle",
+      applicationCategory: "SportsApplication",
+      applicationSubCategory: "AI / Sports",
       operatingSystem: "Web",
       description:
-        "Three autonomous onchain agents (Scout, Bookie, Manager) on X Layer mainnet. Allocate capital — agents act under bounded session keys, settled per match.",
+        "Three AI helpers (Emma, Jack, Tom) for World Cup matches. Fund who you trust — they save moments, place bets, and pick players.",
       url: SITE_URL,
       offers: {
         "@type": "Offer",
@@ -130,18 +126,18 @@ const structuredData = {
         priceCurrency: "OKB",
       },
       featureList: [
-        "Three-agent stable: Scout, Bookie, Manager",
-        "X Layer mainnet (OKX L2) onchain settlement",
-        "Bounded session keys per match",
-        "Public agent track records",
-        "Licensing-clean fantasy: nation + jersey only",
+        "Three AI helpers: Emma, Jack, Tom",
+        "Moment saving, match bets, and player picks",
+        "Spending limits you control",
+        "Public track records for every helper",
+        "Works during live World Cup matches",
       ],
     },
     {
       "@type": "WebSite",
       "@id": `${SITE_URL}#website`,
       url: SITE_URL,
-      name: "xdev",
+      name: "whistle",
       publisher: { "@id": `${SITE_URL}#organization` },
       inLanguage: "en-US",
     },

@@ -1,4 +1,4 @@
-# AGENTS.md — Whistle (xdev AI Agent Stable) Frontend
+# AGENTS.md — Whistle Frontend
 
 This file is the **canonical** contract for any agent (Claude, Codex, Cursor, Aider, Cline, etc.) touching this codebase. `CLAUDE.md` defers to this document.
 
@@ -8,20 +8,33 @@ If a rule here conflicts with model "memory" of how Next.js/React/Tailwind used 
 
 ## 0. Project Identity
 
-**Codename:** Whistle (working name). **Product:** xdev — *AI Agent Stable*.
-**One-liner:** Three onchain agents. Every World Cup match. Acting on X Layer.
+**Product:** Whistle — *AI helpers for football*.
+**One-liner:** Three AI helpers. Every World Cup match. You fund who you trust — they do the work.
 
-The user is a **capital allocator**, not a picker. Three named agents act autonomously on behalf of the user, every action is a transaction on X Layer:
+The user **funds a helper**, they don't pick plays themselves. Three named AI helpers act during matches on the user's behalf:
 
-| Agent | Persona | Acts | Track |
-|---|---|---|---|
-| **The Scout** | Terse observer, one line per mint | Mints commemorative ERC-721 attestations on culturally-weighted moments (goals, cards, upsets) | NFT / Moments |
-| **The Bookie** | Skeptical bookmaker, comments on edge | Generates micro-markets (first goal < 30', > 4 corners H1, etc.), prices, takes positions, settles per match | Prediction / Trading |
-| **The Manager** | Pragmatic coach, justifies in 1–2 lines | Drafts 11-position rosters, makes transfers per matchday. Three profiles: Aggressive / Defensive / Contrarian | Fantasy / GameFi |
+| Slug (code) | Display name | Role | What they do | Focus |
+|---|---|---|---|---|
+| `scout` | **Emma** | Saves great moments | Keeps the best bits from every match | Moments |
+| `bookie` | **Jack** | Places match bets | Bets on what happens next in the game | Bets |
+| `manager` | **Tom** | Picks your players | Chooses which players to back each match | Teams |
 
-**Licensing-clean fantasy:** players are referenced by **nation + jersey number** only (`ARG 10`, not "Messi"). Never name real players, never use real likenesses, never embed broadcast footage. This kills the legal risk that would block OKX cooperation.
+**Internal slugs stay** (`scout`, `bookie`, `manager`) for routes, types, and CSS. **All user-facing copy uses human names** (Emma, Jack, Tom) and plain language. **Never use "fantasy" in UI copy** — say "picks players" or "your team".
+
+**Copy voice — mandatory:**
+- Say **fund / back / spending limit**, not allocate / capital / session key / ceiling (except in wallet/contract code comments never shown in UI).
+- Say **saved highlight / keepsake**, not mint / NFT / ERC-721.
+- Say **bet / prediction**, not micro-market / position / edge.
+- Say **team / players / picks**, not fantasy / roster / GameFi.
+- Say **logged / recorded**, not onchain / settled in one block — unless the user is on a technical contracts page.
+- Write for someone who knows football but **not** web3 and **not** crypto jargon.
+- `PositionManager` is a **smart contract name** — never confuse it with Tom (the player picker).
+
+**Licensing-clean fantasy:** players are referenced by **nation + jersey number** only (`ARG 10`, not "Messi"). Never name real players, never use real likenesses, never embed broadcast footage.
 
 **Submission constraints:** OKX X Cup, deadline May 28 12:00 UTC. AI judges + human judges grade independently on onchain data, code quality, innovation, market potential. Code-quality reads cannot be faked at the last minute — write docstrings, tests, and clean commit history as we go.
+
+**Single source of truth for agent display copy:** `lib/mock/agents.ts`.
 
 ---
 
@@ -81,8 +94,8 @@ All stateful motion via Motion springs from `motion/react`. Never `ease-in-out` 
 ### Procedure 5 — Proof-of-Work Art Direction
 No illustrations. No stock 3D. No unDraw. No vague gradients of "AI brains." The visuals ARE the product:
 - Real JSON of an agent decision as the hero artifact
-- An orbital diagram of Scout / Bookie / Manager around a match clock
-- Live data-viz charts (positions opened, mints, roster diff) as stat containers
+- An orbital diagram of Emma / Jack / Tom around a match clock
+- Live data-viz charts (bets placed, highlights saved, team changes) as stat containers
 - The activity feed terminal IS the product demo
 - Block explorer screenshots are valid art — every action is auditable
 
@@ -152,9 +165,9 @@ Next 16's View Transitions are the default for cross-route motion.
 - `#52525B` (`zinc-600`) — dim text (metadata, captions)
 
 ### Agent identity tints (subtle, never primary)
-- **Scout** — cool steel `#9CA3AF` / icon stroke only
-- **Bookie** — bookmaker amber `#F59E0B` at < 30% opacity, used for "edge" badges
-- **Manager** — deep emerald `#10B981` at < 30% opacity, used for pitch/roster
+- **Emma** — cool steel `#9CA3AF` / icon stroke only
+- **Jack** — amber `#F59E0B` at < 30% opacity, used for bet badges
+- **Tom** — deep emerald `#10B981` at < 30% opacity, used for team/player UI
 - All three sit on the violet canvas — never use these as section backgrounds.
 
 ### Geometry
@@ -228,9 +241,9 @@ The current code ships Reown/Etherlink as scaffolding. **For any new wallet or c
 frontend/
 ├── app/
 │   ├── (marketing)/          # landing, manifesto, docs link-outs
-│   ├── agents/[id]/          # Scout / Bookie / Manager detail
+│   ├── agents/[slug]/          # Emma / Jack / Tom detail (slugs: scout, bookie, manager)
 │   ├── leaderboard/
-│   ├── allocate/             # capital allocator flow
+│   ├── allocate/             # fund-a-helper flow
 │   ├── activity/             # full activity feed (ledger)
 │   ├── api/                  # Next route handlers (proxy only — real API is :7010)
 │   ├── layout.tsx
@@ -395,12 +408,12 @@ When parallelizing work across sub-agents (Explore, general-purpose, Plan):
 
 ---
 
-## 14. The xdev Manifesto (for tone)
+## 14. The Whistle Manifesto (for tone)
 
 > We did not build a Polymarket clone. We built the agent layer the next four years of crypto-sport runs on.
 
-Three agents. Public onchain track records. Auditable decisions. The user picks the agent. The agent picks the rest.
+Three helpers. Public track records. Every decision logged. You pick Emma, Jack, or Tom — they handle the rest.
 
-Every surface — landing, allocator, leaderboard, activity feed — should read like infrastructure that has already been running for a year. Not a launch teaser. Not a "v0 sketch." Infrastructure.
+Every surface — landing, fund flow, leaderboard, activity feed — should feel approachable to a football fan who has never used crypto. Plain words first. Infrastructure tone, not hackathon jargon.
 
 If it looks like a hackathon, it loses.

@@ -23,7 +23,7 @@ export function ContractsStrip() {
               Onchain
             </span>
             <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Five contracts. <span className="font-serif italic font-normal text-violet-200">All verified.</span>
+              Built in the open. <span className="font-serif italic font-normal text-violet-200">Fully verified.</span>
             </h2>
           </div>
           <span className="font-mono text-[11px] text-emerald-300">
@@ -64,8 +64,7 @@ export function ContractsStrip() {
               </div>
               <div className="col-span-2 font-mono text-[12px] text-zinc-400">~{c.lines} lines</div>
               <div className="col-span-2 flex justify-end">
-                <span className="inline-flex items-center gap-1.5 rounded-sm border border-emerald-500/30 bg-emerald-500/[0.06] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.22em] text-emerald-300">
-                  <span className="size-1 rounded-full bg-emerald-400" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
                   Verified
                 </span>
               </div>

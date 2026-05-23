@@ -7,7 +7,7 @@ import { WagmiProvider } from "wagmi";
 import { wagmiConfig } from "@/lib/wagmi";
 
 if (typeof window !== "undefined") {
-  const PURGE_KEY = "__xdev_wallet_purged_v1";
+  const PURGE_KEY = "__whistle_wallet_purged_v1";
   if (!sessionStorage.getItem(PURGE_KEY)) {
     const STALE_PREFIXES = ["@appkit/", "rk-", "wagmi.", "wc@2:", "-walletlink:"];
     for (const key of Object.keys(localStorage)) {

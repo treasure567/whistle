@@ -1,12 +1,15 @@
 "use client";
 
 import { Suspense, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Float, Line, Ring } from "@react-three/drei";
-import type { Group, Mesh } from "three";
+import type { Group } from "three";
 import * as THREE from "three";
+import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
 
 import type { AgentSlug } from "@/types";
+
+const WORLD_CUP_SVG = "/brand/world-cup.svg";
 
 const AGENT_COLOR: Record<AgentSlug, string> = {
   scout: "#9CA3AF",
@@ -16,39 +19,86 @@ const AGENT_COLOR: Record<AgentSlug, string> = {
 
 const AGENT_ORDER: AgentSlug[] = ["scout", "bookie", "manager"];
 
+function WorldCupTrophy() {
+  const svg = useLoader(SVGLoader, WORLD_CUP_SVG);
+
+  const { meshes, scale, offset } = useMemo(() => {
+    const items: { geometry: THREE.ShapeGeometry; color: string }[] = [];
+
+    svg.paths.forEach((path) => {
+      const style = (path.userData?.style ?? {}) as { fill?: string };
+      const color =
+        style.fill && style.fill !== "none" ? style.fill : "#357050";
+
+      SVGLoader.createShapes(path).forEach((shape) => {
+        items.push({ geometry: new THREE.ShapeGeometry(shape), color });
+      });
+    });
+
+    const probe = new THREE.Group();
+    items.forEach(({ geometry }) => {
+      probe.add(new THREE.Mesh(geometry));
+    });
+
+    const box = new THREE.Box3().setFromObject(probe);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, 0.001);
+    const scale = 1.08 / maxDim;
+
+    return {
+      meshes: items,
+      scale,
+      offset: center.multiplyScalar(-scale),
+    };
+  }, [svg]);
+
+  return (
+    <group rotation={[Math.PI, 0, 0]}>
+      <group scale={scale} position={offset}>
+        {meshes.map(({ geometry, color }, index) => (
+          <mesh key={index} geometry={geometry}>
+            <meshStandardMaterial
+              color={color}
+              emissive={color}
+              emissiveIntensity={0.18}
+              metalness={0.55}
+              roughness={0.32}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
 function CoreOrb() {
-  const meshRef = useRef<Mesh>(null);
+  const wireframeRef = useRef<Group>(null);
   useFrame((state) => {
-    if (!meshRef.current) return;
-    meshRef.current.rotation.y = state.clock.elapsedTime * 0.18;
-    meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.12;
+    if (!wireframeRef.current) return;
+    wireframeRef.current.rotation.y = state.clock.elapsedTime * 0.18;
+    wireframeRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.12;
   });
 
   return (
     <group>
-      <mesh ref={meshRef}>
-        <icosahedronGeometry args={[0.95, 1]} />
-        <meshStandardMaterial
-          color="#8B5CF6"
-          emissive="#7C3AED"
-          emissiveIntensity={0.55}
-          roughness={0.35}
-          metalness={0.55}
-          wireframe
-          opacity={0.9}
-          transparent
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[0.58, 32, 32]} />
-        <meshStandardMaterial
-          color="#1A0F3A"
-          emissive="#5B21B6"
-          emissiveIntensity={0.4}
-          roughness={0.2}
-          metalness={0.8}
-        />
-      </mesh>
+      <group ref={wireframeRef}>
+        <mesh>
+          <icosahedronGeometry args={[0.95, 1]} />
+          <meshStandardMaterial
+            color="#8B5CF6"
+            emissive="#7C3AED"
+            emissiveIntensity={0.55}
+            roughness={0.35}
+            metalness={0.55}
+            wireframe
+            opacity={0.9}
+            transparent
+          />
+        </mesh>
+      </group>
+      <WorldCupTrophy />
       <pointLight color="#A78BFA" intensity={2.5} distance={6} />
     </group>
   );

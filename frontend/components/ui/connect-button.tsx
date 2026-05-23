@@ -92,7 +92,7 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
         >
           <div className="px-3 py-3 border-b border-white/5">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-              Connected · X Layer
+              Connected
             </p>
             <p className="mt-1 font-mono text-sm text-zinc-100">
               {truncateAddress(address, 6)}
@@ -113,7 +113,7 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
           />
           <MenuRow
             icon={<Settings02Icon size={14} />}
-            label="Manage session keys"
+            label="Manage spending limits"
             asLink="/dashboard#sessions"
           />
           <div className="my-1 h-px bg-white/5" />
@@ -205,13 +205,13 @@ function ConnectDialog({
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-                      Connect to xdev
+                      Connect to Whistle
                     </p>
                     <Dialog.Title className="mt-2 text-xl font-semibold tracking-tight text-zinc-100">
                       Choose a wallet
                     </Dialog.Title>
                     <Dialog.Description className="mt-1 text-xs text-zinc-500">
-                      Allocate capital to agents on X Layer mainnet.
+                      Fund AI helpers for World Cup matches.
                     </Dialog.Description>
                   </div>
                   <Dialog.Close asChild>
@@ -264,7 +264,7 @@ function ConnectDialog({
                 </div>
 
                 <p className="mt-5 text-[11px] leading-relaxed text-zinc-500">
-                  By connecting, you agree to bounded session-key delegation per match. xdev never custodies funds.
+                  By connecting, you agree to bounded session-key delegation per match. Whistle never custodies funds.
                 </p>
               </motion.div>
             </Dialog.Content>

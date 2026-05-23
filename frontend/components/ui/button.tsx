@@ -6,27 +6,27 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center border font-mono text-xs uppercase tracking-widest transition-none outline-none select-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/15 font-mono text-xs uppercase tracking-widest shadow-none outline-none select-none transition-[background,opacity,color,border-color] duration-150 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40 disabled:bg-white/[0.06] disabled:text-zinc-500 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "border-white/10 bg-white text-zinc-900 hover:bg-zinc-100",
+          "border-zinc-900/15 bg-linear-to-r from-zinc-100 to-zinc-200 text-zinc-900 hover:from-white hover:to-zinc-100 active:opacity-90",
         violet:
-          "border-violet-400/40 bg-violet-500 text-white hover:bg-violet-400 hover:border-violet-300/60",
+          "bg-linear-to-r from-violet-500 to-violet-600 text-white hover:from-violet-400 hover:to-violet-500 active:opacity-90",
         outline:
-          "border-white/15 bg-transparent text-zinc-100 hover:bg-white/5 hover:border-white/25",
+          "bg-white/[0.04] text-zinc-100 hover:bg-white/[0.08] hover:text-white active:opacity-90",
         ghost:
-          "border-transparent bg-transparent text-zinc-400 hover:text-zinc-100 hover:bg-white/5",
+          "bg-transparent text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-100 active:opacity-90",
         destructive:
-          "border-red-900/40 bg-transparent text-red-400 hover:bg-red-900/20",
+          "bg-linear-to-r from-red-500/90 to-red-600/90 text-white hover:from-red-400 hover:to-red-500 active:opacity-90",
       },
       size: {
-        default: "h-9 gap-2 px-5",
-        sm: "h-7 gap-1.5 px-3 text-[10px]",
+        default: "h-10 gap-2 px-5",
+        sm: "h-8 gap-1.5 px-4 text-[10px]",
         lg: "h-11 gap-2.5 px-6 text-[11px]",
-        pill: "h-10 gap-2 rounded-full px-6 text-[11px]",
-        icon: "h-9 w-9",
+        pill: "h-10 gap-2 px-6 text-[11px]",
+        icon: "size-10",
       },
     },
     defaultVariants: {

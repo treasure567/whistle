@@ -23,7 +23,7 @@ import { formatUsdt, truncateAddress } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Hex } from "viem";
 
-const STEP_LABELS = ["Agent", "Limits", "Session", "Confirm"] as const;
+const STEP_LABELS = ["Person", "Limits", "Duration", "Confirm"] as const;
 type StepIndex = 0 | 1 | 2 | 3;
 
 interface AllocateWizardProps {
@@ -78,13 +78,13 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
       <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
         <AnimatePresence mode="wait">
           {step === 0 ? (
-            <StepShell key="step-0" title="Choose an agent" subtitle="Each agent has its own personality and capital model.">
+            <StepShell key="step-0" title="Pick Emma, Jack, or Tom" subtitle="Each one does a different job during the match.">
               <AgentPicker selected={agentSlug} onSelect={setAgentSlug} />
             </StepShell>
           ) : null}
 
           {step === 1 ? (
-            <StepShell key="step-1" title="Set capital limits" subtitle={`Cap how much ${agent.name} can deploy.`}>
+            <StepShell key="step-1" title="Set spending limits" subtitle={`Choose how much ${agent.name} can spend.`}>
               <LimitsForm
                 ceiling={ceiling}
                 perMatch={perMatch}
@@ -97,8 +97,8 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
           {step === 2 ? (
             <StepShell
               key="step-2"
-              title="Session key duration"
-              subtitle="A scoped key signs on your behalf. Revocable any time."
+              title="How long should this last?"
+              subtitle="You can cancel early anytime from your dashboard."
             >
               <SessionForm hours={hours} onHoursChange={setHours} />
             </StepShell>
@@ -107,11 +107,11 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
           {step === 3 ? (
             <StepShell
               key="step-3"
-              title={confirmed ? "Session active" : "Review and sign"}
+              title={confirmed ? "You're all set" : "Review and confirm"}
               subtitle={
                 confirmed
-                  ? `${agent.name} can now act under the limits you set.`
-                  : "One signature creates the session key. xdev never custodies funds."
+                  ? `${agent.name} can now work within the limits you set.`
+                  : "One signature to confirm. Your money stays in your wallet."
               }
             >
               {confirmed ? (
@@ -143,7 +143,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
                 </Button>
               </Link>
               <Button variant="violet" size="sm" onClick={reset}>
-                Allocate another
+                Fund someone else
               </Button>
             </>
           ) : (
@@ -168,7 +168,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
                     size="sm"
                     onClick={() => setConfirmed(true)}
                   >
-                    Sign and create session
+                    Confirm and fund
                     <Tick02Icon size={14} />
                   </Button>
                 ) : (
@@ -189,13 +189,12 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
             Not connected
           </p>
           <p className="mt-1.5">
-            You can walk through the flow now, but signing the session key
-            requires a wallet on X Layer.
+            You can try the steps now, but confirming requires a connected wallet.
           </p>
         </div>
       ) : (
         <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-          Allocating from {truncateAddress(address ?? "")}
+          Funding from {truncateAddress(address ?? "")}
         </p>
       )}
     </div>
@@ -324,15 +323,15 @@ function LimitsForm({
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <LimitField
-        label="Session ceiling"
-        hint="Total USDT the agent can deploy across this session."
+        label="Total budget"
+        hint="The most they can spend across all matches in this period."
         value={ceiling}
         onChange={onCeilingChange}
         suggestions={[250, 500, 1500, 5000]}
       />
       <LimitField
-        label="Per-match cap"
-        hint="Cap on a single match decision. Always ≤ ceiling."
+        label="Per-match limit"
+        hint="The most they can spend on a single match. Cannot exceed the total budget."
         value={perMatch}
         onChange={(v) => onPerMatchChange(Math.min(v, ceiling))}
         suggestions={[50, 100, 250, 500]}
@@ -429,8 +428,7 @@ function SessionForm({
           in {hours < 24 ? `${hours} hours` : `${Math.round(hours / 24)} days`}
         </p>
         <p className="mt-2 text-[12px] text-zinc-500">
-          The session key auto-expires onchain. You can revoke it earlier
-          from the dashboard.
+          Access expires automatically. You can also cancel early from your dashboard.
         </p>
       </div>
     </div>
@@ -449,12 +447,10 @@ function ReviewForm({
   hours: number;
 }) {
   const rows = [
-    { label: "Agent", value: `${agent.name} · ${agent.glyph}` },
-    { label: "Session ceiling", value: formatUsdt(ceiling) },
-    { label: "Per-match cap", value: formatUsdt(perMatch) },
-    { label: "Session duration", value: `${hours} hours` },
-    { label: "Chain", value: "X Layer · chainId 196" },
-    { label: "Contract", value: "PositionManager.sol" },
+    { label: "Person", value: `${agent.name} · ${agent.role}` },
+    { label: "Total budget", value: formatUsdt(ceiling) },
+    { label: "Per-match limit", value: formatUsdt(perMatch) },
+    { label: "Duration", value: `${hours} hours` },
   ];
   return (
     <div className="space-y-5">
@@ -478,15 +474,15 @@ function ReviewForm({
       <ul className="space-y-2 rounded-2xl border border-white/5 bg-[#08080A] p-5 text-[12px] text-zinc-400">
         <li className="flex gap-2">
           <ShieldBlockchainIcon size={14} className="mt-0.5 text-violet-300" />
-          xdev never custodies funds. Capital sits in PositionManager.sol.
+          Your money stays in your wallet. Whistle never holds it for you.
         </li>
         <li className="flex gap-2">
           <Key01Icon size={14} className="mt-0.5 text-violet-300" />
-          The session key is scoped — it cannot exceed the limits above.
+          {agent.name} cannot spend more than the limits you set here.
         </li>
         <li className="flex gap-2">
           <Wallet01Icon size={14} className="mt-0.5 text-violet-300" />
-          One signature creates the session. No further pop-ups per match.
+          One confirmation — no pop-ups during the match.
         </li>
       </ul>
     </div>
@@ -514,17 +510,17 @@ function Confirmed({
         </span>
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
-            Session created
+            Funding confirmed
           </p>
           <p className="mt-0.5 text-sm text-emerald-100">
-            {agent.name} is now active under your limits.
+            {agent.name} is ready to work within your limits.
           </p>
         </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
-        <ReceiptRow label="Session ceiling" value={formatUsdt(ceiling)} />
-        <ReceiptRow label="Per-match cap" value={formatUsdt(perMatch)} />
+        <ReceiptRow label="Total budget" value={formatUsdt(ceiling)} />
+        <ReceiptRow label="Per-match limit" value={formatUsdt(perMatch)} />
         <ReceiptRow label="Window" value={`${hours} hours`} />
         <ReceiptRow label="Tx" value={<TxLink hash={txHash} chars={6} />} />
       </div>

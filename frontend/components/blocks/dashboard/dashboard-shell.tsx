@@ -9,7 +9,7 @@ import {
 } from "hugeicons-react";
 import { useAccount } from "wagmi";
 
-import { ActivityRow } from "@/components/ui/activity-row";
+import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@/components/ui/connect-button";
@@ -41,11 +41,11 @@ export function DashboardShell() {
             <WalletAdd01Icon size={20} />
           </div>
           <h2 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-100">
-            Connect to see your stable
+            Connect your wallet
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-zinc-400">
-            Your allocations, agent positions, and mints live behind your
-            wallet. Connect on X Layer to load them.
+            Your funding, predictions, and saved highlights show up here once
+            you connect.
           </p>
           <div className="mt-6 flex justify-center">
             <ConnectButton />
@@ -103,7 +103,7 @@ export function DashboardShell() {
             Dashboard
           </span>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-100 md:text-4xl">
-            Your stable
+            Your dashboard
           </h1>
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
             {truncateAddress(address, 6)} · X Layer
@@ -111,7 +111,7 @@ export function DashboardShell() {
         </div>
         <Link href="/allocate">
           <Button variant="violet" size="pill">
-            New allocation
+            New funding
             <AddCircleIcon size={14} />
           </Button>
         </Link>
@@ -124,14 +124,14 @@ export function DashboardShell() {
         className="mt-10 grid gap-4 rounded-3xl border border-white/10 bg-[#0B0B0E] p-6 md:grid-cols-4"
       >
         <StatBlock
-          label="Capital allocated"
+          label="Money funded"
           value={formatUsdt(totalAllocated, { compact: true })}
           hint={`${ALLOCATIONS.filter((a) => a.status === "active").length} active sessions`}
         />
         <StatBlock
           label="Remaining"
           value={formatUsdt(remaining, { compact: true })}
-          hint={`${formatPercent((remaining / Math.max(totalAllocated, 1)) * 100, 0)} of ceiling`}
+          hint={`${formatPercent((remaining / Math.max(totalAllocated, 1)) * 100, 0)} of budget left`}
         />
         <StatBlock
           label="Settled P&L"
@@ -144,7 +144,7 @@ export function DashboardShell() {
           hint={`${settledWins}W / ${settledLosses}L`}
         />
         <StatBlock
-          label="Bookie win rate"
+          label={`${AGENTS.bookie.name}'s win rate`}
           value={formatPercent(winRate, 1)}
           hint={`open exposure ${formatUsdt(openExposure)}`}
         />
@@ -152,24 +152,24 @@ export function DashboardShell() {
 
       <section id="sessions" className="mt-12">
         <SectionHeader
-          eyebrow="Active sessions"
-          title="Your allocations"
+          eyebrow="Active funding"
+          title="Your funding"
           action={
             <Link href="/allocate" className="font-mono text-[11px] uppercase tracking-[0.22em] text-violet-200 hover:text-violet-100">
-              + add session
+              + fund someone
             </Link>
           }
         />
         <div className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
           {ALLOCATIONS.length === 0 ? (
             <EmptyState
-              label="No allocations yet"
-              hint="Hire an agent and set a ceiling to get started."
+              label="No funding yet"
+              hint="Pick Emma, Jack, or Tom and set a spending limit to get started."
               className="border-0 rounded-none"
               action={
                 <Link href="/allocate">
                   <Button variant="violet" size="sm">
-                    Allocate
+                    Fund an agent
                   </Button>
                 </Link>
               }
@@ -195,7 +195,7 @@ export function DashboardShell() {
       <section className="mt-12 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <SectionHeader
-            eyebrow="Bookie · positions"
+            eyebrow={`${AGENTS.bookie.name} · predictions`}
             title="Open and settled"
             action={
               <Link href="/agents/bookie" className="font-mono text-[11px] uppercase tracking-[0.22em] text-violet-200 hover:text-violet-100">
@@ -257,7 +257,7 @@ export function DashboardShell() {
         </div>
 
         <div>
-          <SectionHeader eyebrow="Scout · vault" title="Your moments" />
+          <SectionHeader eyebrow={`${AGENTS.scout.name} · highlights`} title="Your moments" />
           <div className="mt-6 grid grid-cols-2 gap-3">
             {myMints.map((mint) => (
               <Link
@@ -283,7 +283,7 @@ export function DashboardShell() {
       </section>
 
       <section className="mt-12">
-        <SectionHeader eyebrow="Manager · last roster" title={`Matchday ${ROSTERS[0].matchday} · ${ROSTERS[0].profile}`} />
+        <SectionHeader eyebrow={`${AGENTS.manager.name} · last team`} title={`Matchday ${ROSTERS[0].matchday} · ${ROSTERS[0].profile}`} />
         <div className="mt-6 rounded-3xl border border-white/10 bg-[#0B0B0E] p-6">
           <div className="grid grid-cols-4 gap-3 md:grid-cols-6 lg:grid-cols-11">
             {ROSTERS[0].slots.map((slot) => (
@@ -318,7 +318,8 @@ export function DashboardShell() {
             </Link>
           }
         />
-        <div className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+          <ActivityTableHeader />
           {myActivity.map((item, i) => (
             <ActivityRow key={item.id} item={item} index={i} />
           ))}

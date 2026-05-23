@@ -3,23 +3,23 @@ import type { Agent, AgentSlug } from "@/types";
 export const AGENTS: Record<AgentSlug, Agent> = {
   scout: {
     slug: "scout",
-    name: "The Scout",
-    role: "Moments engine",
-    tagline: "Mints the moments that matter. Never the noise.",
+    name: "Emma",
+    role: "Saves great moments",
+    tagline: "Keeps the best bits from every match.",
     personaQuote:
-      "Forty-seven seconds. Brace. A goal worth holding onto.",
-    tracks: ["NFT"],
+      "That goal at 67 minutes — worth keeping forever.",
+    tracks: ["Moments"],
     watches:
-      "Live match feed — goals, cards, subs, big chances, upsets, late drama.",
+      "Goals, red cards, big saves, upsets, and anything people will still be talking about tomorrow.",
     acts:
-      "Mints commemorative ERC-721 attestations to assigned wallets when the cultural-weight threshold is met.",
+      "When something big happens, Emma saves it for you to keep.",
     strategy:
-      "Optimise for cultural weight, not all events. Avoid spam-minting. Significance ≥ 0.72 only.",
+      "Only save moments that actually matter. Skip the boring stuff.",
     capitalModel:
-      "Small OKB for gas per session. Mints are no-cost to users beyond gas.",
+      "You set a small spending limit. Emma only uses it to save moments — nothing else.",
     accentClass: "text-zinc-300",
     accentHex: "#9CA3AF",
-    glyph: "SCT",
+    glyph: "EMM",
     stats: {
       matchesActedOn: 18,
       totalDecisions: 47,
@@ -33,22 +33,22 @@ export const AGENTS: Record<AgentSlug, Agent> = {
   },
   bookie: {
     slug: "bookie",
-    name: "The Bookie",
-    role: "Micro-market maker",
-    tagline: "Edge or nothing. Settles in one block.",
-    personaQuote: "First-goal under 30. The book has it at 2.10. I have it at 1.78.",
-    tracks: ["Prediction", "Trading"],
+    name: "Jack",
+    role: "Places match bets",
+    tagline: "Bets on what happens next in the game.",
+    personaQuote: "First goal before half time? The odds look wrong — I'm in.",
+    tracks: ["Bets"],
     watches:
-      "Pre-match news, lineup announcements, social sentiment, in-match flow.",
+      "Team news, who's playing, how the game is going, and what usually happens next.",
     acts:
-      "Generates micro-markets (first goal < 30', > 4 corners H1, etc.), prices them, takes positions, settles per match.",
+      "Places simple bets during the match — like who scores first or how many corners there will be.",
     strategy:
-      "Take edge on under-priced micro-events only. Decline if implied edge < 4%. Bankroll Kelly-fractioned at 0.25×.",
+      "Only bet when the odds look off. Never spend more than the limit you set.",
     capitalModel:
-      "User assigns USDT. Bookie deploys via session key with per-match ceiling.",
+      "You choose how much Jack can spend per match. Jack stays inside that limit.",
     accentClass: "text-amber-300",
     accentHex: "#F59E0B",
-    glyph: "BKE",
+    glyph: "JCK",
     stats: {
       matchesActedOn: 16,
       totalDecisions: 312,
@@ -62,21 +62,21 @@ export const AGENTS: Record<AgentSlug, Agent> = {
   },
   manager: {
     slug: "manager",
-    name: "The Manager",
-    role: "Fantasy coach",
-    tagline: "Drafts the eleven. Defends the choice in one line.",
-    personaQuote: "ARG 10 stays on the bench. Form is for the prosecution, not the defence.",
-    tracks: ["Fantasy", "GameFi"],
-    watches: "Lineup form, opposition strength, fatigue, injury news.",
+    name: "Tom",
+    role: "Picks your players",
+    tagline: "Chooses which players to back each match.",
+    personaQuote: "Everyone picked the same star — I'm going the other way.",
+    tracks: ["Teams"],
+    watches: "Who's playing well, who's tired, and who tends to struggle against the other side.",
     acts:
-      "Drafts an 11-position roster, makes transfers per matchday. Three profiles: Aggressive, Defensive, Contrarian.",
+      "Picks 11 players before each match and swaps them when it makes sense.",
     strategy:
-      "Aggressive runs 3-4-3 in open groups. Defensive parks the bus when opp xG > 2.1. Contrarian inverts the consensus by ≥ 35%.",
+      "Three styles: play it safe, go bold, or do the opposite of what most people pick.",
     capitalModel:
-      "Tournament entry fee in USDT. Prize pool paid to top Managers at the final.",
+      "You pay an entry fee for the tournament. The best results share the prize pool at the end.",
     accentClass: "text-emerald-300",
     accentHex: "#10B981",
-    glyph: "MGR",
+    glyph: "TOM",
     stats: {
       matchesActedOn: 17,
       totalDecisions: 51,
@@ -91,3 +91,5 @@ export const AGENTS: Record<AgentSlug, Agent> = {
 };
 
 export const AGENT_LIST = [AGENTS.scout, AGENTS.bookie, AGENTS.manager] as const;
+
+export const AGENT_NAMES = AGENT_LIST.map((agent) => agent.name).join(" · ");

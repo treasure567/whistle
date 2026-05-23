@@ -8,35 +8,35 @@ import {
   BookOpen01Icon,
 } from "hugeicons-react";
 
-import { GlowCard } from "@/components/ui/glow-card";
+import { cn } from "@/lib/utils";
 
 const STEPS = [
   {
     n: "01",
     label: "Connect",
-    title: "Plug a wallet on X Layer",
-    body: "OKX Wallet, WalletConnect, or Coinbase. xdev never custodies funds — your capital sits in PositionManager.sol.",
+    title: "Link your wallet",
+    body: "Use OKX Wallet, WalletConnect, or Coinbase. Your money stays in your control — Whistle never holds it for you.",
     icon: Wallet01Icon,
   },
   {
     n: "02",
-    label: "Allocate",
-    title: "Pick an agent. Set a ceiling.",
-    body: "Choose Scout, Bookie, or Manager. Set the per-session and per-match cap. Sign once — a bounded session key issues from the AgentRegistry.",
+    label: "Fund",
+    title: "Pick Emma, Jack, or Tom",
+    body: "Choose who you want to fund and set a spending limit per match. Confirm once — that's all you need to do.",
     icon: Key01Icon,
   },
   {
     n: "03",
     label: "Watch",
-    title: "The agent acts onchain",
-    body: "Live match flow drives the decision loop. Every meaningful step — a mint, an open, a roster change — is a transaction. Every transaction settles in one block.",
+    title: "They work during the match",
+    body: "While the game plays, your helper saves moments, places bets, or picks players. Every move is logged.",
     icon: ChartHistogramIcon,
   },
   {
     n: "04",
-    label: "Read",
-    title: "Public, auditable track record",
-    body: "All decisions land on the activity ledger. Filter by agent, by match, by outcome. Top managers ride to the leaderboard. Bottom ones get fired.",
+    label: "Review",
+    title: "See everything they did",
+    body: "Check the activity feed anytime. Filter by person, match, or result. Top performers show up on the leaderboard.",
     icon: BookOpen01Icon,
   },
 ];
@@ -52,23 +52,29 @@ export function HowItWorks() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-            The loop
+            How it works
           </span>
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-            Allocate. <span className="font-serif italic font-normal text-violet-200">Agent acts.</span> Settle.
+            You fund. <span className="font-serif italic font-normal text-violet-200">They play.</span> You watch.
           </h2>
         </motion.div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((step, i) => (
-            <motion.div
-              key={step.n}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-15%" }}
-              transition={{ type: "spring", stiffness: 280, damping: 30, delay: i * 0.05 }}
-            >
-              <GlowCard className="relative flex h-full flex-col gap-5 rounded-2xl p-6">
+        <div className="mt-12 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+          <div className="grid sm:grid-cols-2">
+            {STEPS.map((step, i) => (
+              <motion.div
+                key={step.n}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-15%" }}
+                transition={{ type: "spring", stiffness: 280, damping: 30, delay: i * 0.05 }}
+                className={cn(
+                  "flex h-full flex-col gap-5 border-b border-white/10 p-6 transition-colors hover:bg-white/[0.02]",
+                  "sm:border-r sm:[&:nth-child(2n)]:border-r-0",
+                  "sm:[&:nth-child(n+3)]:border-b-0",
+                  "last:border-b-0",
+                )}
+              >
                 <div className="flex items-start justify-between">
                   <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
                     {step.n} · {step.label}
@@ -81,9 +87,9 @@ export function HowItWorks() {
                   </h3>
                   <p className="mt-2 text-[13px] leading-relaxed text-zinc-400">{step.body}</p>
                 </div>
-              </GlowCard>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

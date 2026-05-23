@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 
-interface XdevMarkProps {
+interface WhistleMarkProps {
   size?: number;
   className?: string;
 }
 
-export function XdevMark({ size = 28, className }: XdevMarkProps) {
+export function WhistleMark({ size = 28, className }: WhistleMarkProps) {
   return (
     <svg
       width={size}
@@ -27,20 +27,10 @@ export function XdevMark({ size = 28, className }: XdevMarkProps) {
   );
 }
 
-export function XdevWordmark({
-  className,
-  hideSlash = false,
-}: {
-  className?: string;
-  hideSlash?: boolean;
-}) {
+export function WhistleWordmark({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-baseline gap-2 font-mono tracking-tight", className)}>
-      <span className="text-foreground">xdev</span>
-      {!hideSlash ? <span aria-hidden className="text-zinc-600">/</span> : null}
-      {!hideSlash ? (
-        <span className="text-zinc-400 text-[0.85em] uppercase tracking-[0.18em]">agent stable</span>
-      ) : null}
+    <span className={cn("font-mono tracking-tight text-foreground", className)}>
+      whistle
     </span>
   );
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight01Icon } from "hugeicons-react";
 
-import { ActivityRow } from "@/components/ui/activity-row";
+import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Agent } from "@/types";
@@ -43,7 +43,7 @@ export function AgentActivity({ agent }: AgentActivityProps) {
           </Link>
         </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
           {items.length === 0 ? (
             <EmptyState
               label={`${agent.name} idle`}
@@ -51,7 +51,12 @@ export function AgentActivity({ agent }: AgentActivityProps) {
               className="border-0 rounded-none"
             />
           ) : (
-            items.map((item, i) => <ActivityRow key={item.id} item={item} index={i} />)
+            <>
+              <ActivityTableHeader />
+              {items.map((item, i) => (
+                <ActivityRow key={item.id} item={item} index={i} />
+              ))}
+            </>
           )}
         </div>
       </div>

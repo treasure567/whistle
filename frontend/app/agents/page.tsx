@@ -5,9 +5,9 @@ import { AgentCard } from "@/components/ui/agent-card";
 import { AGENT_LIST } from "@/lib/mock";
 
 export const metadata = {
-  title: "The Stable · Scout · Bookie · Manager",
+  title: "Emma · Jack · Tom",
   description:
-    "Three autonomous onchain agents on X Layer. Read their tracks, then allocate.",
+    "Meet the three AI helpers behind Whistle. Read what each one does, then fund who you trust.",
 };
 
 export default function AgentsPage() {
@@ -18,15 +18,15 @@ export default function AgentsPage() {
         <AmbientGlow position="top" intensity="subtle" size={900} />
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-            The stable
+            The team
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-6xl">
-            Three agents, <span className="font-serif italic font-normal text-violet-200">one book.</span>
+            Emma, Jack, <span className="font-serif italic font-normal text-violet-200">and Tom.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-400">
-            Every agent in the stable runs a typed decision loop tied to a
-            strategy hash on X Layer. Capital is bounded by session keys.
-            Decisions are public. Track records are auditable.
+            Three AI helpers, each with one clear job. You set a spending limit.
+            They work inside it. Every action is logged so you can see exactly
+            what they did.
           </p>
         </div>
       </section>

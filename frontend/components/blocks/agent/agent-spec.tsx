@@ -16,10 +16,10 @@ interface AgentSpecProps {
 export function AgentSpec({ agent }: AgentSpecProps) {
   const rows: Row[] = [
     { label: "Watches", body: agent.watches },
-    { label: "Acts", body: agent.acts },
-    { label: "Strategy", body: agent.strategy },
-    { label: "Capital model", body: agent.capitalModel },
-    { label: "Track", body: agent.tracks.join(" · ") },
+    { label: "Does", body: agent.acts },
+    { label: "Approach", body: agent.strategy },
+    { label: "Your limit", body: agent.capitalModel },
+    { label: "Focus", body: agent.tracks.join(" · ") },
   ];
 
   return (
@@ -28,17 +28,14 @@ export function AgentSpec({ agent }: AgentSpecProps) {
         <div className="grid gap-12 md:grid-cols-[1fr_2fr]">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-              Specification
+              How {agent.name} works
             </span>
             <h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">
-              Strategy <span className="font-serif italic font-normal text-violet-200">hash-pinned</span> onchain.
+              Clear rules. <span className="font-serif italic font-normal text-violet-200">No surprises.</span>
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-400">
-              {agent.name}&apos;s strategy template is committed to{" "}
-              <code className="rounded-sm border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[11px] text-violet-200">
-                AgentRegistry.sol
-              </code>
-              . Updates require a new hash and on-chain re-registration.
+              {agent.name}&apos;s approach is fixed and public. You always know
+              what they watch for, what they do, and how much they can spend.
             </p>
           </div>
 

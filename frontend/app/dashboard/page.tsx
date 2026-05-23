@@ -4,9 +4,9 @@ import { AmbientGlow } from "@/components/ui/ambient-glow";
 import { DashboardShell } from "@/components/blocks/dashboard/dashboard-shell";
 
 export const metadata = {
-  title: "Dashboard · your stable",
+  title: "Dashboard",
   description:
-    "Your active allocations, positions, mints, and rosters across xdev agents on X Layer.",
+    "Your funding, bets, saved moments, and player picks across Emma, Jack, and Tom.",
 };
 
 export default function DashboardPage() {

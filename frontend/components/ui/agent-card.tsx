@@ -42,7 +42,7 @@ export function AgentCard({ agent, variant = "default", href }: AgentCardProps) 
           <AgentAvatar agent={agent.slug} size={44} />
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-              {agent.glyph} · {agent.tracks.join(" · ")}
+              {agent.role}
             </p>
             <h3 className="text-lg font-semibold tracking-tight text-zinc-100">
               {agent.name}
@@ -71,7 +71,7 @@ export function AgentCard({ agent, variant = "default", href }: AgentCardProps) 
       <div className="relative mt-5 grid grid-cols-3 gap-3 border-t border-white/5 pt-4">
         <Stat label="Decisions" value={agent.stats.totalDecisions.toString()} />
         <Stat
-          label={agent.slug === "scout" ? "Mints" : "Volume"}
+          label={agent.slug === "scout" ? "Moments saved" : "Volume"}
           value={
             agent.slug === "scout"
               ? agent.stats.totalDecisions.toString()
@@ -79,7 +79,7 @@ export function AgentCard({ agent, variant = "default", href }: AgentCardProps) 
           }
         />
         <Stat
-          label={agent.slug === "scout" ? "Allocators" : "Win rate"}
+          label={agent.slug === "scout" ? "Backers" : "Win rate"}
           value={
             agent.slug === "scout"
               ? agent.stats.allocatorsCount.toString()

@@ -7,17 +7,17 @@ export const WALLET_CONNECT_PROJECT_ID =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 
 const APP_METADATA = {
-  name: "xdev — AI Agent Stable",
+  name: "whistle — AI helpers for football",
   description:
-    "Three onchain agents. Every World Cup match. Acting on X Layer.",
+    "Three AI helpers for World Cup matches. Emma, Jack, and Tom work while you watch.",
   url:
     typeof window !== "undefined"
       ? window.location.origin
-      : "https://xdev-agents.xyz",
+      : "https://whistle-agents.xyz",
   icons: [
     typeof window !== "undefined"
       ? `${window.location.origin}/icon.svg`
-      : "https://xdev-agents.xyz/icon.svg",
+      : "https://whistle-agents.xyz/icon.svg",
   ],
 };
 

@@ -5,9 +5,9 @@ import { ActivityFeed } from "@/components/blocks/activity/activity-feed";
 import type { AgentSlug } from "@/types";
 
 export const metadata = {
-  title: "Activity · onchain ledger",
+  title: "Activity feed",
   description:
-    "Every agent decision, every block, all matches. Filterable by agent and kind.",
+    "Everything Emma, Jack, and Tom do during matches — saved moments, bets, and player picks.",
 };
 
 const VALID: ReadonlyArray<AgentSlug> = ["scout", "bookie", "manager"];
@@ -31,15 +31,14 @@ export default async function ActivityPage({
         <AmbientGlow position="top" intensity="subtle" size={900} />
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-            Activity ledger
+            Activity feed
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-5xl">
-            Every decision. <span className="font-serif italic font-normal text-violet-200">Every block.</span>
+            Everything they did. <span className="font-serif italic font-normal text-violet-200">In one place.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">
-            The full book — every mint, position open, settlement, roster
-            change. Filter by agent, by kind. Click any tx hash to verify on
-            OKLink.
+            Saved highlights, predictions, and team picks from every match.
+            Filter by person or type. Tap any entry to see the full details.
           </p>
         </div>
       </section>

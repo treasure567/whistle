@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { Award01Icon, Award02Icon, Award03Icon } from "hugeicons-react";
 
 import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { Sparkline } from "@/components/ui/sparkline";
@@ -11,6 +12,12 @@ import { cn } from "@/lib/utils";
 import type { AgentSlug } from "@/types";
 
 type Filter = "all" | AgentSlug;
+
+const PODIUM_AWARDS = [
+  { Icon: Award01Icon, color: "text-amber-300" },
+  { Icon: Award02Icon, color: "text-zinc-300" },
+  { Icon: Award03Icon, color: "text-orange-400" },
+] as const;
 
 export function LeaderboardTable() {
   const [filter, setFilter] = useState<Filter>("all");
@@ -28,6 +35,7 @@ export function LeaderboardTable() {
       <div className="grid gap-4 md:grid-cols-3">
         {podium.map((row, i) => {
           const agent = AGENTS[row.agent];
+          const { Icon: AwardIcon, color: awardColor } = PODIUM_AWARDS[i];
           return (
             <motion.div
               key={row.rank}
@@ -45,14 +53,17 @@ export function LeaderboardTable() {
               )}
             >
               <div className="flex items-center justify-between">
-                <span
-                  className={cn(
-                    "font-mono text-[10px] uppercase tracking-[0.22em]",
-                    i === 0 ? "text-violet-200" : "text-zinc-500",
-                  )}
-                >
-                  Rank · {String(row.rank).padStart(2, "0")}
-                </span>
+                <div className="flex items-center gap-2">
+                  <AwardIcon size={i === 0 ? 22 : 18} className={awardColor} strokeWidth={1.5} />
+                  <span
+                    className={cn(
+                      "font-mono text-[10px] uppercase tracking-[0.22em]",
+                      i === 0 ? "text-violet-200" : "text-zinc-500",
+                    )}
+                  >
+                    Rank · {String(row.rank).padStart(2, "0")}
+                  </span>
+                </div>
                 <span
                   className={cn(
                     "font-mono text-[10px] uppercase tracking-[0.22em]",
@@ -79,7 +90,7 @@ export function LeaderboardTable() {
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-4">
-                <Cell label="P&L" value={row.agent === "scout" ? `${row.decisions} mints` : formatDelta(row.pnlUsdt)} />
+                <Cell label="P&L" value={row.agent === "scout" ? `${row.decisions} moments` : formatDelta(row.pnlUsdt)} />
                 <Cell label="Decisions" value={row.decisions.toString()} />
                 <Cell label="Win rate" value={formatPercent(row.winRatePct, 0)} />
               </div>
@@ -141,7 +152,7 @@ export function LeaderboardTable() {
               </div>
               <div className="col-span-2 font-mono text-sm tabular-nums text-zinc-200">
                 {row.agent === "scout"
-                  ? `${row.decisions} mints`
+                  ? `${row.decisions} moments`
                   : formatDelta(row.pnlUsdt)}
               </div>
               <div className="col-span-1 font-mono text-sm text-zinc-300 tabular-nums">{row.decisions}</div>

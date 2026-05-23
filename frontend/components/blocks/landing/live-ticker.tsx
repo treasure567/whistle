@@ -1,5 +1,6 @@
 "use client";
 
+import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { RECENT_ACTIVITY, AGENTS } from "@/lib/mock";
 import { truncateHash } from "@/lib/format";
 
@@ -26,7 +27,8 @@ export function LiveTicker() {
                 key={`${item.id}-${i}`}
                 className="flex shrink-0 items-center gap-3 border-r border-white/[0.04] px-6 py-1 font-mono text-[11px] uppercase tracking-[0.18em]"
               >
-                <span className="text-zinc-500">{agent.glyph}</span>
+                <AgentAvatar agent={item.agent} size={24} />
+                <span className="text-zinc-500">{agent.name}</span>
                 <span className="text-zinc-200">{item.headline}</span>
                 <span className="text-zinc-600">{item.matchLabel}</span>
                 <span className="text-violet-300">{truncateHash(item.txHash, 4)}</span>

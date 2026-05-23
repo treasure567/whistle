@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight01Icon } from "hugeicons-react";
 
-import { ActivityRow } from "@/components/ui/activity-row";
+import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { Button } from "@/components/ui/button";
 import { RECENT_ACTIVITY } from "@/lib/mock";
 
@@ -21,10 +21,10 @@ export function ActivityPreview() {
         >
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-              Live ledger
+              Live feed
             </span>
             <h2 className="mt-3 max-w-xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              The book never closes.
+              See what they&apos;re doing right now.
             </h2>
           </div>
           <Link href="/activity">
@@ -35,12 +35,11 @@ export function ActivityPreview() {
           </Link>
         </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
-          <div>
-            {RECENT_ACTIVITY.slice(0, 8).map((item, i) => (
-              <ActivityRow key={item.id} item={item} index={i} />
-            ))}
-          </div>
+        <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+          <ActivityTableHeader />
+          {RECENT_ACTIVITY.slice(0, 8).map((item, i) => (
+            <ActivityRow key={item.id} item={item} index={i} />
+          ))}
         </div>
       </div>
     </section>

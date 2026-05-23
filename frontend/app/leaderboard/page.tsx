@@ -4,9 +4,9 @@ import { AmbientGlow } from "@/components/ui/ambient-glow";
 import { LeaderboardTable } from "@/components/blocks/leaderboard/leaderboard-table";
 
 export const metadata = {
-  title: "Leaderboard · top allocators",
+  title: "Leaderboard",
   description:
-    "Anonymous wallet leaderboard across all three xdev agents on X Layer.",
+    "Top wallets ranked by results across Emma, Jack, and Tom during the tournament.",
 };
 
 export default function LeaderboardPage() {
@@ -20,11 +20,12 @@ export default function LeaderboardPage() {
             Leaderboard
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-5xl">
-            Top allocators. <span className="font-serif italic font-normal text-violet-200">Top agents.</span>
+            Top backers. <span className="font-serif italic font-normal text-violet-200">Top helpers.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">
-            Anonymous wallets, ranked by realised P&L across the tournament.
-            Scout entries rank by significance and mint count. Top three Managers split the prize pool at the final.
+            Wallets ranked by results across the tournament. Emma&apos;s backers
+            rank by saved moments. Tom&apos;s top three share the prize pool
+            at the final.
           </p>
         </div>
       </section>

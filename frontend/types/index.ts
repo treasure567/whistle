@@ -2,7 +2,7 @@ import type { Address, Hex } from "viem";
 
 export type AgentSlug = "scout" | "bookie" | "manager";
 
-export type AgentTrack = "NFT" | "Prediction" | "Trading" | "Fantasy" | "GameFi";
+export type AgentTrack = "Moments" | "Bets" | "Teams";
 
 export interface Agent {
   slug: AgentSlug;

@@ -12,12 +12,12 @@ import {
 import { Menu03Icon } from "hugeicons-react";
 
 import { ConnectButton } from "@/components/ui/connect-button";
-import { XdevMark } from "@/components/ui/xdev-mark";
+import { WhistleMark } from "@/components/ui/whistle-mark";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { label: "Agents", href: "/agents" },
-  { label: "Allocate", href: "/allocate" },
+  { label: "Fund", href: "/allocate" },
   { label: "Activity", href: "/activity" },
   { label: "Leaderboard", href: "/leaderboard" },
   { label: "Dashboard", href: "/dashboard" },
@@ -62,23 +62,9 @@ export function SiteNavbar() {
             scrolled ? "h-14 px-5 md:px-6" : "h-16 px-6 md:px-10",
           )}
         >
-          <Link href="/" className="group flex items-center gap-3" aria-label="xdev home">
-            <XdevMark size={28} className="text-violet-300" />
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono text-base tracking-tight text-zinc-100">xdev</span>
-              <span className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:inline">
-                agent stable
-              </span>
-            </div>
-            <span className="ml-1 hidden items-center gap-1.5 rounded-full border border-violet-500/25 bg-violet-500/[0.06] px-2.5 py-[3px] md:inline-flex">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-violet-400 opacity-70" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-violet-400" />
-              </span>
-              <span className="font-mono text-[9px] font-medium uppercase tracking-[0.22em] text-violet-200">
-                X Layer
-              </span>
-            </span>
+          <Link href="/" className="group flex items-center gap-3" aria-label="whistle home">
+            <WhistleMark size={28} className="text-violet-300" />
+            <span className="font-mono text-base tracking-tight text-zinc-100">whistle</span>
           </Link>
 
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">

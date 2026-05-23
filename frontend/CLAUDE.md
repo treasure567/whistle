@@ -1,4 +1,4 @@
-# CLAUDE.md — Whistle (xdev) Frontend
+# CLAUDE.md — Whistle Frontend
 
 > **The canonical agent contract is [`AGENTS.md`](./AGENTS.md). Read it first. Everything in this file is additive — Claude-specific guidance only.**
 
@@ -10,7 +10,7 @@ If anything below contradicts `AGENTS.md`, `AGENTS.md` wins. Same for the user's
 
 1. **`AGENTS.md`** (this folder) — project identity, stack, design procedures, motion contract, no-AI-flop checklist, file org. Non-negotiable.
 2. The user's global `~/.claude/CLAUDE.md` — coding rules (no comments, no `any`, pnpm, `nanoid`, react-icons/pi fallback, `@/` imports, port 7011, "Ask first, code later").
-3. The xdev PRD at `/Users/apple/Downloads/xdev_PRD.pdf` — product context: three agents (Scout / Bookie / Manager) on X Layer mainnet for the OKX X Cup hackathon, deadline May 28 12:00 UTC.
+3. The Whistle PRD at `/Users/apple/Downloads/xdev_PRD.pdf` — product context: three helpers (**Emma / Jack / Tom**, slugs `scout` / `bookie` / `manager`) for the OKX X Cup hackathon, deadline May 28 12:00 UTC. **All UI copy must use human names and plain language** — never "fantasy" in user-facing text. See AGENTS.md §0 Copy voice.
 
 ---
 
@@ -120,9 +120,9 @@ The codebase ships with Arbiter scaffolding (Etherlink + Reown). Touch these onl
 - `lib/chains.ts` — replace `etherlinkTestnet` with X Layer mainnet (chainId 196). Keep the export shape.
 - `lib/wagmi.ts` — swap `@reown/appkit-adapter-wagmi` for OKX Wallet SDK + wagmi connectors. WalletConnect v2 as fallback.
 - `components/providers/web3.tsx` — drop `createAppKit({...})` Reown init; replace with OKX SDK config + a minimal connect button.
-- `app/layout.tsx` — rewrite metadata + structured data for xdev/whistle; replace `arbiter-gamma.vercel.app` and Arbiter copy with the xdev brand (URL: `xdev-agents.xyz`).
-- `lib/contracts.ts` — replace with the five xdev contracts: `AgentRegistry`, `PositionManager`, `MomentNFT`, `FantasyEntry`, `SettlementOracle`.
-- Strings, OG images, icon files — rebrand to xdev.
+- `app/layout.tsx` — rewrite metadata + structured data for Whistle; replace `arbiter-gamma.vercel.app` and Arbiter copy with the Whistle brand (URL: `whistle-agents.xyz`).
+- `lib/contracts.ts` — replace with the five Whistle contracts: `AgentRegistry`, `PositionManager`, `MomentNFT`, `FantasyEntry`, `SettlementOracle`.
+- Strings, OG images, icon files — rebrand to Whistle.
 - Add: `nextjs-toploader` at root, View Transitions wrapper, Lenis stays as-is.
 
 When migrating, do it in **one focused PR per concern** — don't bundle "chain swap + rebrand + new pages" into a single commit.

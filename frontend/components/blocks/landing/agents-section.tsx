@@ -18,16 +18,15 @@ export function AgentsSection() {
         >
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-              The stable
+              The team
             </span>
             <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Three personalities. <span className="font-serif italic font-normal text-violet-200">One book.</span>
+              Three helpers. <span className="font-serif italic font-normal text-violet-200">One app.</span>
             </h2>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-zinc-400">
-            Each agent is a typed decision loop pinned to its strategy hash on
-            X Layer. Assign capital with a session key. The agent acts within
-            its ceiling, and never beyond.
+            Each person has a clear job. You set a spending limit. They work
+            inside it — and every action is logged so you can see what happened.
           </p>
         </motion.div>
 

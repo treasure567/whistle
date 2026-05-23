@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { ActivityRow } from "@/components/ui/activity-row";
+import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ACTIVITY, AGENT_LIST } from "@/lib/mock";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ type KindFilter = "all" | ActivityItem["kind"];
 
 const KIND_OPTIONS: ReadonlyArray<{ value: KindFilter; label: string }> = [
   { value: "all", label: "All kinds" },
-  { value: "mint", label: "Mint" },
+  { value: "mint", label: "Moments" },
   { value: "position-open", label: "Open" },
   { value: "position-close", label: "Close" },
   { value: "roster-set", label: "Roster" },
@@ -71,7 +71,7 @@ export function ActivityFeed({ initialAgent = "all" }: ActivityFeedProps) {
         ))}
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
         {filtered.length === 0 ? (
           <EmptyState
             label="No matching decisions"
@@ -79,7 +79,12 @@ export function ActivityFeed({ initialAgent = "all" }: ActivityFeedProps) {
             className="border-0 rounded-none"
           />
         ) : (
-          filtered.map((item, i) => <ActivityRow key={item.id} item={item} index={i} />)
+          <>
+            <ActivityTableHeader />
+            {filtered.map((item, i) => (
+              <ActivityRow key={item.id} item={item} index={i} />
+            ))}
+          </>
         )}
       </div>
     </div>
