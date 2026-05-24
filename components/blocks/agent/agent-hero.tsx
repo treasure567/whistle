@@ -6,6 +6,7 @@ import { ArrowRight01Icon } from "hugeicons-react";
 
 import { AmbientGlow } from "@/components/ui/ambient-glow";
 import { AgentAvatar } from "@/components/ui/agent-avatar";
+import { AgentCharacter3D } from "@/components/ui/agent-character-3d";
 import { Button } from "@/components/ui/button";
 import { Sparkline } from "@/components/ui/sparkline";
 import type { Agent } from "@/types";
@@ -102,8 +103,14 @@ export function AgentHero({ agent }: AgentHeroProps) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 280, damping: 30, delay: 0.2 }}
-          className="rounded-3xl border border-white/10 bg-[#0B0B0E] p-8 agent-tint-glow"
+          className="flex flex-col gap-6"
         >
+          <AgentCharacter3D
+            agent={agent.slug}
+            mode="single"
+            className="aspect-square w-full min-h-[280px] border border-white/10 md:min-h-[360px]"
+          />
+          <div className="rounded-3xl border border-white/10 bg-[#0B0B0E] p-8 agent-tint-glow">
           <div className="grid grid-cols-2 gap-y-6 gap-x-8">
             <Stat
               label="Decisions"
@@ -157,6 +164,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
                 height={70}
               />
             </div>
+          </div>
           </div>
         </motion.div>
       </div>

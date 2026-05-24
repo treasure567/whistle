@@ -333,3 +333,33 @@
 .animate-flicker {
   animation: flicker 3s ease-in-out infinite;
 }
+
+.pitch-lineup {
+  --rsl-pitch-line: rgba(255, 255, 255, 0.35);
+}
+
+.pitch-lineup--vertical .clgy323 {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.pitch-lineup--vertical .ty376cs {
+  padding: 0;
+}
+
+.pitch-lineup .n1nj9eua {
+  bottom: -18px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pitch-lineup .c1ae8d3x {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 600;
+}

@@ -44,7 +44,7 @@ export function MatchClock({ match, className, size = "md" }: MatchClockProps) {
       className={cn(
         "inline-flex items-center gap-2 rounded-full border font-mono uppercase tracking-[0.18em]",
         isLive
-          ? "border-red-500/30 bg-red-500/5 text-red-200"
+          ? "border-0 bg-transparent text-red-200"
           : match.phase === "scheduled" || match.phase === "kickoff-soon"
           ? "border-violet-500/30 bg-violet-500/5 text-violet-200"
           : "border-white/10 bg-white/5 text-zinc-400",

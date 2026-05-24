@@ -136,6 +136,99 @@ export interface MatchInfo {
   venue: string;
 }
 
+export type MatchEventType =
+  | "goal"
+  | "own-goal"
+  | "penalty"
+  | "yellow-card"
+  | "red-card"
+  | "substitution";
+
+export interface MatchEvent {
+  id: string;
+  matchId: string;
+  type: MatchEventType;
+  minute: number;
+  team: "home" | "away";
+  nation: string;
+  jersey: number;
+  detail?: string;
+}
+
+export interface LineupPlayer {
+  nation: string;
+  jersey: number;
+  row: "gk" | "df" | "cdm" | "cm" | "cam" | "fw";
+}
+
+export interface MatchLineup {
+  matchId: string;
+  homeFormation: string;
+  awayFormation: string;
+  home: ReadonlyArray<LineupPlayer>;
+  away: ReadonlyArray<LineupPlayer>;
+}
+
+export interface SquadPlayer {
+  id: number;
+  number: number | null;
+  position: string | null;
+  name: string;
+  age: number | null;
+  photo: string;
+}
+
+export interface Squad {
+  code: string;
+  country: string;
+  teamId: number;
+  teamName: string;
+  logo: string;
+  players: ReadonlyArray<SquadPlayer>;
+}
+
+export interface GroupStanding {
+  code: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  gf: number;
+  ga: number;
+  points: number;
+}
+
+export interface Group {
+  letter: string;
+  teams: ReadonlyArray<GroupStanding>;
+}
+
+export interface MatchStats {
+  matchId: string;
+  possession: { home: number; away: number };
+  shots: { home: number; away: number };
+  shotsOnTarget: { home: number; away: number };
+  corners: { home: number; away: number };
+  fouls: { home: number; away: number };
+  yellowCards: { home: number; away: number };
+  redCards: { home: number; away: number };
+  offsides: { home: number; away: number };
+  passes: { home: number; away: number };
+  passAccuracy: { home: number; away: number };
+}
+
+export interface TopScorer {
+  rank: number;
+  playerId: number;
+  name: string;
+  photo: string;
+  country: string;
+  countryFlag: string;
+  goals: number;
+  assists: number;
+  matches: number;
+}
+
 export interface Allocation {
   id: string;
   agent: AgentSlug;

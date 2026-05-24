@@ -16,7 +16,8 @@ import { WhistleMark } from "@/components/ui/whistle-mark";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { label: "Agents", href: "/agents" },
+  { label: "Matches", href: "/matches" },
+  { label: "Teams", href: "/teams" },
   { label: "Fund", href: "/allocate" },
   { label: "Activity", href: "/activity" },
   { label: "Leaderboard", href: "/leaderboard" },
