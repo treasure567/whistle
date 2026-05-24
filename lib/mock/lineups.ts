@@ -1,313 +1,169 @@
-import type { MatchEvent, MatchLineup, LineupPlayer } from "@/types";
+import { SQUADS } from "@/lib/mock/squads";
+import type {
+  LineupPlayer,
+  MatchEvent,
+  MatchEventType,
+  MatchLineup,
+  SquadPlayer,
+} from "@/types";
 
-function player(
-  nation: string,
-  jersey: number,
-  row: LineupPlayer["row"],
-): LineupPlayer {
-  return { nation, jersey, row };
+type Bucket = "Goalkeeper" | "Defender" | "Midfielder" | "Attacker";
+
+function bucket(pos: string | null): Bucket {
+  if (!pos) return "Midfielder";
+  if (pos.includes("Goalkeeper")) return "Goalkeeper";
+  if (pos.includes("Defender")) return "Defender";
+  if (pos.includes("Attacker") || pos.includes("Forward")) return "Attacker";
+  return "Midfielder";
 }
 
-export const MATCH_LINEUPS: ReadonlyArray<MatchLineup> = [
+function pickN(
+  nation: string,
+  group: Bucket,
+  n: number,
+  used: Set<number>,
+): SquadPlayer[] {
+  const squad = SQUADS[nation];
+  if (!squad) return [];
+  const sorted = [...squad.players]
+    .filter((p) => p.number != null && !used.has(p.number))
+    .sort((a, b) => (a.number ?? 999) - (b.number ?? 999));
+  const primary = sorted.filter((p) => bucket(p.position) === group);
+  const picked = primary.slice(0, n);
+  if (picked.length < n) {
+    const fallback = sorted.filter(
+      (p) => bucket(p.position) !== group && !picked.includes(p),
+    );
+    picked.push(...fallback.slice(0, n - picked.length));
+  }
+  for (const p of picked) if (p.number != null) used.add(p.number);
+  return picked;
+}
+
+function buildLineup(nation: string, formation: string): LineupPlayer[] {
+  const used = new Set<number>();
+  const out: LineupPlayer[] = [];
+
+  const push = (players: SquadPlayer[], row: LineupPlayer["row"]) => {
+    for (const p of players) {
+      if (p.number != null) out.push({ nation, jersey: p.number, row });
+    }
+  };
+
+  push(pickN(nation, "Goalkeeper", 1, used), "gk");
+  const parts = formation.split("-").map(Number);
+  push(pickN(nation, "Defender", parts[0] ?? 4, used), "df");
+
+  if (parts.length === 3) {
+    push(pickN(nation, "Midfielder", parts[1] ?? 3, used), "cm");
+    push(pickN(nation, "Attacker", parts[2] ?? 3, used), "fw");
+  } else if (parts.length === 4) {
+    push(pickN(nation, "Midfielder", parts[1] ?? 2, used), "cdm");
+    push(pickN(nation, "Midfielder", parts[2] ?? 3, used), "cam");
+    push(pickN(nation, "Attacker", parts[3] ?? 1, used), "fw");
+  } else {
+    push(pickN(nation, "Midfielder", 3, used), "cm");
+    push(pickN(nation, "Attacker", 3, used), "fw");
+  }
+
+  return out;
+}
+
+interface MatchFormation {
+  matchId: string;
+  home: { code: string; formation: string };
+  away: { code: string; formation: string };
+}
+
+const MATCH_FORMATIONS: ReadonlyArray<MatchFormation> = [
   {
     matchId: "ARG-MEX",
-    homeFormation: "4-3-3",
-    awayFormation: "4-4-2",
-    home: [
-      player("ARG", 23, "gk"),
-      player("ARG", 26, "df"),
-      player("ARG", 13, "df"),
-      player("ARG", 19, "df"),
-      player("ARG", 3, "df"),
-      player("ARG", 7, "cm"),
-      player("ARG", 24, "cm"),
-      player("ARG", 20, "cm"),
-      player("ARG", 11, "fw"),
-      player("ARG", 10, "fw"),
-      player("ARG", 9, "fw"),
-    ],
-    away: [
-      player("MEX", 13, "gk"),
-      player("MEX", 2, "df"),
-      player("MEX", 3, "df"),
-      player("MEX", 4, "df"),
-      player("MEX", 21, "df"),
-      player("MEX", 16, "cm"),
-      player("MEX", 18, "cm"),
-      player("MEX", 8, "cm"),
-      player("MEX", 10, "cm"),
-      player("MEX", 11, "fw"),
-      player("MEX", 7, "fw"),
-    ],
+    home: { code: "ARG", formation: "4-3-3" },
+    away: { code: "MEX", formation: "4-4-2" },
   },
   {
     matchId: "FRA-GER",
-    homeFormation: "4-2-3-1",
-    awayFormation: "4-3-3",
-    home: [
-      player("FRA", 1, "gk"),
-      player("FRA", 5, "df"),
-      player("FRA", 4, "df"),
-      player("FRA", 18, "df"),
-      player("FRA", 22, "df"),
-      player("FRA", 8, "cdm"),
-      player("FRA", 13, "cdm"),
-      player("FRA", 7, "cam"),
-      player("FRA", 10, "cam"),
-      player("FRA", 11, "cam"),
-      player("FRA", 9, "fw"),
-    ],
-    away: [
-      player("GER", 1, "gk"),
-      player("GER", 6, "df"),
-      player("GER", 15, "df"),
-      player("GER", 2, "df"),
-      player("GER", 3, "df"),
-      player("GER", 8, "cm"),
-      player("GER", 21, "cm"),
-      player("GER", 17, "cm"),
-      player("GER", 7, "fw"),
-      player("GER", 10, "fw"),
-      player("GER", 9, "fw"),
-    ],
+    home: { code: "FRA", formation: "4-2-3-1" },
+    away: { code: "GER", formation: "4-3-3" },
   },
   {
     matchId: "BRA-POR",
-    homeFormation: "4-3-3",
-    awayFormation: "4-4-2",
-    home: [
-      player("BRA", 1, "gk"),
-      player("BRA", 2, "df"),
-      player("BRA", 3, "df"),
-      player("BRA", 4, "df"),
-      player("BRA", 6, "df"),
-      player("BRA", 5, "cm"),
-      player("BRA", 8, "cm"),
-      player("BRA", 10, "cm"),
-      player("BRA", 11, "fw"),
-      player("BRA", 9, "fw"),
-      player("BRA", 7, "fw"),
-    ],
-    away: [
-      player("POR", 22, "gk"),
-      player("POR", 20, "df"),
-      player("POR", 4, "df"),
-      player("POR", 13, "df"),
-      player("POR", 5, "df"),
-      player("POR", 8, "cm"),
-      player("POR", 18, "cm"),
-      player("POR", 10, "cm"),
-      player("POR", 11, "cm"),
-      player("POR", 7, "fw"),
-      player("POR", 17, "fw"),
-    ],
+    home: { code: "BRA", formation: "4-3-3" },
+    away: { code: "POR", formation: "4-4-2" },
   },
   {
     matchId: "ESP-NED",
-    homeFormation: "4-3-3",
-    awayFormation: "3-5-2",
-    home: [
-      player("ESP", 23, "gk"),
-      player("ESP", 2, "df"),
-      player("ESP", 3, "df"),
-      player("ESP", 4, "df"),
-      player("ESP", 18, "df"),
-      player("ESP", 16, "cm"),
-      player("ESP", 8, "cm"),
-      player("ESP", 10, "cm"),
-      player("ESP", 11, "fw"),
-      player("ESP", 9, "fw"),
-      player("ESP", 7, "fw"),
-    ],
-    away: [
-      player("NED", 1, "gk"),
-      player("NED", 3, "df"),
-      player("NED", 4, "df"),
-      player("NED", 6, "df"),
-      player("NED", 8, "cm"),
-      player("NED", 14, "cm"),
-      player("NED", 15, "cm"),
-      player("NED", 11, "cm"),
-      player("NED", 10, "cm"),
-      player("NED", 9, "fw"),
-      player("NED", 7, "fw"),
-    ],
+    home: { code: "ESP", formation: "4-3-3" },
+    away: { code: "NED", formation: "3-5-2" },
   },
   {
     matchId: "ENG-USA",
-    homeFormation: "4-3-3",
-    awayFormation: "4-2-3-1",
-    home: [
-      player("ENG", 1, "gk"),
-      player("ENG", 2, "df"),
-      player("ENG", 5, "df"),
-      player("ENG", 6, "df"),
-      player("ENG", 3, "df"),
-      player("ENG", 4, "cm"),
-      player("ENG", 8, "cm"),
-      player("ENG", 10, "cm"),
-      player("ENG", 7, "fw"),
-      player("ENG", 9, "fw"),
-      player("ENG", 11, "fw"),
-    ],
-    away: [
-      player("USA", 1, "gk"),
-      player("USA", 2, "df"),
-      player("USA", 13, "df"),
-      player("USA", 5, "df"),
-      player("USA", 22, "df"),
-      player("USA", 6, "cdm"),
-      player("USA", 8, "cdm"),
-      player("USA", 10, "cam"),
-      player("USA", 7, "cam"),
-      player("USA", 11, "cam"),
-      player("USA", 9, "fw"),
-    ],
+    home: { code: "ENG", formation: "4-3-3" },
+    away: { code: "USA", formation: "4-2-3-1" },
   },
   {
     matchId: "JPN-BEL",
-    homeFormation: "4-2-3-1",
-    awayFormation: "3-4-3",
-    home: [
-      player("JPN", 1, "gk"),
-      player("JPN", 19, "df"),
-      player("JPN", 4, "df"),
-      player("JPN", 5, "df"),
-      player("JPN", 16, "df"),
-      player("JPN", 6, "cdm"),
-      player("JPN", 7, "cdm"),
-      player("JPN", 8, "cam"),
-      player("JPN", 10, "cam"),
-      player("JPN", 20, "cam"),
-      player("JPN", 9, "fw"),
-    ],
-    away: [
-      player("BEL", 1, "gk"),
-      player("BEL", 3, "df"),
-      player("BEL", 5, "df"),
-      player("BEL", 4, "df"),
-      player("BEL", 6, "cm"),
-      player("BEL", 8, "cm"),
-      player("BEL", 7, "cm"),
-      player("BEL", 10, "cm"),
-      player("BEL", 11, "fw"),
-      player("BEL", 9, "fw"),
-      player("BEL", 14, "fw"),
-    ],
+    home: { code: "JPN", formation: "4-2-3-1" },
+    away: { code: "BEL", formation: "3-4-3" },
   },
 ];
 
-export const MATCH_EVENTS: ReadonlyArray<MatchEvent> = [
-  {
-    id: "ev-001",
-    matchId: "ARG-MEX",
-    type: "goal",
-    minute: 23,
-    team: "home",
-    nation: "ARG",
-    jersey: 10,
-  },
-  {
-    id: "ev-002",
-    matchId: "ARG-MEX",
-    type: "goal",
-    minute: 41,
-    team: "away",
-    nation: "MEX",
-    jersey: 11,
-  },
-  {
-    id: "ev-003",
-    matchId: "ARG-MEX",
-    type: "yellow-card",
-    minute: 52,
-    team: "away",
-    nation: "MEX",
-    jersey: 4,
-  },
-  {
-    id: "ev-004",
-    matchId: "ARG-MEX",
-    type: "goal",
-    minute: 61,
-    team: "home",
-    nation: "ARG",
-    jersey: 9,
-  },
-  {
-    id: "ev-005",
-    matchId: "ARG-MEX",
-    type: "substitution",
-    minute: 64,
-    team: "home",
-    nation: "ARG",
-    jersey: 20,
-    detail: "ARG 14 on",
-  },
-  {
-    id: "ev-006",
-    matchId: "FRA-GER",
-    type: "goal",
-    minute: 18,
-    team: "home",
-    nation: "FRA",
-    jersey: 9,
-  },
-  {
-    id: "ev-007",
-    matchId: "FRA-GER",
-    type: "goal",
-    minute: 38,
-    team: "away",
-    nation: "GER",
-    jersey: 10,
-  },
-  {
-    id: "ev-008",
-    matchId: "ESP-NED",
-    type: "goal",
-    minute: 12,
-    team: "home",
-    nation: "ESP",
-    jersey: 9,
-  },
-  {
-    id: "ev-009",
-    matchId: "ESP-NED",
-    type: "goal",
-    minute: 34,
-    team: "away",
-    nation: "NED",
-    jersey: 10,
-  },
-  {
-    id: "ev-010",
-    matchId: "ESP-NED",
-    type: "goal",
-    minute: 55,
-    team: "home",
-    nation: "ESP",
-    jersey: 11,
-  },
-  {
-    id: "ev-011",
-    matchId: "ESP-NED",
-    type: "goal",
-    minute: 71,
-    team: "home",
-    nation: "ESP",
-    jersey: 7,
-  },
-  {
-    id: "ev-012",
-    matchId: "ESP-NED",
-    type: "goal",
-    minute: 82,
-    team: "away",
-    nation: "NED",
-    jersey: 7,
-  },
+export const MATCH_LINEUPS: ReadonlyArray<MatchLineup> = MATCH_FORMATIONS.map(
+  (m) => ({
+    matchId: m.matchId,
+    homeFormation: m.home.formation,
+    awayFormation: m.away.formation,
+    home: buildLineup(m.home.code, m.home.formation),
+    away: buildLineup(m.away.code, m.away.formation),
+  }),
+);
+
+interface EventSeed {
+  id: string;
+  matchId: string;
+  type: MatchEventType;
+  minute: number;
+  team: "home" | "away";
+  slot: number;
+  detail?: string;
+}
+
+const EVENT_SEEDS: ReadonlyArray<EventSeed> = [
+  { id: "ev-001", matchId: "ARG-MEX", type: "goal", minute: 23, team: "home", slot: 9 },
+  { id: "ev-002", matchId: "ARG-MEX", type: "goal", minute: 41, team: "away", slot: 10 },
+  { id: "ev-003", matchId: "ARG-MEX", type: "yellow-card", minute: 52, team: "away", slot: 3 },
+  { id: "ev-004", matchId: "ARG-MEX", type: "goal", minute: 61, team: "home", slot: 10 },
+  { id: "ev-005", matchId: "ARG-MEX", type: "substitution", minute: 64, team: "home", slot: 7, detail: "Tactical sub" },
+  { id: "ev-006", matchId: "FRA-GER", type: "goal", minute: 18, team: "home", slot: 10 },
+  { id: "ev-007", matchId: "FRA-GER", type: "goal", minute: 38, team: "away", slot: 9 },
+  { id: "ev-008", matchId: "ESP-NED", type: "goal", minute: 12, team: "home", slot: 10 },
+  { id: "ev-009", matchId: "ESP-NED", type: "goal", minute: 34, team: "away", slot: 10 },
+  { id: "ev-010", matchId: "ESP-NED", type: "goal", minute: 55, team: "home", slot: 9 },
+  { id: "ev-011", matchId: "ESP-NED", type: "goal", minute: 71, team: "home", slot: 8 },
+  { id: "ev-012", matchId: "ESP-NED", type: "goal", minute: 82, team: "away", slot: 9 },
 ];
+
+function resolveEvent(seed: EventSeed): MatchEvent | null {
+  const lineup = MATCH_LINEUPS.find((l) => l.matchId === seed.matchId);
+  if (!lineup) return null;
+  const players = seed.team === "home" ? lineup.home : lineup.away;
+  const player = players[Math.min(seed.slot, players.length - 1)];
+  if (!player) return null;
+  return {
+    id: seed.id,
+    matchId: seed.matchId,
+    type: seed.type,
+    minute: seed.minute,
+    team: seed.team,
+    nation: player.nation,
+    jersey: player.jersey,
+    detail: seed.detail,
+  };
+}
+
+export const MATCH_EVENTS: ReadonlyArray<MatchEvent> = EVENT_SEEDS.map(
+  resolveEvent,
+).filter((e): e is MatchEvent => e !== null);
 
 export function lineupByMatchId(id: string): MatchLineup | undefined {
   return MATCH_LINEUPS.find((l) => l.matchId === id);
