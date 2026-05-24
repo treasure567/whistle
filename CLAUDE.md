@@ -129,6 +129,7 @@ When migrating, do it in **one focused PR per concern** — don't bundle "chain 
 
 ---
 
+
 ## 7. If you remember nothing else
 
 1. **`AGENTS.md` is law.** Read it.
