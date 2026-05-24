@@ -4,7 +4,7 @@
 
 If anything below contradicts `AGENTS.md`, `AGENTS.md` wins. Same for the user's global `~/.claude/CLAUDE.md`: project-specific rules in `AGENTS.md` override global rules where they overlap.
 
----
+----
 
 ## 1. Read this in order
 
