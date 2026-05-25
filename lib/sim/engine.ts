@@ -3,10 +3,12 @@ export type SimEventType =
   | "goal"
   | "chance"
   | "save"
+  | "corner"
   | "yellow"
   | "red"
   | "penalty-goal"
   | "penalty-miss"
+  | "sub"
   | "halftime"
   | "fulltime";
 
@@ -27,6 +29,22 @@ export type SimTeam = {
   players: string[];
 };
 
+export type MatchStats = {
+  possessionHome: number;
+  shotsHome: number;
+  shotsAway: number;
+  sotHome: number;
+  sotAway: number;
+  cornersHome: number;
+  cornersAway: number;
+  foulsHome: number;
+  foulsAway: number;
+  offsidesHome: number;
+  offsidesAway: number;
+};
+
+export type Motm = { player: string; side: "home" | "away"; rating: number };
+
 export type SimResult = {
   seed: number;
   home: SimTeam;
@@ -34,6 +52,8 @@ export type SimResult = {
   homeScore: number;
   awayScore: number;
   events: SimEvent[];
+  stats: MatchStats;
+  motm: Motm | null;
 };
 
 export type MatchOdds = { home: number; draw: number; away: number };
@@ -95,12 +115,31 @@ export function simulateMatch(home: SimTeam, away: SimTeam, seedInput?: number):
   let homeScore = 0;
   let awayScore = 0;
   let halftimeDone = false;
+  let shotsH = 0;
+  let shotsA = 0;
+  let sotH = 0;
+  let sotA = 0;
+  let cornersH = 0;
+  let cornersA = 0;
+  const goals = new Map<string, { count: number; side: "home" | "away" }>();
 
   const scoreFor = (side: "home" | "away", minute: number, kind: "open" | "penalty") => {
     const team = side === "home" ? home : away;
     const scorer = pickScorer(team.players, rand);
-    if (side === "home") homeScore += 1;
-    else awayScore += 1;
+    if (side === "home") {
+      homeScore += 1;
+      shotsH += 1;
+      sotH += 1;
+    } else {
+      awayScore += 1;
+      shotsA += 1;
+      sotA += 1;
+    }
+    if (scorer) {
+      const g = goals.get(scorer) ?? { count: 0, side };
+      g.count += 1;
+      goals.set(scorer, g);
+    }
     events.push({
       minute,
       type: kind === "penalty" ? "penalty-goal" : "goal",
@@ -119,11 +158,14 @@ export function simulateMatch(home: SimTeam, away: SimTeam, seedInput?: number):
       halftimeDone = true;
     }
 
-    // penalties (rare)
     if (rand() < 0.0045) {
       const side: "home" | "away" = rand() < homeShare ? "home" : "away";
       const team = side === "home" ? home : away;
+      if (side === "home") shotsH += 1;
+      else shotsA += 1;
       if (rand() < 0.76) {
+        if (side === "home") sotH += 1;
+        else sotA += 1;
         scoreFor(side, m, "penalty");
       } else {
         const taker = pickScorer(team.players, rand);
@@ -131,16 +173,21 @@ export function simulateMatch(home: SimTeam, away: SimTeam, seedInput?: number):
       }
     }
 
-    // goals
     if (rand() < homeGoalP) scoreFor("home", m, "open");
     if (rand() < awayGoalP) scoreFor("away", m, "open");
 
-    // chances / saves (flavour)
     if (rand() < 0.16) {
       const side: "home" | "away" = rand() < homeShare ? "home" : "away";
       const team = side === "home" ? home : away;
       const player = pickScorer(team.players, rand);
       const saved = rand() < 0.5;
+      if (side === "home") {
+        shotsH += 1;
+        if (saved) sotH += 1;
+      } else {
+        shotsA += 1;
+        if (saved) sotA += 1;
+      }
       events.push({
         minute: m,
         type: saved ? "save" : "chance",
@@ -150,7 +197,15 @@ export function simulateMatch(home: SimTeam, away: SimTeam, seedInput?: number):
       });
     }
 
-    // cards
+    if (rand() < 0.07 * (homeShare + 0.45)) {
+      cornersH += 1;
+      if (rand() < 0.3) events.push({ minute: m, type: "corner", side: "home", text: `Corner, ${home.code}` });
+    }
+    if (rand() < 0.07 * (1 - homeShare + 0.45)) {
+      cornersA += 1;
+      if (rand() < 0.3) events.push({ minute: m, type: "corner", side: "away", text: `Corner, ${away.code}` });
+    }
+
     if (rand() < 0.035) {
       const side: "home" | "away" = rand() < 0.5 ? "home" : "away";
       const team = side === "home" ? home : away;
@@ -168,5 +223,33 @@ export function simulateMatch(home: SimTeam, away: SimTeam, seedInput?: number):
   events.push({ minute: 90, type: "fulltime", side: "neutral", text: `Full-time: ${home.code} ${homeScore}-${awayScore} ${away.code}` });
   events.sort((a, b) => a.minute - b.minute);
 
-  return { seed, home, away, homeScore, awayScore, events };
+  const stats: MatchStats = {
+    possessionHome: Math.max(35, Math.min(65, Math.round(50 + (homeShare - 0.5) * 36 + (rand() - 0.5) * 8))),
+    shotsHome: shotsH,
+    shotsAway: shotsA,
+    sotHome: sotH,
+    sotAway: sotA,
+    cornersHome: cornersH,
+    cornersAway: cornersA,
+    foulsHome: 7 + Math.floor(rand() * 9),
+    foulsAway: 7 + Math.floor(rand() * 9),
+    offsidesHome: Math.floor(rand() * 5),
+    offsidesAway: Math.floor(rand() * 5),
+  };
+
+  let motm: Motm | null = null;
+  let topGoals = 0;
+  for (const [player, g] of goals) {
+    if (g.count > topGoals) {
+      topGoals = g.count;
+      motm = { player, side: g.side, rating: Math.round((g.count >= 2 ? 9 + rand() * 0.6 : 8 + rand() * 0.7) * 10) / 10 };
+    }
+  }
+  if (!motm) {
+    const winner: "home" | "away" = homeScore >= awayScore ? "home" : "away";
+    const star = (winner === "home" ? home : away).players[0];
+    if (star) motm = { player: star, side: winner, rating: Math.round((7 + rand() * 0.7) * 10) / 10 };
+  }
+
+  return { seed, home, away, homeScore, awayScore, events, stats, motm };
 }

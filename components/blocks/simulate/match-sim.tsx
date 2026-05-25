@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { FootballIcon } from "hugeicons-react";
+import { ChampionIcon, FootballIcon } from "hugeicons-react";
 
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { Button } from "@/components/ui/button";
@@ -259,6 +259,8 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
         )}
       </div>
 
+      {done && result ? <MatchReport result={result} /> : null}
+
       {/* Live commentary */}
       <div className="flex items-center gap-2 border-b border-border px-4 py-2">
         <span className="dot-live" style={{ position: "static" }} />
@@ -307,6 +309,53 @@ const TONE_DOT: Record<SimComment["tone"], string> = {
   info: "bg-emerald-400",
   color: "bg-foreground/30",
 };
+
+function MatchReport({ result }: { result: SimResult }) {
+  const { stats, motm, home, away, events } = result;
+  const yc = (side: "home" | "away") => events.filter((e) => e.type === "yellow" && e.side === side).length;
+  const rows: [string, number, number][] = [
+    ["Shots", stats.shotsHome, stats.shotsAway],
+    ["On target", stats.sotHome, stats.sotAway],
+    ["Corners", stats.cornersHome, stats.cornersAway],
+    ["Fouls", stats.foulsHome, stats.foulsAway],
+    ["Offsides", stats.offsidesHome, stats.offsidesAway],
+    ["Yellow cards", yc("home"), yc("away")],
+  ];
+  return (
+    <div className="border-b border-border p-4">
+      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Match report</p>
+      <div className="mb-3">
+        <div className="mb-1 flex items-center justify-between font-mono text-[11px]">
+          <span className="text-foreground">{stats.possessionHome}%</span>
+          <span className="text-muted-foreground">Possession</span>
+          <span className="text-foreground">{100 - stats.possessionHome}%</span>
+        </div>
+        <div className="flex h-2 overflow-hidden rounded-full bg-foreground/10">
+          <div className="bg-violet-500" style={{ width: `${stats.possessionHome}%` }} />
+          <div className="bg-zinc-500" style={{ width: `${100 - stats.possessionHome}%` }} />
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        {rows.map(([label, h, a]) => (
+          <div key={label} className="grid grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2">
+            <span className="text-left font-mono text-[13px] tabular-nums text-foreground">{h}</span>
+            <span className="text-center font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
+            <span className="text-right font-mono text-[13px] tabular-nums text-foreground">{a}</span>
+          </div>
+        ))}
+      </div>
+      {motm ? (
+        <div className="mt-3 flex items-center gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.05] p-2.5">
+          <ChampionIcon size={14} className="text-amber-300" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-300">MOTM</span>
+          <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">{motm.player}</span>
+          <FlagOrb code={motm.side === "home" ? home.code : away.code} size={16} />
+          <span className="font-mono text-[12px] font-semibold tabular-nums text-amber-300">{motm.rating.toFixed(1)}</span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function CommentLine({ comment }: { comment: SimComment }) {
   return (

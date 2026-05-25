@@ -91,6 +91,20 @@ export function buildCommentary(result: SimResult): SimComment[] {
           ]),
         });
         break;
+      case "corner":
+        comments.push({
+          minute: e.minute,
+          tone: "color",
+          text: pick(rng, [`Corner to ${name(e.side)}, the box loads up.`, `${name(e.side)} swing one in from the corner.`]),
+        });
+        break;
+      case "sub":
+        comments.push({
+          minute: e.minute,
+          tone: "info",
+          text: e.text || `Substitution for ${name(e.side)}.`,
+        });
+        break;
       case "chance":
         comments.push({
           minute: e.minute,
