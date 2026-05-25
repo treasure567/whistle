@@ -18,6 +18,19 @@ type SimBackgroundValue = {
 const SimBackgroundContext = createContext<SimBackgroundValue | null>(null);
 const TICK_MS = 700;
 const MAX_BG = 4;
+const STORAGE_KEY = "whistle_bg_sims_v1";
+
+function readStored(): BgMatch[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? (parsed as BgMatch[]).slice(0, MAX_BG) : [];
+  } catch {
+    return [];
+  }
+}
 
 export function useSimBackground(): SimBackgroundValue {
   return useContext(SimBackgroundContext) ?? { matches: [], start: () => undefined, remove: () => undefined };
@@ -25,6 +38,31 @@ export function useSimBackground(): SimBackgroundValue {
 
 export function SimBackgroundProvider({ children }: { children: ReactNode }) {
   const [matches, setMatches] = useState<BgMatch[]>([]);
+  const [restored, setRestored] = useState(false);
+
+  // Restore after mount (not via lazy init) so server and first client render
+  // both start empty, avoiding a hydration mismatch on the dock. The storage is
+  // read synchronously (before the persist effect can clobber it) but applied in
+  // an async tick so we never call setState synchronously inside the effect.
+  useEffect(() => {
+    const stored = readStored();
+    const id = setTimeout(() => {
+      if (stored.length) setMatches(stored);
+      setRestored(true);
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
+
+  // Persist running matches so one survives a reload. Skipped until the initial
+  // restore has run so we don't clobber stored data with the empty start state.
+  useEffect(() => {
+    if (!restored || typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(matches));
+    } catch {
+      // storage full or unavailable: ignore
+    }
+  }, [matches, restored]);
 
   useEffect(() => {
     const t = setInterval(() => {

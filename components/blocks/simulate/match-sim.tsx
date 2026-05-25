@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "motion/react";
 import { ChampionIcon, FootballIcon, VolumeHighIcon, VolumeOffIcon } from "hugeicons-react";
 
@@ -25,6 +26,17 @@ const SPEEDS = [
 
 const GOAL_TYPES = new Set<SimEvent["type"]>(["goal", "penalty-goal"]);
 
+const StadiumPitch = dynamic(() => import("@/components/ui/stadium-pitch").then((m) => m.StadiumPitch), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-64 items-center justify-center font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+      Loading 3D pitch…
+    </div>
+  ),
+});
+
+const XI_433 = ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "FWD", "FWD", "FWD"].map((position) => ({ position }));
+
 function shortName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length < 2) return name;
@@ -39,12 +51,14 @@ export function MatchSim({
   bettable = false,
   coach,
   bench,
+  onResult,
 }: {
   home: SimTeam;
   away: SimTeam;
   bettable?: boolean;
   coach?: Coach;
   bench?: { home: string[]; away: string[] };
+  onResult?: (r: { homeScore: number; awayScore: number }) => void;
 }) {
   const [result, setResult] = useState<SimResult | null>(null);
   const [minute, setMinute] = useState(0);
@@ -57,6 +71,7 @@ export function MatchSim({
   const [subsMade, setSubsMade] = useState<{ off: string; on: string }[]>([]);
   const [subOpen, setSubOpen] = useState(false);
   const [pendingOff, setPendingOff] = useState<string | null>(null);
+  const [view, setView] = useState<"2d" | "3d">("2d");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { balance, setBalance } = useVirtualWallet();
@@ -105,6 +120,18 @@ export function MatchSim({
   useEffect(() => {
     if (justGoalKey) cheer();
   }, [justGoalKey, cheer]);
+
+  const reported = useRef(false);
+  useEffect(() => {
+    if (!done) {
+      reported.current = false;
+      return;
+    }
+    if (result && !reported.current) {
+      reported.current = true;
+      onResult?.({ homeScore: result.homeScore, awayScore: result.awayScore });
+    }
+  }, [done, result, onResult]);
 
   const availableBench = bench ? bench.home.filter((n) => !lineup.includes(n)) : [];
 
@@ -252,14 +279,37 @@ export function MatchSim({
         </AnimatePresence>
       </div>
 
-      {/* Momentum pitch */}
-      <div className="relative h-12 overflow-hidden border-b border-border bg-gradient-to-r from-violet-500/10 via-transparent to-zinc-400/10">
-        <div className="absolute inset-y-0 left-1/2 w-px bg-foreground/10" />
-        <motion.div
-          className="absolute top-1/2 size-3 -translate-y-1/2 rounded-full bg-white shadow"
-          animate={{ left: `${ballX}%` }}
-          transition={{ type: "spring", stiffness: 120, damping: 18 }}
-        />
+      {/* Pitch view */}
+      <div className="relative border-b border-border">
+        <div className="absolute right-2.5 top-2 z-10 flex gap-1">
+          {(["2d", "3d"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setView(v)}
+              className={cn(
+                "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
+                view === v
+                  ? "border-violet-400/50 bg-violet-500/[0.12] text-violet-100"
+                  : "border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+        {view === "3d" ? (
+          <StadiumPitch homeXI={XI_433} awayXI={XI_433} className="h-64 w-full bg-gradient-to-b from-emerald-950/40 to-transparent" />
+        ) : (
+          <div className="relative h-12 overflow-hidden bg-gradient-to-r from-violet-500/10 via-transparent to-zinc-400/10">
+            <div className="absolute inset-y-0 left-1/2 w-px bg-foreground/10" />
+            <motion.div
+              className="absolute top-1/2 size-3 -translate-y-1/2 rounded-full bg-white shadow"
+              animate={{ left: `${ballX}%` }}
+              transition={{ type: "spring", stiffness: 120, damping: 18 }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Gaffer's touchline advice */}

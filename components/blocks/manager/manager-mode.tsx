@@ -32,6 +32,7 @@ const DIFFICULTY = [
 type Difficulty = (typeof DIFFICULTY)[number]["id"];
 
 const SCORE_ORDER = ["FWD", "MID", "DEF", "GK"];
+const ROUNDS = ["Round of 16", "Quarter-final", "Semi-final", "Final"] as const;
 
 function bestXI(players: ManagerPlayer[], formation: string): ManagerPlayer[] {
   const shape = FORMATIONS[formation]!;
@@ -61,6 +62,9 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   const [xi, setXi] = useState<ManagerPlayer[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [opponent, setOpponent] = useState<string>("");
+  const [round, setRound] = useState(0);
+  const [outcome, setOutcome] = useState<null | "advanced" | "eliminated" | "champion">(null);
+  const [lastScore, setLastScore] = useState<{ h: number; a: number } | null>(null);
 
   const squad = useMemo(() => byCode.get(country)?.players ?? [], [byCode, country]);
   const bench = useMemo(() => {
@@ -91,7 +95,26 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     const others = teams.filter((t) => t.code !== country);
     const opp = others[Math.floor(Math.random() * others.length)];
     if (opp) setOpponent(opp.code);
+    setRound(0);
+    setOutcome(null);
+    setLastScore(null);
     setPhase("match");
+  }
+
+  function nextMatch() {
+    const others = teams.filter((t) => t.code !== country && t.code !== opponent);
+    const opp = others[Math.floor(Math.random() * others.length)];
+    if (opp) setOpponent(opp.code);
+    setRound((r) => r + 1);
+    setOutcome(null);
+    setLastScore(null);
+  }
+
+  function restartRun() {
+    setRound(0);
+    setOutcome(null);
+    setLastScore(null);
+    setPhase("squad");
   }
 
   const diff = DIFFICULTY.find((d) => d.id === difficulty)!;
@@ -105,11 +128,24 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
         return {
           name: oppTeam.name,
           code: oppTeam.code,
-          strength: Math.max(0.4, Math.min(0.98, strengthFromXI(oppXi) * diff.factor)),
+          strength: Math.max(0.4, Math.min(0.98, strengthFromXI(oppXi) * (diff.factor + round * 0.05))),
           players: scorerOrder(oppXi),
         };
       })()
     : null;
+  const homeStrength = homeSim?.strength ?? 0.5;
+  const awayStrength = awaySim?.strength ?? 0.5;
+  function handleResult({ homeScore, awayScore }: { homeScore: number; awayScore: number }) {
+    setLastScore({ h: homeScore, a: awayScore });
+    let through: boolean;
+    if (homeScore > awayScore) through = true;
+    else if (homeScore < awayScore) through = false;
+    else through = Math.random() < homeStrength / (homeStrength + awayStrength); // shootout
+    if (!through) setOutcome("eliminated");
+    else if (round >= ROUNDS.length - 1) setOutcome("champion");
+    else setOutcome("advanced");
+  }
+
   const homeBench = bench.map((p) => p.name);
   const awayBench = oppTeam
     ? (() => {
@@ -234,20 +270,75 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
             <ArrowLeft01Icon size={13} /> Back to squad
           </button>
           <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="mb-3 flex items-center justify-center gap-1.5">
+              {ROUNDS.map((r, i) => (
+                <span
+                  key={r}
+                  title={r}
+                  className={cn(
+                    "h-1.5 flex-1 rounded-full transition-colors",
+                    i < round ? "bg-emerald-500" : i === round ? "bg-violet-500" : "bg-foreground/15",
+                  )}
+                />
+              ))}
+            </div>
             <div className="flex items-center justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
               <span className="text-foreground">{homeSim.name}</span>
               <span>vs</span>
               <span className="text-foreground">{awaySim.name}</span>
+              <span className="rounded-full border border-violet-400/40 px-2 py-0.5 text-violet-500 dark:text-violet-200">{ROUNDS[round]}</span>
               <span className="rounded-full border border-border px-2 py-0.5">{difficulty}</span>
             </div>
           </div>
           <MatchSim
-            key={`${country}-${opponent}`}
+            key={`${country}-${opponent}-${round}`}
             home={homeSim}
             away={awaySim}
             coach={{ name: "Tom", side: "home" }}
             bench={{ home: homeBench, away: awayBench }}
+            onResult={handleResult}
           />
+          {outcome ? (
+            <div
+              className={cn(
+                "rounded-2xl border p-5 text-center",
+                outcome === "eliminated"
+                  ? "border-red-500/30 bg-red-500/[0.06]"
+                  : "border-emerald-500/30 bg-emerald-500/[0.06]",
+              )}
+            >
+              {lastScore ? (
+                <p className="mb-1 font-mono text-2xl font-semibold tabular-nums text-foreground">
+                  {lastScore.h}-{lastScore.a}
+                </p>
+              ) : null}
+              {outcome === "champion" ? (
+                <>
+                  <p className="text-lg font-semibold text-foreground">World Champions!</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{homeSim.name} have won the tournament. Some run, gaffer.</p>
+                  <Button variant="violet" size="lg" onClick={restartRun} className="mt-4">
+                    Start a new run
+                  </Button>
+                </>
+              ) : outcome === "eliminated" ? (
+                <>
+                  <p className="text-lg font-semibold text-foreground">Knocked out in the {ROUNDS[round]}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Heartbreak. Reshape the squad and go again.</p>
+                  <Button variant="violet" size="lg" onClick={restartRun} className="mt-4">
+                    Try again
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-semibold text-foreground">Through to the {ROUNDS[round + 1]}!</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{homeSim.name} march on. Next opponent awaits.</p>
+                  <Button variant="violet" size="lg" onClick={nextMatch} className="mt-4">
+                    <FootballIcon size={14} /> Play the {ROUNDS[round + 1]}
+                  </Button>
+                </>
+              )}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
