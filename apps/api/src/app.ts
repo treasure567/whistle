@@ -31,6 +31,7 @@ import { createPlayerController } from './controllers/player.controller.js';
 import { createFantasyController } from './controllers/fantasy.controller.js';
 import { createLeagueController } from './controllers/league.controller.js';
 import { createPredictionController } from './controllers/prediction.controller.js';
+import { createMatchReadController } from './controllers/match-read.controller.js';
 import { createRouter } from './routes/index.js';
 import { requireServiceAuth } from './http/service-auth.js';
 import { createOpenAiClient, type LlmClient } from '@whistle/agent-core';
@@ -103,6 +104,7 @@ export async function createApp(deps: AppDeps): Promise<Express> {
     fantasy: createFantasyController(playerRepo, fantasyRepo, leagueRepo, matchRepo, llm),
     league: createLeagueController(leagueRepo, fantasyRepo),
     prediction: createPredictionController(createPredictionRepo(deps.prisma)),
+    matchRead: createMatchReadController(llm),
     feed: deps.feedHandler ?? feedUnavailable,
   });
   app.use('/v1', limiter, requireServiceAuth(deps.serviceAuthSecret), router);

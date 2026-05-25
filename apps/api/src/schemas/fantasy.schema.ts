@@ -35,6 +35,25 @@ export const joinLeagueBody = z.object({
   accessToken: z.string().optional(),
 });
 
+export const matchReadBody = z.object({
+  home: z.string().min(1).max(60),
+  away: z.string().min(1).max(60),
+});
+
+export const matchChatBody = z.object({
+  home: z.string().min(1).max(60),
+  away: z.string().min(1).max(60),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().min(1).max(800),
+      }),
+    )
+    .min(1)
+    .max(20),
+});
+
 export const aiPickBody = z.object({
   countries: z.array(z.string().min(2).max(4)).max(48).optional(),
   strength: z.enum(['balanced', 'galacticos', 'value', 'attacking', 'defensive']).default('balanced'),
