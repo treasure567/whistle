@@ -79,7 +79,7 @@ export function SimulateView({ teams }: { teams: SimTeam[] }) {
         </div>
       </div>
 
-      <MatchSim key={`${homeCode}-${awayCode}`} home={home} away={away} />
+      <MatchSim key={`${homeCode}-${awayCode}`} home={home} away={away} bettable />
         </div>
       )}
     </div>

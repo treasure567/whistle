@@ -36,6 +36,22 @@ export type SimResult = {
   events: SimEvent[];
 };
 
+export type MatchOdds = { home: number; draw: number; away: number };
+
+/// Decimal odds derived from team strength, with a small bookmaker margin.
+export function matchOdds(homeStrength: number, awayStrength: number): MatchOdds {
+  const hs = Math.max(0.2, homeStrength) * 1.1;
+  const as = Math.max(0.2, awayStrength);
+  const homeShare = hs / (hs + as);
+  const drawP = 0.26;
+  const odd = (p: number) => Math.max(1.05, Math.round((1 / Math.max(0.02, p)) * 0.92 * 100) / 100);
+  return {
+    home: odd(homeShare * (1 - drawP)),
+    draw: odd(drawP),
+    away: odd((1 - homeShare) * (1 - drawP)),
+  };
+}
+
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
