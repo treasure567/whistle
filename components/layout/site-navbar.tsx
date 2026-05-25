@@ -66,12 +66,12 @@ export function SiteNavbar() {
             scrolled ? "h-14 px-5 md:px-6" : "h-16 px-6 md:px-10",
           )}
         >
-          <Link href="/" className="group flex items-center gap-3" aria-label="whistle home">
+          <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="whistle home">
             <WhistleMark size={28} className="text-violet-300" />
             <span className="font-mono text-base tracking-tight text-foreground">whistle</span>
           </Link>
 
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
             {NAV_LINKS.map((link) => {
               const isActive =
                 link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -92,14 +92,14 @@ export function SiteNavbar() {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <ThemeToggle />
             <ConnectButton compact />
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-foreground/5 text-foreground md:hidden"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-foreground/5 text-foreground lg:hidden"
             >
               <Menu03Icon className="size-4" />
             </button>
@@ -115,7 +115,7 @@ export function SiteNavbar() {
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -8, height: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 32 }}
-            className="mx-4 mt-2 w-[calc(100%-2rem)] max-w-[880px] overflow-hidden rounded-2xl border border-border bg-popover/95 backdrop-blur-2xl dark:border-white/10 dark:bg-[rgba(10,10,10,0.92)] md:hidden"
+            className="mx-4 mt-2 w-[calc(100%-2rem)] max-w-[880px] overflow-hidden rounded-2xl border border-border bg-popover/95 backdrop-blur-2xl dark:border-white/10 dark:bg-[rgba(10,10,10,0.92)] lg:hidden"
           >
             <div className="flex flex-col gap-1 p-5">
               {NAV_LINKS.map((link, i) => (
