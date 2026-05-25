@@ -90,10 +90,12 @@ export function formatMatchMinute(minute: number | null): string {
   return `${minute}'`;
 }
 
+const EXPLORER_BASE = "https://www.okx.com/web3/explorer/xlayer-test";
+
 export function explorerTxUrl(hash: Hex | string): string {
-  return `https://www.oklink.com/xlayer/tx/${hash}`;
+  return `${EXPLORER_BASE}/tx/${hash}`;
 }
 
 export function explorerAddressUrl(address: Address | string): string {
-  return `https://www.oklink.com/xlayer/address/${address}`;
+  return `${EXPLORER_BASE}/address/${address}`;
 }
