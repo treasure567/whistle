@@ -121,6 +121,21 @@ export const predictionSchema = z.object({
 export type PredictionRecord = z.infer<typeof predictionSchema>;
 export const predictionsSchema = z.array(predictionSchema);
 
+export const aiPickResultSchema = z.object({
+  picks: z.array(
+    z.object({
+      playerId: z.string(),
+      starter: z.boolean(),
+      captain: z.boolean(),
+    }),
+  ),
+  formation: z.string(),
+  costMillions: z.coerce.number(),
+  source: z.enum(["llm", "heuristic"]),
+  rationale: z.string().optional(),
+});
+export type AiPickResult = z.infer<typeof aiPickResultSchema>;
+
 export const agentLeaderboardRowSchema = z.object({
   kind: z.enum(["SCOUT", "BOOKIE", "MANAGER"]),
   name: z.string(),

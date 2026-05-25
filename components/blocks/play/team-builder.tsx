@@ -22,6 +22,7 @@ import {
 import { PlayerPool } from "./player-pool";
 import { SquadBoard } from "./squad-board";
 import { ManagerCoach } from "./manager-coach";
+import { AiPickPanel } from "./ai-pick-panel";
 
 export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
   const { address, isConnected } = useAccount();
@@ -86,6 +87,19 @@ export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
     setSlots((prev) => prev.map((slot) => ({ ...slot, captain: slot.player.id === id })));
   }
 
+  function applyAiPicks(picks: { playerId: string; starter: boolean; captain: boolean }[]) {
+    const byId = new Map(players.map((player) => [player.id, player]));
+    const next: SquadSlot[] = [];
+    for (const pick of picks) {
+      const player = byId.get(pick.playerId);
+      if (player) next.push({ player, starter: pick.starter, captain: pick.captain });
+    }
+    setSlots(next);
+    setResult(null);
+    setError(null);
+    setHydrated(true);
+  }
+
   async function submit() {
     if (!address) return;
     setBusy(true);
@@ -127,6 +141,7 @@ export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
   return (
     <>
       <ManagerCoach filled={slots.length} remaining={remaining} validation={validation} />
+      <AiPickPanel players={players} onDraft={applyAiPicks} />
       <div className="mx-auto grid max-w-7xl items-start gap-6 px-6 md:grid-cols-[1.4fr_1fr] md:px-10">
       <PlayerPool
         players={players}

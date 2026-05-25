@@ -1,10 +1,30 @@
 import { apiGet, apiPost, apiPut } from "./client";
 import {
+  aiPickResultSchema,
   createTeamResultSchema,
   fantasyTeamSchema,
+  type AiPickResult,
   type CreateTeamResult,
   type FantasyTeamRecord,
 } from "./schemas";
+
+export type AiPickStrength =
+  | "balanced"
+  | "galacticos"
+  | "value"
+  | "attacking"
+  | "defensive";
+
+export type AiPickInput = {
+  countries?: string[];
+  strength: AiPickStrength;
+  budget?: number;
+  formation?: string;
+};
+
+export function aiPickSquad(input: AiPickInput): Promise<AiPickResult> {
+  return apiPost("/fantasy/ai-pick", input, aiPickResultSchema);
+}
 
 export type TeamPickInput = {
   playerId: string;
