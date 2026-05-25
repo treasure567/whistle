@@ -18,24 +18,96 @@ import { useFundAgent, phaseLabel } from "@/hooks/use-fund-agent";
 import { cn } from "@/lib/utils";
 import type { MatchInfo } from "@/types";
 
-type MarketKind = "result" | "yesno" | "teams";
 type Side = { id: string; label: string };
+type Category = "Match" | "Goals" | "Corners" | "Cards" | "Fouls" | "Specials";
+type Market = {
+  id: string;
+  label: string;
+  category: Category;
+  sides: (home: string, away: string) => Side[];
+};
 
-const MARKETS: ReadonlyArray<{ id: string; label: string; kind: MarketKind }> = [
-  { id: "result", label: "Match result", kind: "result" },
-  { id: "btts", label: "Both teams to score", kind: "yesno" },
-  { id: "over25", label: "Over 2.5 goals", kind: "yesno" },
-  { id: "firstgoal", label: "First team to score", kind: "teams" },
+const yesNo = (): Side[] => [
+  { id: "yes", label: "Yes" },
+  { id: "no", label: "No" },
+];
+const overUnder = (line: string) => (): Side[] => [
+  { id: "over", label: `Over ${line}` },
+  { id: "under", label: `Under ${line}` },
+];
+const wdl = (home: string, away: string): Side[] => [
+  { id: "home", label: home },
+  { id: "draw", label: "Draw" },
+  { id: "away", label: away },
+];
+const teams = (home: string, away: string): Side[] => [
+  { id: "home", label: home },
+  { id: "away", label: away },
+];
+
+const CATEGORIES: ReadonlyArray<Category> = ["Match", "Goals", "Corners", "Cards", "Fouls", "Specials"];
+
+const MARKETS: ReadonlyArray<Market> = [
+  { id: "1x2", label: "Match result", category: "Match", sides: wdl },
+  {
+    id: "dc",
+    label: "Double chance",
+    category: "Match",
+    sides: (h, a) => [
+      { id: "1x", label: `${h} or draw` },
+      { id: "12", label: "Either team" },
+      { id: "x2", label: `Draw or ${a}` },
+    ],
+  },
+  { id: "dnb", label: "Draw no bet", category: "Match", sides: teams },
+  { id: "ht1x2", label: "Half-time result", category: "Match", sides: wdl },
+
+  { id: "btts", label: "Both teams to score", category: "Goals", sides: yesNo },
+  { id: "ou15", label: "Over/Under 1.5 goals", category: "Goals", sides: overUnder("1.5") },
+  { id: "ou25", label: "Over/Under 2.5 goals", category: "Goals", sides: overUnder("2.5") },
+  { id: "ou35", label: "Over/Under 3.5 goals", category: "Goals", sides: overUnder("3.5") },
+  {
+    id: "oddeven",
+    label: "Total goals odd/even",
+    category: "Goals",
+    sides: () => [
+      { id: "odd", label: "Odd" },
+      { id: "even", label: "Even" },
+    ],
+  },
+  {
+    id: "firstgoal",
+    label: "First team to score",
+    category: "Goals",
+    sides: (h, a) => [
+      { id: "home", label: h },
+      { id: "away", label: a },
+      { id: "none", label: "No goal" },
+    ],
+  },
+
+  { id: "corners85", label: "Total corners O/U 8.5", category: "Corners", sides: overUnder("8.5") },
+  { id: "corners95", label: "Total corners O/U 9.5", category: "Corners", sides: overUnder("9.5") },
+  { id: "corners105", label: "Total corners O/U 10.5", category: "Corners", sides: overUnder("10.5") },
+  { id: "mostcorners", label: "Most corners", category: "Corners", sides: wdl },
+
+  { id: "redcard", label: "Red card shown", category: "Cards", sides: yesNo },
+  { id: "cards35", label: "Total cards O/U 3.5", category: "Cards", sides: overUnder("3.5") },
+  { id: "cards45", label: "Total cards O/U 4.5", category: "Cards", sides: overUnder("4.5") },
+  { id: "mostcards", label: "Most cards", category: "Cards", sides: wdl },
+
+  { id: "fouls205", label: "Total fouls O/U 20.5", category: "Fouls", sides: overUnder("20.5") },
+  { id: "fouls245", label: "Total fouls O/U 24.5", category: "Fouls", sides: overUnder("24.5") },
+
+  { id: "penalty", label: "Penalty awarded", category: "Specials", sides: yesNo },
+  { id: "wintonil", label: "Win to nil", category: "Specials", sides: teams },
+  { id: "cleansheet", label: "Team keeps clean sheet", category: "Specials", sides: teams },
 ];
 
 const STAKES = [0, 5, 10, 25] as const;
 
-function sidesFor(kind: MarketKind, match: MatchInfo | undefined): Side[] {
-  if (kind === "yesno") return [{ id: "yes", label: "Yes" }, { id: "no", label: "No" }];
-  const home = match?.home ?? "Home";
-  const away = match?.away ?? "Away";
-  if (kind === "teams") return [{ id: "home", label: home }, { id: "away", label: away }];
-  return [{ id: "home", label: home }, { id: "draw", label: "Draw" }, { id: "away", label: away }];
+function marketsIn(category: Category): Market[] {
+  return MARKETS.filter((market) => market.category === category);
 }
 
 export function PredictView({ matches }: { matches: MatchInfo[] }) {
@@ -43,6 +115,7 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
   const { state: fundState, fund, reset: resetFund } = useFundAgent();
   const jack = AGENTS.bookie;
   const [matchId, setMatchId] = useState<string>(matches[0]?.id ?? "");
+  const [category, setCategory] = useState<Category>("Match");
   const [marketId, setMarketId] = useState<string>(MARKETS[0]!.id);
   const [sideId, setSideId] = useState<string>("home");
   const [stake, setStake] = useState<number>(0);
@@ -51,8 +124,10 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
   const [predictions, setPredictions] = useState<PredictionRecord[]>([]);
 
   const match = matches.find((item) => item.id === matchId);
+  const homeName = match?.home ?? "Home";
+  const awayName = match?.away ?? "Away";
   const market = MARKETS.find((item) => item.id === marketId) ?? MARKETS[0]!;
-  const sides = useMemo(() => sidesFor(market.kind, match), [market.kind, match]);
+  const sides = useMemo(() => market.sides(homeName, awayName), [market, homeName, awayName]);
 
   const fundBusy =
     fundState.phase === "checking" ||
@@ -80,7 +155,16 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
   function selectMarket(id: string) {
     setMarketId(id);
     const next = MARKETS.find((item) => item.id === id) ?? MARKETS[0]!;
-    setSideId(sidesFor(next.kind, match)[0]!.id);
+    setSideId(next.sides(homeName, awayName)[0]!.id);
+  }
+
+  function selectCategory(cat: Category) {
+    setCategory(cat);
+    const first = marketsIn(cat)[0];
+    if (first) {
+      setMarketId(first.id);
+      setSideId(first.sides(homeName, awayName)[0]!.id);
+    }
   }
 
   async function submit() {
@@ -160,9 +244,14 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
           </div>
         </Section>
 
-        <Section label="Market">
+        <Section label="Market type">
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {CATEGORIES.map((cat) => (
+              <Chip key={cat} active={category === cat} onClick={() => selectCategory(cat)} label={cat} />
+            ))}
+          </div>
           <div className="flex flex-wrap gap-1.5">
-            {MARKETS.map((item) => (
+            {marketsIn(category).map((item) => (
               <Chip key={item.id} active={marketId === item.id} onClick={() => selectMarket(item.id)} label={item.label} />
             ))}
           </div>
