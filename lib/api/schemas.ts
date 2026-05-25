@@ -120,3 +120,12 @@ export const predictionSchema = z.object({
 });
 export type PredictionRecord = z.infer<typeof predictionSchema>;
 export const predictionsSchema = z.array(predictionSchema);
+
+export const agentLeaderboardRowSchema = z.object({
+  kind: z.enum(["SCOUT", "BOOKIE", "MANAGER"]),
+  name: z.string(),
+  decisions: z.number(),
+  allocatedUsdt: z.string(),
+});
+export type AgentLeaderboardRow = z.infer<typeof agentLeaderboardRowSchema>;
+export const agentLeaderboardSchema = z.array(agentLeaderboardRowSchema);

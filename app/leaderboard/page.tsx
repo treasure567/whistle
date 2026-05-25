@@ -2,14 +2,15 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteNavbar } from "@/components/layout/site-navbar";
 import { AmbientGlow } from "@/components/ui/ambient-glow";
 import { LeaderboardTable } from "@/components/blocks/leaderboard/leaderboard-table";
+import { fetchAgentLeaderboard } from "@/lib/api/leaderboard";
 
 export const metadata = {
   title: "Leaderboard",
-  description:
-    "Top wallets ranked by results across Emma, Jack, and Tom during the tournament.",
+  description: "Emma, Jack, and Tom ranked by their on-chain record across the tournament.",
 };
 
-export default function LeaderboardPage() {
+export default async function LeaderboardPage() {
+  const { rows } = await fetchAgentLeaderboard();
   return (
     <main className="flex min-h-screen flex-col bg-background text-foreground">
       <SiteNavbar />
@@ -23,14 +24,13 @@ export default function LeaderboardPage() {
             Top backers. <span className="font-serif italic font-normal text-violet-200">Top helpers.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">
-            Wallets ranked by results across the tournament. Emma&apos;s backers
-            rank by saved moments. Tom&apos;s top three share the prize pool
-            at the final.
+            Each helper&apos;s live record across the tournament — how many decisions
+            they have made on-chain and how much they have been funded.
           </p>
         </div>
       </section>
       <section className="pb-24">
-        <LeaderboardTable />
+        <LeaderboardTable rows={rows} />
       </section>
       <SiteFooter />
     </main>
