@@ -12,11 +12,16 @@ type ContractName =
 type AddressBook = Record<ContractName, Address>;
 
 const X_LAYER_TESTNET_ADDRESSES: AddressBook = {
-  AgentRegistry: "0x777bBFafAD29cD92575de91FF8CCA59e85729b76",
-  PositionManager: "0x91bed7A3ce8940430646BD8cC4AB842a2A470B22",
-  MomentNFT: "0x5c2C8476ff37010f0A258D428490152EA05F0cC5",
-  FantasyEntry: "0xCf5959D698D813f1d82fa27eA9Cdd9911253d67C",
-  SettlementOracle: "0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4",
+  AgentRegistry: (process.env.NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS ??
+    "0x777bBFafAD29cD92575de91FF8CCA59e85729b76") as Address,
+  PositionManager: (process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS ??
+    "0x91bed7A3ce8940430646BD8cC4AB842a2A470B22") as Address,
+  MomentNFT: (process.env.NEXT_PUBLIC_MOMENT_NFT_ADDRESS ??
+    "0x5c2C8476ff37010f0A258D428490152EA05F0cC5") as Address,
+  FantasyEntry: (process.env.NEXT_PUBLIC_FANTASY_ENTRY_ADDRESS ??
+    "0xCf5959D698D813f1d82fa27eA9Cdd9911253d67C") as Address,
+  SettlementOracle: (process.env.NEXT_PUBLIC_SETTLEMENT_ORACLE_ADDRESS ??
+    "0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4") as Address,
 };
 
 export const CONTRACTS: Record<number, AddressBook> = {
