@@ -9,6 +9,8 @@ import { FlagOrb } from "@/components/ui/flag-orb";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { FlatPitch } from "@/components/blocks/manager/flat-pitch";
 import { MatchSim } from "@/components/blocks/simulate/match-sim";
+import { fetchManagerBrief } from "@/lib/api/manager";
+import type { ManagerBriefResult } from "@/lib/api/schemas";
 import type { SimTeam } from "@/lib/sim/engine";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +67,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   const [round, setRound] = useState(0);
   const [outcome, setOutcome] = useState<null | "advanced" | "eliminated" | "champion">(null);
   const [lastScore, setLastScore] = useState<{ h: number; a: number } | null>(null);
+  const [brief, setBrief] = useState<ManagerBriefResult | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
 
   const squad = useMemo(() => byCode.get(country)?.players ?? [], [byCode, country]);
   const bench = useMemo(() => {
@@ -72,9 +76,17 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     return squad.filter((p) => !ids.has(p.id));
   }, [squad, xi]);
 
+  function pickOpponent() {
+    const others = teams.filter((t) => t.code !== country);
+    const opp = others[Math.floor(Math.random() * others.length)];
+    if (opp) setOpponent(opp.code);
+  }
+
   function startSquad() {
     setXi(bestXI(squad, formation));
     setActiveId(null);
+    setBrief(null);
+    pickOpponent();
     setPhase("squad");
   }
 
@@ -92,9 +104,6 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   }
 
   function kickOff() {
-    const others = teams.filter((t) => t.code !== country);
-    const opp = others[Math.floor(Math.random() * others.length)];
-    if (opp) setOpponent(opp.code);
     setRound(0);
     setOutcome(null);
     setLastScore(null);
@@ -155,6 +164,27 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
       })()
     : [];
 
+  async function askTom() {
+    if (!homeSim || !awaySim || briefLoading) return;
+    setBriefLoading(true);
+    try {
+      const result = await fetchManagerBrief({
+        countryName: homeSim.name,
+        opponentName: awaySim.name,
+        formation,
+        ourStrength: homeSim.strength,
+        theirStrength: awaySim.strength,
+        xi: xi.map((p) => ({ name: p.name, position: p.position, price: p.price })),
+        bench: bench.map((p) => ({ name: p.name, position: p.position, price: p.price })),
+      });
+      setBrief(result);
+    } catch {
+      setBrief(null);
+    } finally {
+      setBriefLoading(false);
+    }
+  }
+
   if (teams.length < 2) {
     return (
       <div className="mx-auto max-w-3xl px-6 md:px-10">
@@ -198,7 +228,55 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
           </Button>
         </div>
       ) : phase === "squad" ? (
-        <div className="grid items-start gap-6 md:grid-cols-[1fr_1fr]">
+        <div className="flex flex-col gap-6">
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="flex items-center gap-2">
+                <span className="flex size-6 items-center justify-center rounded-full bg-emerald-500 font-mono text-[11px] font-semibold text-white">
+                  T
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{"Tom's briefing"}</span>
+              </span>
+              {brief ? (
+                <span className="rounded-full border border-emerald-400/40 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-300">
+                  {brief.verdict}
+                </span>
+              ) : null}
+            </div>
+            {awaySim ? (
+              <div className="mb-3 flex items-center gap-3 rounded-xl border border-border bg-foreground/[0.02] p-3">
+                <FlagOrb code={awaySim.code} size={34} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-foreground">Next up: {awaySim.name}</p>
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-foreground/[0.08]">
+                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round(awaySim.strength * 100)}%` }} />
+                  </div>
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">threat</span>
+              </div>
+            ) : null}
+            {brief ? (
+              <>
+                <p className="mb-2 text-[13px] leading-relaxed text-foreground">{brief.opponentRead}</p>
+                <ul className="flex flex-col gap-1.5">
+                  {brief.suggestions.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2 text-[13px] leading-relaxed text-muted-foreground">
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-400" />
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="text-[13px] text-muted-foreground">
+                Ask Tom to scout {awaySim?.name ?? "the opponent"} and suggest tweaks before kickoff.
+              </p>
+            )}
+            <Button variant="outline" size="sm" onClick={askTom} disabled={briefLoading} className="mt-3">
+              {briefLoading ? "Tom's watching tape…" : brief ? "Refresh read" : "Ask Tom for his read"}
+            </Button>
+          </div>
+          <div className="grid items-start gap-6 md:grid-cols-[1fr_1fr]">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <FlagOrb code={country} size={34} />
@@ -258,6 +336,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                 );
               })}
             </div>
+          </div>
           </div>
         </div>
       ) : homeSim && awaySim ? (

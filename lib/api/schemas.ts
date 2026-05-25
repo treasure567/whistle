@@ -184,6 +184,14 @@ export const simMatchSchema = z.object({
 });
 export type SimMatchPayload = z.infer<typeof simMatchSchema>;
 
+export const managerBriefSchema = z.object({
+  verdict: z.string(),
+  opponentRead: z.string(),
+  suggestions: z.array(z.string()).default([]),
+  source: z.enum(["llm", "heuristic"]),
+});
+export type ManagerBriefResult = z.infer<typeof managerBriefSchema>;
+
 export const slipPickSchema = z.object({
   matchExternalId: z.string(),
   homeCode: z.string(),
