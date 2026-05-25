@@ -175,11 +175,9 @@ function buildTool(): { name: string; description: string; inputSchema: JsonSche
       type: 'object',
       properties: {
         playerNums: { type: 'array', items: { type: 'integer' }, minItems: 15, maxItems: 15 },
-        starterNums: { type: 'array', items: { type: 'integer' }, minItems: 11, maxItems: 11 },
-        captainNum: { type: 'integer' },
         rationale: { type: 'string' },
       },
-      required: ['playerNums', 'starterNums', 'captainNum'],
+      required: ['playerNums'],
     } as JsonSchema,
   };
 }
@@ -199,6 +197,55 @@ function toIndices(value: unknown, max: number): number[] {
     .filter((n) => Number.isInteger(n) && n >= 1 && n <= max);
 }
 
+/// Coerces the LLM's chosen players into a legal, in-budget 15: trims/fills
+/// each position to the exact composition and swaps down on price until under
+/// budget, drawing top-ups from the candidate pool.
+function repairToValid(
+  chosen: PickPlayer[],
+  groups: Record<Position, PickPlayer[]>,
+  budget: number,
+): PickPlayer[] {
+  const used = new Set<string>();
+  const byPos: Record<Position, PickPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
+  for (const player of chosen) {
+    if (used.has(player.id)) continue;
+    if (byPos[player.position].length < COMPOSITION[player.position]) {
+      byPos[player.position].push(player);
+      used.add(player.id);
+    }
+  }
+  for (const position of POSITIONS) {
+    for (const cand of [...groups[position]].sort((a, b) => a.price - b.price)) {
+      if (byPos[position].length >= COMPOSITION[position]) break;
+      if (used.has(cand.id)) continue;
+      byPos[position].push(cand);
+      used.add(cand.id);
+    }
+  }
+
+  let cost = POSITIONS.reduce((sum, p) => sum + byPos[p].reduce((s, x) => s + x.price, 0), 0);
+  for (let guard = 0; cost > budget && guard < 500; guard += 1) {
+    let best: { pos: Position; out: PickPlayer; in: PickPlayer; save: number } | null = null;
+    for (const position of POSITIONS) {
+      const dearest = [...byPos[position]].sort((a, b) => b.price - a.price)[0];
+      if (!dearest) continue;
+      const cheaper = [...groups[position]]
+        .filter((c) => !used.has(c.id) && c.price < dearest.price)
+        .sort((a, b) => a.price - b.price)[0];
+      if (!cheaper) continue;
+      const save = dearest.price - cheaper.price;
+      if (!best || save > best.save) best = { pos: position, out: dearest, in: cheaper, save };
+    }
+    if (!best) break;
+    byPos[best.pos] = byPos[best.pos].map((p) => (p.id === best!.out.id ? best!.in : p));
+    used.delete(best.out.id);
+    used.add(best.in.id);
+    cost -= best.save;
+  }
+
+  return POSITIONS.flatMap((position) => byPos[position]);
+}
+
 async function llmPick(fullPool: PickPlayer[], criteria: AiPickCriteria, llm: LlmClient): Promise<AiPickResult | null> {
   const candidates = shortlist(fullPool, criteria.countries);
   // Number the candidates: LLMs reliably echo small integers, not opaque ids.
@@ -211,9 +258,8 @@ async function llmPick(fullPool: PickPlayer[], criteria: AiPickCriteria, llm: Ll
     'budget-aware squad and respond only through the submit_squad tool.';
   const prompt = [
     `Pick exactly 15 players by their number: 2 GK, 5 DEF, 5 MID, 3 FWD.`,
-    `The sum of the 15 prices must be <= ${criteria.budget}m (prices are shown).`,
-    `Then choose 11 starters (1 GK, at least 3 DEF, at least 1 FWD) and 1 captain (a starter).`,
-    `Return only the candidate NUMBERS (the integer before each name).`,
+    `Keep the sum of the 15 prices close to but under ${criteria.budget}m (prices are shown).`,
+    `Return only the candidate NUMBERS (the integer before each name) in playerNums.`,
     `Manager brief: style="${criteria.strength}"${criteria.formation ? `, formation ${criteria.formation}` : ''}.`,
     criteria.countries.length ? `Favour these countries: ${criteria.countries.join(', ')}.` : '',
     `Candidates:`,
@@ -223,48 +269,33 @@ async function llmPick(fullPool: PickPlayer[], criteria: AiPickCriteria, llm: Ll
     .join('\n');
 
   const call = await llm.decide({ system, prompt, tools: [buildTool()] });
-  const input = call.input as { playerNums?: unknown; starterNums?: unknown; captainNum?: unknown; rationale?: unknown };
+  const input = call.input as { playerNums?: unknown; rationale?: unknown };
 
   const playerNums = toIndices(input.playerNums, candidates.length);
-  const selected = Array.from(
+  const chosen = Array.from(
     new Map(playerNums.map((n) => candidates[n - 1]!).filter(Boolean).map((p) => [p.id, p])).values(),
   );
-  if (selected.length !== 15) return null;
+  // Need a meaningful selection from the model; otherwise let the heuristic run.
+  if (chosen.length < 8) return null;
 
-  const starterIds = new Set<string>();
-  for (const n of toIndices(input.starterNums, candidates.length)) {
-    const player = candidates[n - 1];
-    if (player && selected.some((p) => p.id === player.id)) starterIds.add(player.id);
-  }
-  const captainNum = typeof input.captainNum === 'number' ? input.captainNum : 0;
-  const captainId = candidates[captainNum - 1]?.id ?? '';
+  const groups = candidatePool(fullPool, criteria.countries);
+  const squad = repairToValid(chosen, groups, criteria.budget);
+  const rationale = typeof input.rationale === 'string' ? input.rationale.slice(0, 280) : undefined;
+  const result = assemble(squad, criteria, 'llm', rationale);
 
   const validation = validateSquad(
     { maxBudgetMillions: criteria.budget, squadSize: 15, startingSize: 11 },
-    selected.map((p) => ({
-      position: p.position,
-      priceMillions: p.price,
-      starter: starterIds.has(p.id),
-      captain: p.id === captainId,
-    })),
+    result.picks.map((pick) => {
+      const player = squad.find((p) => p.id === pick.playerId)!;
+      return {
+        position: player.position,
+        priceMillions: player.price,
+        starter: pick.starter,
+        captain: pick.captain,
+      };
+    }),
   );
-  if (!validation.valid) return null;
-
-  const counts: Record<Position, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 };
-  for (const p of selected) if (starterIds.has(p.id)) counts[p.position] += 1;
-  const rationale = typeof input.rationale === 'string' ? input.rationale.slice(0, 280) : undefined;
-
-  return {
-    picks: selected.map((p) => ({
-      playerId: p.id,
-      starter: starterIds.has(p.id),
-      captain: p.id === captainId,
-    })),
-    formation: `${counts.DEF}-${counts.MID}-${counts.FWD}`,
-    costMillions: validation.costMillions,
-    source: 'llm',
-    ...(rationale ? { rationale } : {}),
-  };
+  return validation.valid ? result : null;
 }
 
 export async function aiPick(
