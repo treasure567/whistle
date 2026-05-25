@@ -47,6 +47,18 @@ export const COUNTRY_FLAGS: Record<string, string> = {
   CIV: "🇨🇮",
   ALG: "🇩🇿",
   NZL: "🇳🇿",
+  RSA: "🇿🇦",
+  CZE: "🇨🇿",
+  SCO: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  CPV: "🇨🇻",
+  COD: "🇨🇩",
+  CUW: "🇨🇼",
+  HAI: "🇭🇹",
+  IRQ: "🇮🇶",
+  JOR: "🇯🇴",
+  UZB: "🇺🇿",
+  PAN: "🇵🇦",
+  BIH: "🇧🇦",
 };
 
 export function flagOf(code: string): string {
@@ -102,6 +114,18 @@ export const FLAG_SLUGS: Record<string, string> = {
   CIV: "ci",
   ALG: "dz",
   NZL: "nz",
+  RSA: "za",
+  CZE: "cz",
+  SCO: "gb-sct",
+  CPV: "cv",
+  COD: "cd",
+  CUW: "cw",
+  HAI: "ht",
+  IRQ: "iq",
+  JOR: "jo",
+  UZB: "uz",
+  PAN: "pa",
+  BIH: "ba",
 };
 
 type FlagWidth = 40 | 80 | 160 | 320 | 640 | 1280;
