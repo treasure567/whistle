@@ -87,10 +87,17 @@ export function FixturesBoard({ fixtures }: { fixtures: Fixture[] }) {
   );
 }
 
+function venueLabel(fixture: Fixture): string {
+  const venue = fixture.venue ?? "Venue TBD";
+  const city = fixture.city ?? "";
+  if (!city || venue.toLowerCase().includes(city.toLowerCase())) return venue;
+  return `${venue} · ${city}`;
+}
+
 function FixtureRow({ fixture }: { fixture: Fixture }) {
   const label = fixture.group ? `Group ${fixture.group.replace(/^Group\s*/i, "")}` : fixture.stage ?? "Knockout";
   return (
-    <div className="grid grid-cols-1 items-center gap-3 px-5 py-4 md:grid-cols-[7rem_1fr_auto]">
+    <div className="grid grid-cols-1 items-center gap-3 px-5 py-4 md:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,12.5rem)]">
       <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-1">
         <span className="font-mono text-sm tabular-nums text-zinc-100">
           {timeFmt.format(fixture.kickoffAt)}
@@ -100,23 +107,22 @@ function FixtureRow({ fixture }: { fixture: Fixture }) {
         </span>
       </div>
 
-      <div className="flex items-center justify-center gap-3">
-        <span className="flex flex-1 items-center justify-end gap-2 truncate text-right text-sm text-zinc-100">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+        <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm text-zinc-100">
           <span className="truncate">{teamName(fixture.homeCode)}</span>
           <FlagOrb code={fixture.homeCode} size={26} />
         </span>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">v</span>
-        <span className="flex flex-1 items-center gap-2 truncate text-sm text-zinc-100">
+        <span className="flex min-w-0 items-center gap-2 text-sm text-zinc-100">
           <FlagOrb code={fixture.awayCode} size={26} />
           <span className="truncate">{teamName(fixture.awayCode)}</span>
         </span>
       </div>
 
-      <div className="flex items-center gap-1.5 md:justify-end">
-        <Location01Icon size={13} className="text-zinc-600" />
+      <div className="flex min-w-0 items-center gap-1.5 md:justify-end">
+        <Location01Icon size={13} className="shrink-0 text-zinc-600" />
         <span className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-          {fixture.venue ?? "Venue TBD"}
-          {fixture.city ? ` · ${fixture.city}` : ""}
+          {venueLabel(fixture)}
         </span>
       </div>
     </div>

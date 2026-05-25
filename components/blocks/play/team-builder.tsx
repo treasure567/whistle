@@ -23,6 +23,7 @@ import { PlayerPool } from "./player-pool";
 import { SquadBoard } from "./squad-board";
 import { ManagerCoach } from "./manager-coach";
 import { AiPickPanel } from "./ai-pick-panel";
+import { PitchView } from "./pitch-view";
 
 export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
   const { address, isConnected } = useAccount();
@@ -142,6 +143,7 @@ export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
     <>
       <ManagerCoach filled={slots.length} remaining={remaining} validation={validation} />
       <AiPickPanel players={players} onDraft={applyAiPicks} />
+      {slots.some((slot) => slot.starter) ? <PitchView slots={slots} onSetCaptain={setCaptain} /> : null}
       <div className="mx-auto grid max-w-7xl items-start gap-6 px-6 md:grid-cols-[1.4fr_1fr] md:px-10">
       <PlayerPool
         players={players}
