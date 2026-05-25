@@ -1,6 +1,6 @@
 import type { ZodType } from "zod";
 
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL, serviceHeaders } from "./config";
 
 export class ApiError extends Error {
   readonly status?: number;
@@ -20,7 +20,7 @@ export async function apiGet<T>(path: string, schema: ZodType<T>): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
-      headers: { accept: "application/json" },
+      headers: { accept: "application/json", ...serviceHeaders() },
       cache: "no-store",
     });
   } catch {
@@ -56,7 +56,7 @@ async function apiSend<T>(
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       method,
-      headers: { accept: "application/json", "content-type": "application/json" },
+      headers: { accept: "application/json", "content-type": "application/json", ...serviceHeaders() },
       body: JSON.stringify(payload),
       cache: "no-store",
     });
