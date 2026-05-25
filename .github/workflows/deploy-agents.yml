@@ -2,7 +2,7 @@ name: Deploy agents
 
 on:
   push:
-    branches: [main]
+    branches: [backend]
     paths:
       - apps/agents/**
       - packages/types/**
@@ -89,8 +89,8 @@ jobs:
 
       - name: Upload tarball
         env:
-          SSHPASS: ${{ secrets.VPS_SSH_PASSWORD }}
-          VPS_USER: ${{ secrets.VPS_USER }}
+          SSHPASS: ${{ secrets.AGENTS_VPS_SSH_PASSWORD }}
+          VPS_USER: ${{ secrets.AGENTS_VPS_USER }}
           VPS_HOST: ${{ secrets.VPS_HOST }}
           RELEASE_ID: ${{ steps.meta.outputs.release_id }}
         run: |
@@ -103,19 +103,17 @@ jobs:
 
       - name: Release on VPS
         env:
-          SSHPASS: ${{ secrets.VPS_SSH_PASSWORD }}
-          VPS_USER: ${{ secrets.VPS_USER }}
+          SSHPASS: ${{ secrets.AGENTS_VPS_SSH_PASSWORD }}
+          VPS_USER: ${{ secrets.AGENTS_VPS_USER }}
           VPS_HOST: ${{ secrets.VPS_HOST }}
           RELEASE_ID: ${{ steps.meta.outputs.release_id }}
         run: |
           set -euo pipefail
           cat > remote.sh <<EOF
           set -euo pipefail
-          export NVM_DIR="\$HOME/.nvm"
-          [ -s "\$NVM_DIR/nvm.sh" ] && . "\$NVM_DIR/nvm.sh"
-          nvm install 24 --no-progress || true
-          nvm use 24 || true
-          npm install -g pm2@5.4.3
+          export PATH="\$HOME/.npm-global/bin:\$PATH"
+          npm config set prefix "\$HOME/.npm-global" >/dev/null 2>&1 || true
+          command -v pm2 >/dev/null 2>&1 || npm install -g pm2@5.4.3
 
           cd ~/${DEPLOY_PATH}
           mkdir -p releases/${RELEASE_ID}

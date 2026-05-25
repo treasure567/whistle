@@ -4,6 +4,10 @@ import type { MatchController } from '../controllers/match.controller.js';
 import type { AllocationController } from '../controllers/allocation.controller.js';
 import type { LeaderboardController } from '../controllers/leaderboard.controller.js';
 import type { ActivityController } from '../controllers/activity.controller.js';
+import type { PlayerController } from '../controllers/player.controller.js';
+import type { FantasyController } from '../controllers/fantasy.controller.js';
+import type { LeagueController } from '../controllers/league.controller.js';
+import type { PredictionController } from '../controllers/prediction.controller.js';
 
 export type RouterDeps = {
   agent: AgentController;
@@ -11,6 +15,10 @@ export type RouterDeps = {
   allocation: AllocationController;
   leaderboard: LeaderboardController;
   activity: ActivityController;
+  player: PlayerController;
+  fantasy: FantasyController;
+  league: LeagueController;
+  prediction: PredictionController;
   feed: RequestHandler;
 };
 
@@ -24,6 +32,18 @@ export function createRouter(deps: RouterDeps): Router {
   router.get('/allocations', deps.allocation.list);
   router.get('/leaderboard', deps.leaderboard.list);
   router.get('/activity', deps.activity.list);
+
+  router.get('/players', deps.player.list);
+  router.post('/fantasy/teams', deps.fantasy.createTeam);
+  router.get('/fantasy/teams', deps.fantasy.getTeam);
+  router.put('/fantasy/teams/:id', deps.fantasy.updateTeam);
+  router.post('/leagues', deps.league.create);
+  router.get('/leagues', deps.league.listPublic);
+  router.post('/leagues/:id/join', deps.league.join);
+  router.get('/leagues/:id/leaderboard', deps.league.leaderboard);
+  router.post('/predictions', deps.prediction.create);
+  router.get('/predictions', deps.prediction.list);
+
   router.get('/feed', deps.feed);
   return router;
 }

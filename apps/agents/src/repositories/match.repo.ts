@@ -7,6 +7,7 @@ export type LiveMatch = {
   homeCode: string;
   awayCode: string;
   status: string;
+  payload: unknown;
 };
 
 export type MatchRepository = {
@@ -61,7 +62,14 @@ export function createMatchRepo(prisma: PrismaClient): MatchRepository {
     async listLive() {
       return prisma.match.findMany({
         where: { status: { in: LIVE_STATUSES } },
-        select: { id: true, externalId: true, homeCode: true, awayCode: true, status: true },
+        select: {
+          id: true,
+          externalId: true,
+          homeCode: true,
+          awayCode: true,
+          status: true,
+          payload: true,
+        },
       });
     },
   };

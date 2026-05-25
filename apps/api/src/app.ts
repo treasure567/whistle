@@ -18,11 +18,19 @@ import { createMatchRepo } from './repositories/match.repo.js';
 import { createAllocationRepo } from './repositories/allocation.repo.js';
 import { createDecisionRepo } from './repositories/decision.repo.js';
 import { createLeaderboardRepo } from './repositories/leaderboard.repo.js';
+import { createPlayerRepo } from './repositories/player.repo.js';
+import { createFantasyRepo } from './repositories/fantasy.repo.js';
+import { createLeagueRepo } from './repositories/league.repo.js';
+import { createPredictionRepo } from './repositories/prediction.repo.js';
 import { createAgentController } from './controllers/agent.controller.js';
 import { createMatchController } from './controllers/match.controller.js';
 import { createAllocationController } from './controllers/allocation.controller.js';
 import { createLeaderboardController } from './controllers/leaderboard.controller.js';
 import { createActivityController } from './controllers/activity.controller.js';
+import { createPlayerController } from './controllers/player.controller.js';
+import { createFantasyController } from './controllers/fantasy.controller.js';
+import { createLeagueController } from './controllers/league.controller.js';
+import { createPredictionController } from './controllers/prediction.controller.js';
 import { createRouter } from './routes/index.js';
 
 export type AppDeps = {
@@ -65,15 +73,24 @@ export async function createApp(deps: AppDeps): Promise<Express> {
     legacyHeaders: false,
   });
 
+  const playerRepo = createPlayerRepo(deps.prisma);
+  const fantasyRepo = createFantasyRepo(deps.prisma);
+  const leagueRepo = createLeagueRepo(deps.prisma);
+  const matchRepo = createMatchRepo(deps.prisma);
+
   const router = createRouter({
     agent: createAgentController(createAgentRepo(deps.prisma)),
-    match: createMatchController(createMatchRepo(deps.prisma)),
+    match: createMatchController(matchRepo),
     allocation: createAllocationController(
       createAllocationRepo(deps.prisma),
       createAgentRepo(deps.prisma),
     ),
     leaderboard: createLeaderboardController(createLeaderboardRepo(deps.prisma)),
     activity: createActivityController(createDecisionRepo(deps.prisma)),
+    player: createPlayerController(playerRepo),
+    fantasy: createFantasyController(playerRepo, fantasyRepo, leagueRepo, matchRepo),
+    league: createLeagueController(leagueRepo, fantasyRepo),
+    prediction: createPredictionController(createPredictionRepo(deps.prisma)),
     feed: deps.feedHandler ?? feedUnavailable,
   });
   app.use('/v1', limiter, router);

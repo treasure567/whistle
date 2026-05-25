@@ -29,6 +29,7 @@ describe('match controller', () => {
     const repo: MatchRepository = {
       list: vi.fn(async () => [matchRow]),
       getByExternalId: vi.fn(),
+      nextKickoff: vi.fn(async () => null),
     };
     const res = mockRes();
     await createMatchController(repo).list(mockReq({ query: {} }), res);
@@ -40,6 +41,7 @@ describe('match controller', () => {
     const repo: MatchRepository = {
       list: vi.fn(),
       getByExternalId: vi.fn(async () => matchRow),
+      nextKickoff: vi.fn(async () => null),
     };
     const res = mockRes();
     await createMatchController(repo).getByExternalId(
@@ -54,6 +56,7 @@ describe('match controller', () => {
     const repo: MatchRepository = {
       list: vi.fn(),
       getByExternalId: vi.fn(async () => null),
+      nextKickoff: vi.fn(async () => null),
     };
     await expect(
       createMatchController(repo).getByExternalId(mockReq({ params: { externalId: 'x' } }), mockRes()),

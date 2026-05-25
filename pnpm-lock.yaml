@@ -233,6 +233,9 @@ importers:
       '@prisma/client':
         specifier: 6.3.0
         version: 6.3.0(prisma@6.3.0(typescript@5.8.2))(typescript@5.8.2)
+      '@whistle/scoring':
+        specifier: workspace:*
+        version: link:../scoring
     devDependencies:
       prisma:
         specifier: 6.3.0
@@ -297,6 +300,15 @@ importers:
       '@types/express':
         specifier: 5.0.0
         version: 5.0.0
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vitest:
+        specifier: 3.0.5
+        version: 3.0.5(@types/debug@4.1.13)(@types/node@24.0.0)(tsx@4.19.2)
+
+  packages/scoring:
+    devDependencies:
       typescript:
         specifier: 5.8.2
         version: 5.8.2

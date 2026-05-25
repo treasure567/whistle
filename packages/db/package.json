@@ -20,10 +20,15 @@
     "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev --schema=prisma/schema.prisma",
     "prisma:deploy": "prisma migrate deploy --schema=prisma/schema.prisma",
-    "seed": "tsx scripts/seed-agents.ts"
+    "seed": "tsx scripts/seed-agents.ts",
+    "seed:matches": "tsx scripts/seed-matches.ts",
+    "seed:players": "tsx scripts/seed-players.ts",
+    "seed:scoring": "tsx scripts/seed-scoring.ts",
+    "enrich:photos": "tsx scripts/enrich-photos.ts"
   },
   "dependencies": {
-    "@prisma/client": "6.3.0"
+    "@prisma/client": "6.3.0",
+    "@whistle/scoring": "workspace:*"
   },
   "devDependencies": {
     "prisma": "6.3.0",

@@ -3,6 +3,7 @@ import { AGENT_FEED_CHANNEL, type AgentActivityEvent } from '@whistle/types';
 import type { AgentLookup } from '../repositories/agent.repo.js';
 import type { DecisionRepository } from '../repositories/decision.repo.js';
 import type { MatchRepository } from '../repositories/match.repo.js';
+import type { IpfsPinner } from '../clients/ipfs.js';
 
 export type AgentPublisher = {
   publish(channel: string, message: string): Promise<void>;
@@ -15,6 +16,7 @@ export type AgentRunnerDeps = {
   decisions: DecisionRepository;
   matches: MatchRepository;
   publisher: AgentPublisher;
+  ipfs?: IpfsPinner;
 };
 
 export type TickResult = { decisions: number };
@@ -22,6 +24,14 @@ export type TickResult = { decisions: number };
 export type AgentRunner = {
   runTick(): Promise<TickResult>;
 };
+
+function matchNote(payload: unknown): string | null {
+  if (payload && typeof payload === 'object' && 'note' in payload) {
+    const note = (payload as Record<string, unknown>).note;
+    return typeof note === 'string' ? note : null;
+  }
+  return null;
+}
 
 function summarize(toolCall: LlmToolCall): string {
   const { input } = toolCall;
@@ -33,7 +43,7 @@ function summarize(toolCall: LlmToolCall): string {
 }
 
 export function createAgentRunner(deps: AgentRunnerDeps): AgentRunner {
-  const { llm, definitions, agents, decisions, matches, publisher } = deps;
+  const { llm, definitions, agents, decisions, matches, publisher, ipfs } = deps;
 
   return {
     async runTick() {
@@ -42,9 +52,12 @@ export function createAgentRunner(deps: AgentRunnerDeps): AgentRunner {
 
       let count = 0;
       for (const match of live) {
+        const note = matchNote(match.payload);
         const context = {
           matchExternalId: match.externalId,
-          summary: `${match.homeCode} versus ${match.awayCode}, status ${match.status}`,
+          summary: `${match.homeCode} versus ${match.awayCode}, status ${match.status}.${
+            note ? ` Latest: ${note}` : ''
+          }`,
         };
 
         for (const definition of definitions) {
@@ -65,12 +78,25 @@ export function createAgentRunner(deps: AgentRunnerDeps): AgentRunner {
 
           if (toolCall.tool === 'skip') continue;
 
+          let action: Record<string, unknown> = { ...toolCall };
+          if (ipfs && toolCall.tool === 'save_moment') {
+            try {
+              const pin = await ipfs.pinJson(`moment-${match.externalId}`, {
+                match: match.externalId,
+                ...toolCall.input,
+              });
+              action = { ...toolCall, ipfsUri: pin.uri };
+            } catch {
+              action = { ...toolCall };
+            }
+          }
+
           await decisions.record({
             agentId: agent.id,
             matchId: match.id,
             prompt: { system, prompt },
             response: toolCall,
-            action: toolCall,
+            action,
           });
           count += 1;
 

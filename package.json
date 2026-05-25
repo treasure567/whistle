@@ -23,6 +23,10 @@
     "db:migrate": "pnpm --filter @whistle/db prisma:migrate",
     "db:deploy": "pnpm --filter @whistle/db prisma:deploy",
     "db:seed": "pnpm --filter @whistle/db seed",
+    "db:seed-matches": "pnpm --filter @whistle/db seed:matches",
+    "db:seed-players": "pnpm --filter @whistle/db seed:players",
+    "db:score": "pnpm --filter @whistle/db seed:scoring",
+    "db:enrich-photos": "pnpm --filter @whistle/db enrich:photos",
     "cve:check": "pnpm audit --prod --audit-level=high"
   },
   "devDependencies": {

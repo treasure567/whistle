@@ -15,6 +15,8 @@ const schema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default('gpt-4o-mini'),
   OPENAI_BASE_URL: z.string().url().optional(),
+  PINATA_JWT: z.string().optional(),
+  PINATA_BASE_URL: z.string().url().optional(),
   AGENT_TICK_MS: z.coerce.number().int().positive().default(60_000),
   API_FOOTBALL_KEY: z.string().optional(),
   API_FOOTBALL_BASE_URL: z.string().url().default('https://v3.football.api-sports.io'),

@@ -14,6 +14,7 @@ import { createMatchIngestion, type MatchIngestion } from './services/match-inge
 import { createAgentRepo } from './repositories/agent.repo.js';
 import { createDecisionRepo } from './repositories/decision.repo.js';
 import { createAgentRunner, type AgentRunner } from './services/agent-runner.js';
+import { createIpfsPinner } from './clients/ipfs.js';
 import { AGENT_DEFINITIONS } from './agents/definitions.js';
 import {
   createAnthropicClient,
@@ -82,6 +83,12 @@ async function main() {
   }
 
   const llm = buildLlmClient(env);
+  const ipfs = env.PINATA_JWT
+    ? createIpfsPinner({
+        jwt: env.PINATA_JWT,
+        ...(env.PINATA_BASE_URL ? { baseUrl: env.PINATA_BASE_URL } : {}),
+      })
+    : undefined;
   let agentRunner: AgentRunner | undefined;
   if (llm) {
     agentRunner = createAgentRunner({
@@ -95,6 +102,7 @@ async function main() {
           await redis.publish(channel, message);
         },
       },
+      ...(ipfs ? { ipfs } : {}),
     });
   }
 

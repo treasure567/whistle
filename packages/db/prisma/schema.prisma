@@ -20,6 +20,24 @@ enum DecisionStatus {
   FAILED
 }
 
+enum PlayerPosition {
+  GK
+  DEF
+  MID
+  FWD
+}
+
+enum LeagueKind {
+  PUBLIC
+  PRIVATE
+}
+
+enum PredictionStatus {
+  OPEN
+  WON
+  LOST
+}
+
 model Agent {
   id           String    @id @default(cuid())
   kind         AgentKind @unique
@@ -88,4 +106,118 @@ model Decision {
   @@index([agentId, createdAt])
   @@index([txHash])
   @@map("decisions")
+}
+
+model Player {
+  id            String         @id @default(cuid())
+  externalId    String         @unique
+  name          String
+  position      PlayerPosition
+  nation        String
+  teamCode      String
+  priceMillions Decimal        @db.Decimal(6, 1)
+  photo         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  picks  FantasyPick[]
+  scores PlayerScore[]
+
+  @@index([position])
+  @@index([nation])
+  @@map("players")
+}
+
+model PlayerScore {
+  id       String @id @default(cuid())
+  playerId String
+  gameweek Int
+  points   Int    @default(0)
+  minutes  Int    @default(0)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, gameweek])
+  @@map("player_scores")
+}
+
+model FantasyTeam {
+  id           String   @id @default(cuid())
+  ownerAddress String
+  name         String
+  formation    String   @default("4-4-2")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  picks   FantasyPick[]
+  entries LeagueEntry[]
+
+  @@index([ownerAddress])
+  @@map("fantasy_teams")
+}
+
+model FantasyPick {
+  id          String  @id @default(cuid())
+  teamId      String
+  playerId    String
+  starter     Boolean @default(true)
+  captain     Boolean @default(false)
+  viceCaptain Boolean @default(false)
+  benchOrder  Int?
+
+  team   FantasyTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  player Player      @relation(fields: [playerId], references: [id])
+
+  @@unique([teamId, playerId])
+  @@index([teamId])
+  @@map("fantasy_picks")
+}
+
+model League {
+  id                      String     @id @default(cuid())
+  name                    String
+  kind                    LeagueKind @default(PUBLIC)
+  accessToken             String?    @unique
+  ownerAddress            String
+  maxBudgetMillions       Decimal    @db.Decimal(6, 1) @default(100.0)
+  squadSize               Int        @default(15)
+  startingSize            Int        @default(11)
+  transferDeadlineMinutes Int        @default(60)
+  createdAt               DateTime   @default(now())
+
+  entries LeagueEntry[]
+
+  @@index([kind])
+  @@map("leagues")
+}
+
+model LeagueEntry {
+  id       String   @id @default(cuid())
+  leagueId String
+  teamId   String
+  points   Int      @default(0)
+  joinedAt DateTime @default(now())
+
+  league League      @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  team   FantasyTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([leagueId, teamId])
+  @@index([leagueId])
+  @@map("league_entries")
+}
+
+model Prediction {
+  id              String           @id @default(cuid())
+  ownerAddress    String
+  matchExternalId String
+  market          String
+  side            String
+  stakeUsdt       Decimal          @db.Decimal(38, 0) @default(0)
+  status          PredictionStatus @default(OPEN)
+  txHash          String?
+  createdAt       DateTime         @default(now())
+
+  @@index([ownerAddress])
+  @@index([matchExternalId])
+  @@map("predictions")
 }

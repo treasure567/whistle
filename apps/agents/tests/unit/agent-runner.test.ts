@@ -21,7 +21,14 @@ function agentRow(kind: AgentKind): Agent {
   };
 }
 
-const liveMatch = { id: 'm1', externalId: '215662', homeCode: 'ARG', awayCode: 'FRA', status: '1H' };
+const liveMatch = {
+  id: 'm1',
+  externalId: '215662',
+  homeCode: 'ARG',
+  awayCode: 'FRA',
+  status: '1H',
+  payload: { note: 'ARG 10 scored at 67' },
+};
 
 function deps(toolCall: LlmToolCall) {
   const recorded: { agentId: string; matchId: string | null }[] = [];
