@@ -10,6 +10,7 @@ export type ManagerBriefInput = {
   theirStrength: number;
   xi: BriefPlayer[];
   bench: BriefPlayer[];
+  played?: { ourScore: number; theirScore: number } | undefined;
 };
 
 export type ManagerBrief = {
@@ -65,6 +66,24 @@ function heuristicBrief(input: ManagerBriefInput): ManagerBrief {
   return { verdict, opponentRead, suggestions: suggestions.slice(0, 3), source: 'heuristic' };
 }
 
+function heuristicAnalysis(input: ManagerBriefInput): ManagerBrief {
+  const { ourScore, theirScore } = input.played ?? { ourScore: 0, theirScore: 0 };
+  const won = ourScore > theirScore;
+  const lost = ourScore < theirScore;
+  const verdict = won ? 'Job done' : lost ? 'Painful one' : 'Battling draw';
+  const opponentRead = won
+    ? `A ${ourScore}-${theirScore} win over ${input.opponentName}. We controlled the big moments and took our chances.`
+    : lost
+      ? `A ${ourScore}-${theirScore} defeat to ${input.opponentName}. We came up short when it mattered most.`
+      : `${ourScore}-${theirScore} with ${input.opponentName}. We dug in but could not find the winner.`;
+  const suggestions = [
+    won ? 'Keep the same spine, it is clicking.' : 'We need a sharper edge in the final third.',
+    'Freshen the legs where you can before the next round.',
+    'Tighten up at set pieces, that is where knockout ties turn.',
+  ];
+  return { verdict, opponentRead, suggestions: suggestions.slice(0, 3), source: 'heuristic' };
+}
+
 function briefTool(): { name: string; description: string; inputSchema: JsonSchema } {
   return {
     name: 'submit_brief',
@@ -94,21 +113,23 @@ function squadLine(players: BriefPlayer[]): string {
 }
 
 export async function managerBrief(input: ManagerBriefInput, llm?: LlmClient): Promise<ManagerBrief> {
-  if (!llm) return heuristicBrief(input);
+  const fallback = (): ManagerBrief => (input.played ? heuristicAnalysis(input) : heuristicBrief(input));
+  if (!llm) return fallback();
   try {
-    const call = await llm.decide({
-      system: SYSTEM,
-      prompt:
-        `We are ${input.countryName}. Our next knockout opponent is ${input.opponentName}.\n` +
+    const prompt = input.played
+      ? `We are ${input.countryName}. We just played ${input.opponentName} in a knockout match and it ` +
+        `finished ${input.played.ourScore}-${input.played.theirScore} (our score first). Our XI: ${squadLine(input.xi)}.\n` +
+        `Give a short verdict on the performance, a one or two sentence analysis of how the match went, ` +
+        `and two or three takeaways or changes to make before the next round. Submit via the submit_brief tool.`
+      : `We are ${input.countryName}. Our next knockout opponent is ${input.opponentName}.\n` +
         `Our strength is ${input.ourStrength.toFixed(2)} of 1; theirs is ${input.theirStrength.toFixed(2)} of 1.\n` +
         `Our formation: ${input.formation}.\n` +
         `Our starting XI: ${squadLine(input.xi)}.\n` +
         `Our bench: ${squadLine(input.bench)}.\n\n` +
         `Give your player a short verdict on the tie, a one or two sentence scouting read on ` +
         `${input.opponentName}, and two or three concrete suggested changes to our lineup or shape ` +
-        `(name our players where it helps). Submit via the submit_brief tool.`,
-      tools: [briefTool()],
-    });
+        `(name our players where it helps). Submit via the submit_brief tool.`;
+    const call = await llm.decide({ system: SYSTEM, prompt, tools: [briefTool()] });
     const data = call.input as { verdict?: unknown; opponentRead?: unknown; suggestions?: unknown };
     const verdict = typeof data.verdict === 'string' ? data.verdict.trim().slice(0, 40) : '';
     const opponentRead = typeof data.opponentRead === 'string' ? data.opponentRead.trim().slice(0, 320) : '';
@@ -119,9 +140,9 @@ export async function managerBrief(input: ManagerBriefInput, llm?: LlmClient): P
           .filter(Boolean)
           .slice(0, 3)
       : [];
-    if (!verdict || !opponentRead || suggestions.length === 0) return heuristicBrief(input);
+    if (!verdict || !opponentRead || suggestions.length === 0) return fallback();
     return { verdict, opponentRead, suggestions, source: 'llm' };
   } catch {
-    return heuristicBrief(input);
+    return fallback();
   }
 }

@@ -74,6 +74,12 @@ export const managerBriefBody = z.object({
   theirStrength: z.coerce.number().min(0).max(1),
   xi: z.array(briefPlayerSchema).max(11),
   bench: z.array(briefPlayerSchema).max(26),
+  played: z
+    .object({
+      ourScore: z.coerce.number().int().min(0).max(30),
+      theirScore: z.coerce.number().int().min(0).max(30),
+    })
+    .optional(),
 });
 
 export const matchChatBody = z.object({
