@@ -9,6 +9,7 @@ export type MatchRead = {
   outcomes: MatchOutcome[];
   markets: MatchMarket[];
   summary: string;
+  suggestions: string[];
   source: 'llm' | 'heuristic';
 };
 
@@ -18,6 +19,19 @@ const SYSTEM =
   'You are Jack, a sharp, friendly football bookmaker for the World Cup. You read a ' +
   'match and talk through likely outcomes in plain, confident language. You never ' +
   'guarantee results and you keep it short.';
+
+const DEFAULT_SUGGESTIONS = ["Who's your value pick?", 'Will both teams score?', 'Any cards to watch?'];
+const DEFAULT_CHAT_SUGGESTIONS = ["What's the safest bet?", 'Could there be an upset?', 'How many goals?'];
+
+function cleanSuggestions(value: unknown, fallback: string[]): string[] {
+  if (!Array.isArray(value)) return fallback;
+  const list = value
+    .filter((v): v is string => typeof v === 'string')
+    .map((s) => s.trim().slice(0, 60))
+    .filter(Boolean)
+    .slice(0, 4);
+  return list.length > 0 ? list : fallback;
+}
 
 function normalise(home: number, draw: number, away: number): MatchOutcome[] {
   const clamp = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
@@ -52,6 +66,7 @@ function heuristicRead(home: string, away: string): MatchRead {
       { label: 'First to score', lean: 'Home', note: 'Early tempo usually favours the home name.' },
     ],
     summary: `${home} v ${away} looks tight on paper. I'd watch the first 20 minutes for who takes control.`,
+    suggestions: DEFAULT_SUGGESTIONS,
     source: 'heuristic',
   };
 }
@@ -81,8 +96,15 @@ function readTool(): { name: string; description: string; inputSchema: JsonSchem
           },
         },
         summary: { type: 'string' },
+        suggestions: {
+          type: 'array',
+          minItems: 3,
+          maxItems: 3,
+          items: { type: 'string' },
+          description: 'Three short follow-up questions a fan might ask about THIS match.',
+        },
       },
-      required: ['homePct', 'drawPct', 'awayPct', 'markets', 'summary'],
+      required: ['homePct', 'drawPct', 'awayPct', 'markets', 'summary', 'suggestions'],
     } as JsonSchema,
   };
 }
@@ -95,8 +117,9 @@ export async function matchRead(home: string, away: string, llm?: LlmClient): Pr
       prompt:
         `Read this World Cup match: ${home} (home) vs ${away} (away). ` +
         `Give win/draw/win percentages that sum to about 100, two or three betting ` +
-        `markets with your lean and a one-line note each, and a punchy one or two ` +
-        `sentence summary in your own voice. Submit via the tool.`,
+        `markets with your lean and a one-line note each, a punchy one or two ` +
+        `sentence summary in your own voice, and three short, specific follow-up ` +
+        `questions a fan might ask about this exact match. Submit via the tool.`,
       tools: [readTool()],
     });
     const input = call.input as {
@@ -105,6 +128,7 @@ export async function matchRead(home: string, away: string, llm?: LlmClient): Pr
       awayPct?: unknown;
       markets?: unknown;
       summary?: unknown;
+      suggestions?: unknown;
     };
     const markets = Array.isArray(input.markets)
       ? input.markets
@@ -126,6 +150,7 @@ export async function matchRead(home: string, away: string, llm?: LlmClient): Pr
       outcomes: normalise(Number(input.homePct), Number(input.drawPct), Number(input.awayPct)),
       markets,
       summary: input.summary.slice(0, 320),
+      suggestions: cleanSuggestions(input.suggestions, DEFAULT_SUGGESTIONS),
       source: 'llm',
     };
   } catch {
@@ -136,11 +161,20 @@ export async function matchRead(home: string, away: string, llm?: LlmClient): Pr
 function replyTool(): { name: string; description: string; inputSchema: JsonSchema } {
   return {
     name: 'reply',
-    description: "Reply to the user as Jack.",
+    description: 'Reply to the user as Jack and suggest follow-ups.',
     inputSchema: {
       type: 'object',
-      properties: { text: { type: 'string' } },
-      required: ['text'],
+      properties: {
+        text: { type: 'string' },
+        suggestions: {
+          type: 'array',
+          minItems: 3,
+          maxItems: 3,
+          items: { type: 'string' },
+          description: 'Three short follow-up questions that build on this reply.',
+        },
+      },
+      required: ['text', 'suggestions'],
     } as JsonSchema,
   };
 }
@@ -150,10 +184,11 @@ export async function matchChat(
   away: string,
   messages: ChatMessage[],
   llm?: LlmClient,
-): Promise<{ reply: string; source: 'llm' | 'heuristic' }> {
+): Promise<{ reply: string; suggestions: string[]; source: 'llm' | 'heuristic' }> {
   if (!llm) {
     return {
       reply: "I'm between matches right now. Check my read above and lock in your call when you're ready.",
+      suggestions: DEFAULT_CHAT_SUGGESTIONS,
       source: 'heuristic',
     };
   }
@@ -167,16 +202,18 @@ export async function matchChat(
       prompt:
         `Match: ${home} (home) vs ${away} (away).\n` +
         `Conversation so far:\n${history}\n\n` +
-        `Reply to the fan's latest message as Jack in two or three sentences. Submit via the reply tool.`,
+        `Reply to the fan's latest message as Jack in two or three sentences, then ` +
+        `suggest three short follow-up questions that build on your reply. Submit via the reply tool.`,
       tools: [replyTool()],
     });
-    const input = call.input as { text?: unknown };
+    const input = call.input as { text?: unknown; suggestions?: unknown };
     const text = typeof input.text === 'string' ? input.text.slice(0, 600) : '';
     if (!text) throw new Error('empty reply');
-    return { reply: text, source: 'llm' };
+    return { reply: text, suggestions: cleanSuggestions(input.suggestions, DEFAULT_CHAT_SUGGESTIONS), source: 'llm' };
   } catch {
     return {
-      reply: "My line dropped for a second. Ask me again, or go with the read above.",
+      reply: 'My line dropped for a second. Ask me again, or go with the read above.',
+      suggestions: DEFAULT_CHAT_SUGGESTIONS,
       source: 'heuristic',
     };
   }
