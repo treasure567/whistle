@@ -19,6 +19,13 @@ export interface Agent {
   accentHex: string;
   glyph: string;
   stats: AgentStats;
+  onchain?: AgentOnchain;
+}
+
+export interface AgentOnchain {
+  registryId: number | null;
+  ownerAddress: Address;
+  strategyHash: Hex;
 }
 
 export interface AgentStats {
