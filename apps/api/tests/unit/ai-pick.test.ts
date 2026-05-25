@@ -59,6 +59,7 @@ describe('aiPick heuristic', () => {
   it('honours a country filter and still fills a legal squad', async () => {
     const pool = makePool();
     const result = await aiPick(pool, { countries: ['ARG'], strength: 'balanced', budget: 100 });
+    expect(result.picks).toHaveLength(15);
     assertValid(result.picks, pool);
   });
 
