@@ -1,0 +1,98 @@
+---
+title: "Deployment"
+sidebarTitle: "Deployment"
+description: "Frontend on Vercel, backend via GitHub Actions to a VPS with atomic releases and PM2, contracts via Hardhat Ignition to X Layer testnet."
+---
+
+whistle deploys across three distinct targets: the Next.js frontend lives on Vercel, the backend monorepo (`apps/api` + `apps/agents`) runs on a VPS managed by GitHub Actions, and the smart contracts are deployed to X Layer testnet via Hardhat Ignition.
+
+## Frontend — Vercel
+
+The Next.js app deploys automatically on every push to the main branch via the Vercel Git integration. The BFF proxy at `/api/v1/[...path]` is a Next.js Route Handler: it runs server-side on Vercel and injects the service master key before forwarding requests to the backend. The browser never receives or stores the service key.
+
+**Frontend environment variables:**
+
+| Variable | Purpose |
+|---|---|
+| `WHISTLE_API_URL` | Base URL of the backend API (no trailing slash) |
+| `WHISTLE_SERVICE_KEY` | Service master key injected by the BFF proxy |
+| `NEXT_PUBLIC_CHAIN_ID` | X Layer testnet chain ID (`1952`) |
+| `NEXT_PUBLIC_RPC_URL` | X Layer testnet JSON-RPC endpoint |
+| `NEXT_PUBLIC_POSITION_MANAGER` | `PositionManager` contract address |
+| `NEXT_PUBLIC_MOCK_ERC20` | `MockERC20` (test OKB) contract address |
+| `NEXT_PUBLIC_MOMENT_NFT` | `MomentNFT` contract address |
+| `NEXT_PUBLIC_FANTASY_ENTRY` | `FantasyEntry` contract address |
+| `NEXT_PUBLIC_AGENT_REGISTRY` | `AgentRegistry` contract address |
+
+<Note>
+Variables prefixed `NEXT_PUBLIC_` are embedded into the client bundle at build time. They are safe to expose because they are read-only contract addresses and public RPC endpoints — not secrets.
+</Note>
+
+## Backend — GitHub Actions to VPS
+
+The backend release pipeline runs on every push to `main` that touches the `backend/` directory. It follows a build-then-swap pattern to achieve zero-downtime deploys.
+
+<Steps>
+  <Step title="Install and build">
+    `pnpm install --frozen-lockfile` followed by `pnpm turbo build` compiles both `apps/api` and `apps/agents` plus all shared packages into `dist/` trees.
+  </Step>
+  <Step title="Bundle into a release directory">
+    The built artefacts, `node_modules`, and a copy of the production `.env` (injected from GitHub secrets) are written into a timestamped release directory on the VPS: `~/releases/<timestamp>/`.
+  </Step>
+  <Step title="Atomic symlink swap">
+    A symlink `~/current` is updated atomically to point at the new release directory. In-flight requests continue against the old symlink until PM2 restarts.
+  </Step>
+  <Step title="PM2 reload">
+    `pm2 reload ecosystem.config.js --update-env` restarts `apps/api` and `apps/agents` under the new release. PM2 handles graceful restart with zero dropped connections.
+  </Step>
+  <Step title="Health gate">
+    The pipeline polls `GET /healthz` on both processes. If either process does not return `200` within 30 seconds, the pipeline fails and the rollback workflow is triggered automatically.
+  </Step>
+  <Step title="Rollback (on failure)">
+    The rollback workflow re-points `~/current` to the previous timestamped release directory and reloads PM2 against it. The previous release is retained until the next successful deploy.
+  </Step>
+</Steps>
+
+**Backend environment variables:**
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string |
+| `REDIS_URL` | Redis connection string |
+| `OPENAI_API_KEY` | OpenAI API key used by `@whistle/agent-core` |
+| `OPENAI_MODEL` | Model name (e.g. `gpt-4o-mini`) |
+| `SERVICE_AUTH_SECRET` | Shared secret validated by the `apps/api` auth middleware |
+
+## Contracts — Hardhat Ignition to X Layer
+
+Smart contracts live in a separate `blockchain/` project and are deployed independently of the backend.
+
+```bash
+# Deploy all contracts to X Layer testnet
+cd blockchain
+npx hardhat ignition deploy ignition/modules/Whistle.ts \
+  --network xlayer-testnet \
+  --verify
+```
+
+The Hardhat Ignition module deploys contracts in dependency order — `MockERC20` and `AgentRegistry` first, then `PositionManager` (which depends on both), then `MomentNFT`, `FantasyEntry`, and `SettlementOracle`. Deployed addresses are written to the Ignition journal and copied into the frontend `.env` variables listed above.
+
+<Tip>
+After a redeployment, update all five `NEXT_PUBLIC_*` contract address env vars in the Vercel project dashboard and trigger a new frontend build. The backend reads addresses from `@whistle/chain`, which is compiled — update `packages/chain/src/addresses.ts` and redeploy the backend too.
+</Tip>
+
+## CI security
+
+Every pull request and main-branch push runs:
+
+| Check | Tool |
+|---|---|
+| Secret scanning | gitleaks — fails the build if credentials are detected in any committed file |
+| Dependency vulnerability scan | osv-scanner — reports known CVEs in `pnpm-lock.yaml` dependencies |
+| Weekly scheduled CVE scan | osv-scanner runs on a cron schedule against the production lockfile |
+
+No deploy proceeds if gitleaks or osv-scanner report a blocking finding.
+
+---
+
+- See [Architecture Overview](/architecture/overview) for the full system diagram and the BFF proxy design.

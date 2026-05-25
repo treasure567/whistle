@@ -1,0 +1,122 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "whistle",
+  "colors": {
+    "primary": "#8B5CF6",
+    "light": "#A78BFA",
+    "dark": "#7C3AED"
+  },
+  "background": {
+    "colors": {
+      "light": "#FBFAFF",
+      "dark": "#0A0A0A"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Space Grotesk"
+    },
+    "body": {
+      "family": "Inter"
+    }
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "how-it-works",
+              "quick-start"
+            ]
+          },
+          {
+            "group": "The Agents",
+            "pages": [
+              "agents/overview",
+              "agents/emma",
+              "agents/jack",
+              "agents/tom"
+            ]
+          },
+          {
+            "group": "Playing whistle",
+            "pages": [
+              "play/match-simulator",
+              "play/manager-mode",
+              "play/predict",
+              "play/fund"
+            ]
+          },
+          {
+            "group": "Onchain",
+            "pages": [
+              "onchain/x-layer",
+              "onchain/contracts",
+              "onchain/funding-flow"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "architecture/overview",
+              "architecture/ai-layer",
+              "architecture/deployment"
+            ]
+          },
+          {
+            "group": "Hackathon",
+            "pages": [
+              "hackathon"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/data",
+              "api-reference/match-ai",
+              "api-reference/predictions"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "X Layer Explorer",
+        "href": "https://www.okx.com/web3/explorer/xlayer-test"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Launch app",
+      "href": "https://whistle-one.vercel.app"
+    }
+  },
+  "footer": {
+    "socials": {}
+  }
+}

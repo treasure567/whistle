@@ -1,0 +1,88 @@
+---
+title: "X Layer"
+sidebarTitle: "X Layer"
+description: "Why whistle runs on X Layer, how the two OKB tokens work, and how your wallet connects automatically."
+---
+
+X Layer is OKK's Ethereum Layer 2, built on Polygon CDK. It settles to Ethereum mainnet while keeping gas costs a fraction of L1 — which matters when every in-tournament prediction, roster submission, and commemorative mint should feel instant, not expensive.
+
+## Why X Layer for whistle
+
+A World Cup produces dozens of matches over a month. Each match can trigger position opens, settlement calls, NFT mints, and fantasy roster finalizations — all onchain. A slow or expensive chain would make that unworkable for everyday fans.
+
+X Layer fits because:
+
+<CardGroup cols={3}>
+  <Card title="Low fees" icon="coins">
+    Submitting a prediction or minting a Moment costs a few cents in gas, not dollars.
+  </Card>
+  <Card title="Fast finality" icon="shield">
+    Transactions confirm in seconds, so agents can act before odds shift mid-match.
+  </Card>
+  <Card title="OKB-native" icon="wallet">
+    Native OKB is the gas token, and test OKB funds your agents — no cross-chain wrapping needed.
+  </Card>
+</CardGroup>
+
+## Network details
+
+| Field | Value |
+|---|---|
+| Network name | X Layer Testnet |
+| Chain ID | `1952` |
+| Currency symbol | OKB |
+| Explorer | [okx.com/web3/explorer/xlayer-test](https://www.okx.com/web3/explorer/xlayer-test) |
+
+When you connect your wallet in whistle, the app requests a network switch or add automatically via wagmi. You will see a single confirmation prompt in your wallet — no manual RPC entry required.
+
+## Two flavours of OKB
+
+This is the most common point of confusion for new users.
+
+<Note>
+There are two tokens called "OKB" in the whistle environment. They serve different purposes and are not interchangeable.
+</Note>
+
+**Native OKB (gas token)**
+: This is the L2 gas token shown in your wallet balance. You need a small amount to pay for every transaction on X Layer — funding an agent, approving a token, minting an NFT. Obtain it from the X Layer testnet faucet.
+
+**Test OKB — MockERC20 (funding token)**
+: This is an open-mint ERC-20 deployed at `0x487F536593b1680B8247E67254Fc8D0394D137D7` specifically for the hackathon testnet. It acts as the stablecoin you use to fund agents and back predictions. Anyone can mint it freely. It carries 18 decimals and is **not** deployed to mainnet.
+
+```
+MockERC20 (test OKB)  0x487F536593b1680B8247E67254Fc8D0394D137D7
+```
+
+When the UI shows "Fund Emma" or "Allocate to Jack", the amount is denominated in this MockERC20 OKB, not in native gas OKB.
+
+## Connecting your wallet
+
+<Steps>
+  <Step title="Open whistle and click Connect">
+    The app uses wagmi. If X Layer Testnet (chainId 1952) is not already in your wallet, a network-add prompt appears automatically.
+  </Step>
+  <Step title="Approve the network">
+    Confirm the RPC details in your wallet popup. You will not need to enter them manually.
+  </Step>
+  <Step title="Switch to X Layer Testnet">
+    A second prompt asks you to switch the active network. After confirming, your wallet is live on X Layer.
+  </Step>
+  <Step title="Check your balances">
+    You need native OKB for gas and MockERC20 OKB for funding. Mint test OKB from the contract or the in-app faucet button before proceeding.
+  </Step>
+</Steps>
+
+<Tip>
+Keep at least 0.01 native OKB in your wallet at all times. The funding flow involves three transactions (mint, approve, allocate) and each one consumes a small amount of gas.
+</Tip>
+
+## Verifying transactions
+
+Every transaction whistle submits is visible on the public block explorer. Paste any transaction hash or contract address into the explorer to inspect it.
+
+[https://www.okx.com/web3/explorer/xlayer-test](https://www.okx.com/web3/explorer/xlayer-test)
+
+---
+
+- See [Contracts](/onchain/contracts) for the full list of deployed addresses.
+- See [Funding Flow](/onchain/funding-flow) to walk through mint → approve → allocate step by step.

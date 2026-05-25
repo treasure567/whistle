@@ -1,0 +1,76 @@
+---
+title: "Built for the X Cup"
+sidebarTitle: "Hackathon"
+description: "How whistle maps to the OKX X Cup tracks and judging criteria — with the live contracts and endpoints to verify."
+---
+
+whistle is a submission to the OKX **X Cup** — a World Cup-themed hackathon
+on X Layer, judged on a **dual track**: AI judges and human judges score
+independently across on-chain data, code quality, innovation and market
+potential, then the scores are combined.
+
+This page is written so both can verify the project quickly.
+
+## The one-line pitch
+
+The World Cup is too big to watch alone, so you fund three AI agents who
+work it for you onchain on X Layer — scouting moments, pricing markets, and
+managing a nation.
+
+## Tracks we fit
+
+<CardGroup cols={2}>
+  <Card title="AI Agent" icon="robot">
+    Three LLM agents (Emma, Jack, Tom) you fund onchain; each reads match
+    context and produces structured, verifiable output through a tool-use
+    contract.
+  </Card>
+  <Card title="Prediction / Trading" icon="chart-line">
+    Jack reads ties, prices markets, and builds budgeted slips you approve
+    and fund.
+  </Card>
+  <Card title="GameFi" icon="gamepad">
+    A full match simulator and a manager career mode — knockout runs,
+    subs, penalty shootouts.
+  </Card>
+  <Card title="NFT" icon="image">
+    Emma mints commemorative match moments as ERC-721s with IPFS metadata.
+  </Card>
+</CardGroup>
+
+## How we score against the criteria
+
+| Criterion | Where whistle delivers |
+|---|---|
+| **Innovation** | "Fund an agent, don't click buttons." LLM-generated matches and agent reads, not scripted heuristics — a differentiated angle on World Cup engagement. |
+| **Market potential** | A clean path from World Cup traffic to X Layer transactions: every funding and agent action is an onchain tx in OKB. |
+| **Completion** | Live deploy (frontend + API + 5 contracts), real LLM output in production, onchain-verifiable funding, full test + lint + build green. |
+| **Demo (bonus)** | A 1–3 min walkthrough of the funding → read → simulate arc. |
+
+## Verify it
+
+<CardGroup cols={2}>
+  <Card title="Contracts (live)" icon="file-contract" href="/onchain/contracts">
+    Five contracts on X Layer testnet (chainId 1952), agents registered
+    onchain. Addresses on the Onchain page.
+  </Card>
+  <Card title="The AI layer" icon="robot" href="/architecture/ai-layer">
+    OpenAI `gpt-4o-mini` via a tool-use contract, validated + repaired,
+    Redis-cached, with a deterministic fallback. Confirmed `source:"llm"`
+    in production.
+  </Card>
+  <Card title="Architecture" icon="diagram-project" href="/architecture/overview">
+    Next.js frontend, Express/Prisma API, an autonomous agent runtime, and
+    the contracts — and how they connect.
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/introduction">
+    The advisor and simulation endpoints, with request and response
+    shapes.
+  </Card>
+</CardGroup>
+
+<Warning>
+**Scope note.** whistle is World Cup-themed (the X Cup). It does not use a
+Uniswap V4 Hook — if a submission is governed by terms that require a V4
+Pool + Hook, confirm eligibility against the correct track's terms.
+</Warning>

@@ -1,0 +1,79 @@
+---
+title: "Emma the Scout"
+description: "Agent 1 — watches every match for moments worth keeping and mints them as ERC-721 NFTs on X Layer so you own the keepsake permanently."
+---
+
+Emma does not wait for you to hit record. She monitors the live match feed and decides, autonomously, when something just happened that deserves to exist onchain forever.
+
+## What is a "moment"
+
+A moment is any match event that Emma's AI layer scores as significant: a goal, a penalty miss in a shootout, a red card that changes the game, or a decisive save in the final minute. Her `decide()` call (gpt-4o-mini via `@whistle/agent-core`) scores the event's narrative weight. If it crosses the threshold, she queues a mint.
+
+<Note>
+  Emma's scoring is deterministic-first: if the LLM call fails, a heuristic fallback fires so no moment is silently dropped. Every response carries `source: "llm"` or `source: "heuristic"` so you can see which path was taken.
+</Note>
+
+## Licensing-clean by design
+
+Real player names are never stored onchain. Every MomentNFT references the moment by **nation** and **jersey number** — for example "Nation A · No. 9" — so the metadata is licensing-clean while remaining unambiguous to anyone who watched the match.
+
+## The mint flow
+
+<Steps>
+  <Step title="Fund Emma">
+    Allocate OKB to agent id `1` via `PositionManager.allocate(1, amount)`. Emma will not act on a wallet that has not funded her.
+  </Step>
+  <Step title="Emma detects a moment">
+    The agent-core `decide()` call evaluates the match event stream. A significant event produces a structured moment payload: nation pair, minute, jersey number(s), event type, narrative text.
+  </Step>
+  <Step title="IPFS metadata is prepared">
+    The moment payload is serialised as a JSON metadata object and pinned to IPFS. The resulting `ipfs://` URI is the canonical token URI for the NFT.
+  </Step>
+  <Step title="MomentNFT.mint() is called">
+    Emma calls the `MomentNFT` contract (`0x5c2C8476ff37010f0A258D428490152EA05F0cC5`) on X Layer testnet. The ERC-721 token is minted to your wallet address. You own it.
+  </Step>
+  <Step title="Token appears in your activity feed">
+    The new token shows up in `/activity` alongside its IPFS metadata link and the X Layer explorer transaction.
+  </Step>
+</Steps>
+
+## What lives onchain
+
+The `MomentNFT` contract is a standard ERC-721. Each token's `tokenURI` points to IPFS-hosted JSON that includes:
+
+```json
+{
+  "name": "Quarterfinal · Nation A vs Nation B · 87'",
+  "description": "Nation A No. 9 converts the decisive penalty in the 87th minute.",
+  "image": "ipfs://<CID>/moment.png",
+  "attributes": [
+    { "trait_type": "Stage", "value": "Quarterfinal" },
+    { "trait_type": "Minute", "value": 87 },
+    { "trait_type": "Event", "value": "Penalty Goal" },
+    { "trait_type": "Nation", "value": "Nation A" },
+    { "trait_type": "Jersey", "value": 9 },
+    { "trait_type": "Source", "value": "llm" }
+  ]
+}
+```
+
+<Tip>
+  You can verify any mint at `https://www.okx.com/web3/explorer/xlayer-test` — search the MomentNFT contract address `0x5c2C8476ff37010f0A258D428490152EA05F0cC5` and filter by your wallet.
+</Tip>
+
+## Contract reference
+
+| Contract | Address |
+|---|---|
+| MomentNFT (ERC-721) | `0x5c2C8476ff37010f0A258D428490152EA05F0cC5` |
+| PositionManager (funding) | `0x91bed7A3ce8940430646BD8cC4AB842a2A470B22` |
+| AgentRegistry (id = 1) | `0x777bBFafAD29cD92575de91FF8CCA59e85729b76` |
+
+<CardGroup cols={2}>
+  <Card title="All agents" icon="robot" href="/agents/overview">
+    See how Emma sits alongside Jack and Tom in the agent lineup.
+  </Card>
+  <Card title="Contracts" icon="file-contract" href="/onchain/contracts">
+    Full contract reference for X Layer testnet (chainId 1952).
+  </Card>
+</CardGroup>

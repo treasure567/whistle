@@ -1,0 +1,282 @@
+---
+title: Match AI
+description: AI-backed endpoints for match analysis, conversational chat, match simulation, and manager briefings.
+---
+
+These four endpoints are powered by OpenAI GPT-4o-mini via a tool-use layer. Outputs are validated and repaired before being returned, and a deterministic fallback guarantees a response even when the model is unavailable. Every response carries a `source` field indicating whether the result came from the model or the fallback.
+
+<Note>
+  Results are cached in Redis keyed by the request inputs. For `/sim/match`, bump the optional `variant` integer to force a fresh simulation of the same fixture.
+</Note>
+
+---
+
+## POST /v1/matches/read
+
+Analyse a fixture and return outcome probabilities, market leans, a narrative summary, and follow-up suggestions.
+
+**Request**
+
+<ParamField body="home" type="string" required>
+  Home team name or code (e.g. `"Argentina"`, `"ARG"`).
+</ParamField>
+
+<ParamField body="away" type="string" required>
+  Away team name or code.
+</ParamField>
+
+**Response**
+
+<ResponseField name="home" type="string">Home team identifier echoed back.</ResponseField>
+<ResponseField name="away" type="string">Away team identifier echoed back.</ResponseField>
+<ResponseField name="outcomes" type="array">
+  List of outcome objects, each with `label` (string) and `pct` (number 0–100).
+</ResponseField>
+<ResponseField name="markets" type="array">
+  List of market objects, each with `label` (string), `lean` (string), and `note` (string).
+</ResponseField>
+<ResponseField name="summary" type="string">Narrative pre-match analysis.</ResponseField>
+<ResponseField name="suggestions" type="array">Follow-up question strings the UI can surface to the user.</ResponseField>
+<ResponseField name="source" type="string">`"llm"` or `"heuristic"`.</ResponseField>
+
+---
+
+## POST /v1/matches/chat
+
+Conversational endpoint for back-and-forth match discussion. Pass the full message history on each call.
+
+**Request**
+
+<ParamField body="home" type="string" required>
+  Home team name or code.
+</ParamField>
+
+<ParamField body="away" type="string" required>
+  Away team name or code.
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  Conversation history. Each item has `role` (`"user"` or `"assistant"`) and `content` (string).
+</ParamField>
+
+**Response**
+
+<ResponseField name="reply" type="string">The assistant's next message.</ResponseField>
+<ResponseField name="suggestions" type="array">Suggested follow-up prompts.</ResponseField>
+<ResponseField name="source" type="string">`"llm"` or `"heuristic"`.</ResponseField>
+
+---
+
+## POST /v1/sim/match
+
+Simulate a match minute-by-minute and return a full event timeline, stats, and Man of the Match.
+
+**Request**
+
+<ParamField body="home" type="object" required>
+  Home team descriptor with fields: `code` (string), `name` (string), `strength` (number), `players` (array of strings).
+</ParamField>
+
+<ParamField body="away" type="object" required>
+  Away team descriptor — same shape as `home`.
+</ParamField>
+
+<ParamField body="variant" type="integer">
+  Seed variant. Increment to get a fresh simulation for the same fixture without changing inputs. Defaults to `0`.
+</ParamField>
+
+**Response**
+
+<ResponseField name="homeScore" type="integer">Full-time goals for the home side.</ResponseField>
+<ResponseField name="awayScore" type="integer">Full-time goals for the away side.</ResponseField>
+<ResponseField name="events" type="array">
+  Ordered list of match events. Each event has:
+  - `minute` (integer)
+  - `type` — one of `kickoff`, `goal`, `penalty-goal`, `penalty-miss`, `save`, `chance`, `corner`, `yellow`, `red`, `sub`, `halftime`, `fulltime`
+  - `side` — `"home"`, `"away"`, or `"neutral"`
+  - `player` (string, optional)
+</ResponseField>
+<ResponseField name="stats" type="object">
+  Match statistics: `possessionHome`, `shotsHome`, `shotsAway`, `sotHome`, `sotAway`, `cornersHome`, `cornersAway`, `foulsHome`, `foulsAway`, `offsidesHome`, `offsidesAway`.
+</ResponseField>
+<ResponseField name="motm" type="object | null">
+  Man of the Match: `player` (string), `side` (`"home"` or `"away"`), `rating` (number). `null` if undetermined.
+</ResponseField>
+<ResponseField name="source" type="string">`"llm"` or `"heuristic"`.</ResponseField>
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.whistle.app/v1/sim/match \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{
+    "home": {
+      "code": "ARG",
+      "name": "Argentina",
+      "strength": 88,
+      "players": ["Messi", "De Paul", "Alvarez"]
+    },
+    "away": {
+      "code": "FRA",
+      "name": "France",
+      "strength": 87,
+      "players": ["Mbappe", "Griezmann", "Camavinga"]
+    },
+    "variant": 1
+  }'
+```
+
+```json Response
+{
+  "ok": true,
+  "data": {
+    "homeScore": 2,
+    "awayScore": 1,
+    "events": [
+      { "minute": 1,  "type": "kickoff",  "side": "neutral" },
+      { "minute": 34, "type": "goal",     "side": "home",   "player": "Alvarez" },
+      { "minute": 45, "type": "halftime", "side": "neutral" },
+      { "minute": 67, "type": "goal",     "side": "away",   "player": "Mbappe" },
+      { "minute": 82, "type": "goal",     "side": "home",   "player": "Messi" },
+      { "minute": 90, "type": "fulltime", "side": "neutral" }
+    ],
+    "stats": {
+      "possessionHome": 54,
+      "shotsHome": 14, "shotsAway": 11,
+      "sotHome": 6,    "sotAway": 4,
+      "cornersHome": 7, "cornersAway": 5,
+      "foulsHome": 12,  "foulsAway": 14,
+      "offsidesHome": 2, "offsidesAway": 3
+    },
+    "motm": { "player": "Messi", "side": "home", "rating": 8.9 },
+    "source": "llm"
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## POST /v1/manager/brief
+
+Tom the Manager analyses your XI and returns a tactical verdict, an opponent read, and actionable suggestions. Send the optional `played` field after a match for post-match analysis instead of pre-match scouting.
+
+**Request**
+
+<ParamField body="countryName" type="string" required>
+  Your team's country name.
+</ParamField>
+
+<ParamField body="opponentName" type="string" required>
+  Opponent's country name.
+</ParamField>
+
+<ParamField body="formation" type="string" required>
+  Your formation, e.g. `"4-3-3"`.
+</ParamField>
+
+<ParamField body="ourStrength" type="number" required>
+  Your squad strength (0–100 scale).
+</ParamField>
+
+<ParamField body="theirStrength" type="number" required>
+  Opponent's squad strength (0–100 scale).
+</ParamField>
+
+<ParamField body="xi" type="array" required>
+  Starting XI. Each player object has `name` (string), `position` (string), `price` (number).
+</ParamField>
+
+<ParamField body="bench" type="array" required>
+  Bench players — same shape as `xi`.
+</ParamField>
+
+<ParamField body="played" type="object">
+  Include after the match has been played to request post-match analysis. Object has `ourScore` (integer) and `theirScore` (integer). Omit for pre-match.
+</ParamField>
+
+**Response**
+
+<ResponseField name="verdict" type="string">Tom's overall tactical verdict.</ResponseField>
+<ResponseField name="opponentRead" type="string">Assessment of the opponent's likely approach.</ResponseField>
+<ResponseField name="suggestions" type="array">List of tactical suggestion strings.</ResponseField>
+<ResponseField name="source" type="string">`"llm"` or `"heuristic"`.</ResponseField>
+
+<CodeGroup>
+
+```bash Pre-match
+curl -X POST https://api.whistle.app/v1/manager/brief \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{
+    "countryName":  "Brazil",
+    "opponentName": "England",
+    "formation":    "4-3-3",
+    "ourStrength":  86,
+    "theirStrength": 82,
+    "xi": [
+      { "name": "Alisson",   "position": "GK",  "price": 6.0 },
+      { "name": "Vinicius",  "position": "FWD", "price": 9.5 },
+      { "name": "Rodrygo",   "position": "FWD", "price": 8.5 }
+    ],
+    "bench": [
+      { "name": "Endrick", "position": "FWD", "price": 7.0 }
+    ]
+  }'
+```
+
+```json Pre-match response
+{
+  "ok": true,
+  "data": {
+    "verdict": "Brazil's pace on the wings should stretch England's high line. Favour pressing high in the first 20 minutes.",
+    "opponentRead": "England will look to play through Bellingham in the half-spaces and exploit set pieces.",
+    "suggestions": [
+      "Push Vinicius inside to occupy the right-back and create overloads centrally.",
+      "Set a defensive mid to shadow Bellingham's runs."
+    ],
+    "source": "llm"
+  }
+}
+```
+
+```bash Post-match
+curl -X POST https://api.whistle.app/v1/manager/brief \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{
+    "countryName":  "Brazil",
+    "opponentName": "England",
+    "formation":    "4-3-3",
+    "ourStrength":  86,
+    "theirStrength": 82,
+    "xi": [
+      { "name": "Alisson",  "position": "GK",  "price": 6.0 },
+      { "name": "Vinicius", "position": "FWD", "price": 9.5 },
+      { "name": "Rodrygo",  "position": "FWD", "price": 8.5 }
+    ],
+    "bench": [
+      { "name": "Endrick", "position": "FWD", "price": 7.0 }
+    ],
+    "played": { "ourScore": 2, "theirScore": 1 }
+  }'
+```
+
+```json Post-match response
+{
+  "ok": true,
+  "data": {
+    "verdict": "A well-earned win. The early press paid off and Vinicius was decisive.",
+    "opponentRead": "England's set-piece threat materialised but couldn't find an equaliser after going 2-1 down.",
+    "suggestions": [
+      "Rodrygo's pressing won the second goal — consider starting him wider next match.",
+      "Defensive shape held well; keep the same back four for the quarterfinal."
+    ],
+    "source": "llm"
+  }
+}
+```
+
+</CodeGroup>

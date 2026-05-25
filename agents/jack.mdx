@@ -1,0 +1,102 @@
+---
+title: "Jack the Bookie"
+description: "Agent 2 — reads a tie, prices 2-3 markets, builds you a budgeted bet slip, and advises you live while the match is in play."
+---
+
+Jack turns raw match data into structured, opinionated intelligence. Fund him once and he works every fixture: pre-match reads, a budgeted slip you can act on, and live commentary on how your positions are faring as the minutes tick by.
+
+## Reading a tie
+
+The core of Jack's work is `POST /v1/matches/read`. Send him a fixture and he returns win/draw/win probabilities, 2-3 priced markets with a lean and a note on each, a one-paragraph summary, and 3 follow-up questions you can fire back at him.
+
+**Illustrative response:**
+
+```json
+{
+  "homePct": 54,
+  "drawPct": 22,
+  "awayPct": 24,
+  "markets": [
+    {
+      "label": "Match result",
+      "lean": "Home win",
+      "note": "Home side are unbeaten in five and face a depleted back four.",
+      "odds": "1.72"
+    },
+    {
+      "label": "Both teams to score",
+      "lean": "Yes",
+      "note": "Away team have scored in each of their last six away games.",
+      "odds": "1.90"
+    },
+    {
+      "label": "Over 2.5 goals",
+      "lean": "Yes",
+      "note": "Average 3.1 goals per game across both sides this tournament.",
+      "odds": "1.85"
+    }
+  ],
+  "summary": "A home-favoured fixture with goals likely on both sides. The visitors are dangerous in transition despite a defensive injury concern.",
+  "suggestions": [
+    "What is the away team's record in knockout-stage pressure matches?",
+    "How has the home keeper performed under high-press systems?",
+    "Is the 0-0 at half time market worth considering given the expected slow start?"
+  ],
+  "source": "llm"
+}
+```
+
+<Note>
+  `source` is always present. A value of `"heuristic"` means the LLM was unavailable and a deterministic fallback produced the read — the structure is identical either way.
+</Note>
+
+You can also open a live conversation about any fixture with `POST /v1/matches/chat`. Both endpoints sit under `/v1`, require the `x-service-auth` header, and are reached from the browser through the Next BFF proxy.
+
+## Building a bet slip
+
+`POST /v1/predictions/slip` takes your available budget and a fixture (or set of fixtures) and returns a structured slip: which markets to back, stake allocations, and a plain-English rationale.
+
+<Tip>
+  The slip respects the budget you pass — Jack will not suggest staking more than you tell him you have available. Stakes are illustrative guidance, not instructions to a bookmaker.
+</Tip>
+
+## Live match advice
+
+Once a match kicks off, Jack monitors position movement and the live score. He can tell you whether the markets have swung in your favour, where the value now lies, and whether any of his pre-match reads need revision. Access this through `/play/predict` while a fixture is in progress.
+
+## Funding Jack
+
+<Steps>
+  <Step title="Mint test OKB">
+    Call `mint()` on the open-mint `MockERC20` at `0x487F536593b1680B8247E67254Fc8D0394D137D7`.
+  </Step>
+  <Step title="Approve PositionManager">
+    `MockERC20.approve(0x91bed7A3ce8940430646BD8cC4AB842a2A470B22, amount)` — amounts use 18 decimals.
+  </Step>
+  <Step title="Allocate to Jack">
+    `PositionManager.allocate(2, amount)` — agent id `2` is Jack. The call is signed in your browser; the API holds no keys.
+  </Step>
+</Steps>
+
+## Contract reference
+
+| Contract | Address |
+|---|---|
+| PositionManager | `0x91bed7A3ce8940430646BD8cC4AB842a2A470B22` |
+| AgentRegistry (id = 2) | `0x777bBFafAD29cD92575de91FF8CCA59e85729b76` |
+| SettlementOracle | `0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4` |
+
+<CardGroup cols={2}>
+  <Card title="Predictions UI" icon="chart-line" href="/play/predict">
+    Open the prediction interface to see Jack's live reads and build a slip.
+  </Card>
+  <Card title="Match Simulator" icon="futbol" href="/play/match-simulator">
+    Run simulated fixtures through the LLM timeline engine and see how Jack reads the projected result.
+  </Card>
+  <Card title="All agents" icon="robot" href="/agents/overview">
+    See the full agent lineup alongside Emma and Tom.
+  </Card>
+  <Card title="Contracts" icon="file-contract" href="/onchain/contracts">
+    Full contract reference for X Layer testnet (chainId 1952).
+  </Card>
+</CardGroup>

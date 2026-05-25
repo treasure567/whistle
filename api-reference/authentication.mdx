@@ -1,0 +1,67 @@
+---
+title: Authentication
+description: How whistle authenticates API requests using the service master key.
+---
+
+Every route under `/v1` requires a **service master key** passed in the `x-service-auth` request header.
+
+```http
+x-service-auth: <your-service-key>
+```
+
+There are no public unauthenticated `/v1` routes. The only unauthenticated endpoints are the ops probes (`/healthz`, `/readyz`, `/metrics`).
+
+## BFF injection
+
+The Next.js app never calls the backend directly from the browser. Instead it routes through the BFF (Backend for Frontend) proxy at `/api/v1/...`. The BFF reads the key from the server-side environment variable `WHISTLE_SERVICE_KEY` and injects the `x-service-auth` header before forwarding the request.
+
+```
+Browser  →  /api/v1/matches  →  [Next.js BFF]  →  /v1/matches
+                                  injects x-service-auth
+```
+
+This means:
+
+- The service key is **never exposed** to browser JavaScript.
+- Browser requests do not need to set `x-service-auth` — the BFF handles it.
+- Server-to-server callers must supply the header themselves.
+
+## Example — server-to-server request
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.whistle.app/v1/matches/read \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{ "home": "Argentina", "away": "France" }'
+```
+
+```json Response
+{
+  "ok": true,
+  "data": {
+    "home": "Argentina",
+    "away": "France",
+    "outcomes": [
+      { "label": "Home win", "pct": 42 },
+      { "label": "Draw",     "pct": 25 },
+      { "label": "Away win", "pct": 33 }
+    ],
+    "summary": "A closely contested clash with Argentina holding a slight edge.",
+    "source": "llm"
+  }
+}
+```
+
+</CodeGroup>
+
+<Warning>
+  Never embed `WHISTLE_SERVICE_KEY` in client-side code, mobile bundles, or public repositories. It grants full access to every API endpoint. Rotate the key immediately if it is exposed.
+</Warning>
+
+## Environment variable
+
+| Variable | Where it lives | Purpose |
+|---|---|---|
+| `WHISTLE_SERVICE_KEY` | Next.js server environment | Injected by the BFF; never sent to the browser. |

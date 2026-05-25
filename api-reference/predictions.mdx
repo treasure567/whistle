@@ -1,0 +1,212 @@
+---
+title: Predictions & Fantasy
+description: AI bet-slip generation, AI fantasy squad picking, and recording user predictions.
+---
+
+## POST /v1/predictions/slip
+
+Jack the Bookie generates a personalised bet slip — a set of picks across upcoming matches that respect your budget and risk appetite.
+
+**Request**
+
+<ParamField body="budget" type="number" required>
+  Total OKB budget available for the slip.
+</ParamField>
+
+<ParamField body="risk" type="string">
+  Risk profile. One of `"safe"`, `"balanced"` (default), or `"aggressive"`.
+</ParamField>
+
+<ParamField body="preferences" type="any">
+  Optional free-form preferences (teams, markets, etc.) passed to the model as context.
+</ParamField>
+
+<ParamField body="count" type="integer">
+  Number of picks to include. Defaults to a model-chosen value.
+</ParamField>
+
+**Response**
+
+<ResponseField name="picks" type="array">
+  List of pick objects:
+  - `matchExternalId` (string) — identifies the match
+  - `homeCode` (string)
+  - `awayCode` (string)
+  - `market` (string) — e.g. `"1X2"`, `"BTTS"`
+  - `side` (string) — the selected outcome
+  - `stake` (number) — OKB allocated to this pick
+  - `confidence` (number) — model confidence 0–1
+  - `note` (string) — rationale for the pick
+</ResponseField>
+<ResponseField name="totalStake" type="number">Sum of all pick stakes. Will not exceed `budget`.</ResponseField>
+<ResponseField name="budget" type="number">The budget echoed back.</ResponseField>
+<ResponseField name="source" type="string">`"llm"` or `"heuristic"`.</ResponseField>
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.whistle.app/v1/predictions/slip \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{
+    "budget": 50,
+    "risk": "balanced",
+    "count": 3
+  }'
+```
+
+```json Response
+{
+  "ok": true,
+  "data": {
+    "picks": [
+      {
+        "matchExternalId": "wc26_arg_fra",
+        "homeCode": "ARG",
+        "awayCode": "FRA",
+        "market": "1X2",
+        "side": "Home",
+        "stake": 20,
+        "confidence": 0.61,
+        "note": "Argentina's form at home venues is historically strong in knockouts."
+      },
+      {
+        "matchExternalId": "wc26_bra_eng",
+        "homeCode": "BRA",
+        "awayCode": "ENG",
+        "market": "BTTS",
+        "side": "Yes",
+        "stake": 15,
+        "confidence": 0.57,
+        "note": "Both attacks are prolific; both defences have leaked in qualification."
+      },
+      {
+        "matchExternalId": "wc26_esp_ger",
+        "homeCode": "ESP",
+        "awayCode": "GER",
+        "market": "Over 2.5",
+        "side": "Over",
+        "stake": 15,
+        "confidence": 0.54,
+        "note": "High-press clash; expect an open game."
+      }
+    ],
+    "totalStake": 50,
+    "budget": 50,
+    "source": "llm"
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## POST /v1/fantasy/ai-pick
+
+Emma the Scout selects a legal 15-player fantasy squad from the player pool that fits your budget and style.
+
+**Squad legality constraints**
+
+<Note>
+  Every squad returned by this endpoint is guaranteed to satisfy all of the following rules:
+  - Exactly 15 players: 2 GK, 5 DEF, 5 MID, 3 FWD
+  - Exactly 11 starters; the remaining 4 are bench
+  - Exactly 1 captain and 1 vice-captain among the starters
+  - Total price of all 15 players does not exceed `budget`
+</Note>
+
+**Request**
+
+<ParamField body="countries" type="array" required>
+  List of country name strings to filter the player pool. Pass an empty array to use all available players.
+</ParamField>
+
+<ParamField body="strength" type="string" required>
+  Squad-building strategy. One of `"balanced"`, `"galacticos"`, `"value"`, `"attacking"`, or `"defensive"`.
+</ParamField>
+
+<ParamField body="budget" type="number" required>
+  Maximum total price for all 15 players.
+</ParamField>
+
+**Response**
+
+<ResponseField name="picks" type="array">
+  15-item list of player selection objects:
+  - `playerId` (string) — references a player in `GET /v1/players`
+  - `starter` (boolean) — `true` for the 11 starters
+  - `captain` (boolean) — `true` for exactly one player
+  - `viceCaptain` (boolean) — `true` for exactly one player
+  - `benchOrder` (integer | null) — `1`–`4` for bench players, `null` for starters
+</ResponseField>
+<ResponseField name="source" type="string">`"llm"` or `"heuristic"`.</ResponseField>
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.whistle.app/v1/fantasy/ai-pick \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{
+    "countries": ["Argentina", "France", "Brazil", "England", "Spain"],
+    "strength": "attacking",
+    "budget": 100
+  }'
+```
+
+```json Response
+{
+  "ok": true,
+  "data": {
+    "picks": [
+      { "playerId": "p_alisson",    "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_courtois",   "starter": false, "captain": false, "viceCaptain": false, "benchOrder": 4    },
+      { "playerId": "p_cancelo",    "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_militao",    "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_koundé",     "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_hernandez",  "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_walker",     "starter": false, "captain": false, "viceCaptain": false, "benchOrder": 3    },
+      { "playerId": "p_depaul",     "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_bellingham", "starter": true,  "captain": false, "viceCaptain": true,  "benchOrder": null },
+      { "playerId": "p_griezmann",  "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_pedri",      "starter": false, "captain": false, "viceCaptain": false, "benchOrder": 2    },
+      { "playerId": "p_messi",      "starter": true,  "captain": true,  "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_mbappe",     "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_vinicius",   "starter": true,  "captain": false, "viceCaptain": false, "benchOrder": null },
+      { "playerId": "p_endrick",    "starter": false, "captain": false, "viceCaptain": false, "benchOrder": 1    }
+    ],
+    "source": "llm"
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## POST /v1/predictions
+
+Record a user prediction (not AI-generated). Use `GET /v1/predictions` to retrieve stored predictions.
+
+**Request**
+
+<ParamField body="matchExternalId" type="string" required>
+  The match this prediction applies to.
+</ParamField>
+
+<ParamField body="market" type="string" required>
+  Market being predicted, e.g. `"1X2"`.
+</ParamField>
+
+<ParamField body="side" type="string" required>
+  The outcome selected, e.g. `"Home"`, `"Draw"`, `"Away"`.
+</ParamField>
+
+<ParamField body="stake" type="number" required>
+  OKB staked on this prediction.
+</ParamField>
+
+**Response**
+
+Returns the created prediction object wrapped in the standard envelope.

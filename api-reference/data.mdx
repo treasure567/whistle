@@ -1,0 +1,196 @@
+---
+title: Data Endpoints
+description: REST endpoints for agents, matches, players, leaderboard, activity, allocations, fantasy teams, leagues, predictions, and the live SSE feed.
+---
+
+All routes below require `x-service-auth`. Browser callers use the `/api/v1/...` BFF prefix; server callers use `/v1/...` directly.
+
+---
+
+## Agents
+
+### List all agents
+
+```
+GET /v1/agents
+```
+
+Returns the three AI agents available in whistle.
+
+### Get a single agent
+
+```
+GET /v1/agents/:kind
+```
+
+<ParamField path="kind" type="string" required>
+  Agent identifier. One of `emma` (Scout), `jack` (Bookie), or `tom` (Manager).
+</ParamField>
+
+<CodeGroup>
+
+```bash curl
+curl https://api.whistle.app/v1/agents/emma \
+  -H "x-service-auth: sk_live_••••••••••••"
+```
+
+```json Response
+{
+  "ok": true,
+  "data": {
+    "kind": "emma",
+    "name": "Emma the Scout",
+    "description": "Pre-match scouting and odds analysis."
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Matches
+
+### List matches
+
+```
+GET /v1/matches
+```
+
+Returns upcoming and completed World Cup 2026 matches.
+
+### Get a match
+
+```
+GET /v1/matches/:externalId
+```
+
+<ParamField path="externalId" type="string" required>
+  The external identifier for the match.
+</ParamField>
+
+---
+
+## Players
+
+```
+GET /v1/players
+```
+
+Returns the full player pool used by the fantasy and AI-pick endpoints.
+
+---
+
+## Leaderboard
+
+```
+GET /v1/leaderboard
+```
+
+Returns the ranked list of users by points.
+
+---
+
+## Activity
+
+```
+GET /v1/activity
+```
+
+Returns a reverse-chronological activity log across all users.
+
+---
+
+## Allocations
+
+Allocations represent OKB funding directed to an AI agent.
+
+```
+POST /v1/allocations
+GET  /v1/allocations
+```
+
+<ParamField body="agentKind" type="string" required>
+  Agent to fund. One of `emma`, `jack`, `tom`.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  OKB amount to allocate.
+</ParamField>
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.whistle.app/v1/allocations \
+  -H "Content-Type: application/json" \
+  -H "x-service-auth: sk_live_••••••••••••" \
+  -d '{ "agentKind": "jack", "amount": 10 }'
+```
+
+```json Response
+{
+  "ok": true,
+  "data": {
+    "id": "alloc_01jx...",
+    "agentKind": "jack",
+    "amount": 10,
+    "createdAt": "2026-06-01T10:00:00Z"
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Fantasy teams
+
+```
+POST /v1/fantasy/teams
+GET  /v1/fantasy/teams
+PUT  /v1/fantasy/teams/:id
+```
+
+<ParamField path="id" type="string">
+  Fantasy team ID (required for `PUT`).
+</ParamField>
+
+---
+
+## Leagues
+
+```
+POST /v1/leagues
+GET  /v1/leagues
+POST /v1/leagues/:id/join
+GET  /v1/leagues/:id/leaderboard
+```
+
+<ParamField path="id" type="string">
+  League ID (required for join and leaderboard routes).
+</ParamField>
+
+---
+
+## Predictions
+
+```
+POST /v1/predictions
+GET  /v1/predictions
+```
+
+Records or retrieves user predictions. To generate AI-suggested picks see [Predictions & Fantasy](/api-reference/predictions).
+
+---
+
+## Live feed (SSE)
+
+```
+GET /v1/feed
+```
+
+Server-Sent Events stream. Connect with an `EventSource` in the browser or an SSE-capable HTTP client on the server to receive real-time match and activity updates.
+
+<Note>
+  The `/v1/feed` connection still requires `x-service-auth`. Pass it as a query parameter or via the BFF if your SSE client cannot set custom headers.
+</Note>

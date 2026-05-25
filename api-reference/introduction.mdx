@@ -1,0 +1,81 @@
+---
+title: API Reference
+description: Overview of the whistle HTTP API — conventions, response envelope, and endpoint families.
+---
+
+The whistle HTTP API powers both the companion app and its three AI agents (Emma the Scout, Jack the Bookie, Tom the Manager). All resources are served under `/v1`.
+
+## Base paths
+
+There are two ways to reach the API depending on where your code runs.
+
+| Caller | Base URL | Notes |
+|---|---|---|
+| Browser / Next.js app | `/api/v1/...` | Next.js BFF proxy — injects the service key server-side and forwards to the backend. |
+| Server-to-server | `/v1/...` | Hit the backend directly; you must supply `x-service-auth` yourself. |
+
+The BFF exists so the browser never holds the master key. See [Authentication](/api-reference/authentication) for details.
+
+## Content type
+
+All requests and responses use `Content-Type: application/json`.
+
+## Response envelope
+
+Every `/v1` response is wrapped in a consistent envelope.
+
+**Success**
+
+```json
+{
+  "ok": true,
+  "data": { }
+}
+```
+
+**Error**
+
+```json
+{
+  "ok": false,
+  "code": "VALIDATION_ERROR",
+  "message": "home is required"
+}
+```
+
+## Rate limiting
+
+Rate limits are enforced per window. When a limit is exceeded the API returns `429 Too Many Requests` with the standard error envelope.
+
+## Ops routes
+
+These routes are unauthenticated and intended for infrastructure health checks.
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/healthz` | Liveness probe |
+| `GET` | `/readyz` | Readiness probe |
+| `GET` | `/metrics` | Prometheus-compatible metrics |
+
+<Note>
+  Ops routes do **not** require the `x-service-auth` header and are not proxied through the BFF.
+</Note>
+
+---
+
+## Endpoint families
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    How the service master key works, BFF injection, and security guidelines.
+  </Card>
+  <Card title="Data endpoints" icon="database" href="/api-reference/data">
+    Agents, matches, players, leaderboard, allocations, fantasy teams, leagues, predictions, and the live SSE feed.
+  </Card>
+  <Card title="Match AI" icon="robot" href="/api-reference/match-ai">
+    AI-backed match reading, chat, match simulation, and manager briefings powered by GPT-4o-mini.
+  </Card>
+  <Card title="Predictions & Fantasy" icon="chart-line" href="/api-reference/predictions">
+    AI bet-slip generation and AI fantasy squad picking, plus recording user predictions.
+  </Card>
+</CardGroup>

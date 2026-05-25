@@ -1,0 +1,119 @@
+---
+title: "Predict"
+sidebarTitle: "Predict"
+description: "Build markets by hand or tell Jack your budget and risk appetite — he returns a ready-to-fund slip you approve and allocate to him onchain."
+---
+
+The prediction screen lives at `/play/predict`. You can build a slip yourself
+from structured market categories, or hand the decision to Jack: give him a
+budget, a risk level, and any preferences, and he returns a budgeted slip
+ready to approve and fund onchain.
+
+See [Jack the Bookie](/agents/jack) for how he reads a tie and prices markets.
+
+## Manual market builder
+
+The manual builder lets you construct a slip from six market categories:
+
+| Category | Example markets |
+|---|---|
+| Match | Result (1X2), Both teams to score, Clean sheet |
+| Goals | Over/under 2.5, First goalscorer, Anytime scorer |
+| Corners | Total corners over/under, First corner, Asian corners |
+| Cards | Total cards over/under, First booking, Player to be carded |
+| Fouls | Total fouls over/under |
+| Specials | MOTM, Penalty in match, VAR decision |
+
+Select one or more legs, review the combined slip, then move to the funding
+step when you're ready.
+
+## Ask Jack — the budgeted slip
+
+<Steps>
+  <Step title="Open Ask Jack">
+    Switch to the **Ask Jack** tab on the predict screen. You will see three
+    inputs: budget (in OKB), risk level (low / medium / high), and an
+    optional preferences field (e.g. "favour corners markets", "no
+    accumulators").
+  </Step>
+  <Step title="Jack builds your slip">
+    Submitting calls `POST /v1/predictions/slip` with your parameters. Jack
+    reads the upcoming fixtures, prices each leg against his model, and
+    returns a slip that fits inside your stated budget and risk band.
+
+    ```json
+    {
+      "budget": "50",
+      "risk": "medium",
+      "preferences": "favour goals markets"
+    }
+    ```
+
+    The response includes each leg with a label, odds, and stake, plus a
+    total stake that does not exceed your budget.
+  </Step>
+  <Step title="Review the slip">
+    Jack's slip is displayed as a readable card — each leg labelled, odds
+    shown, total stake confirmed. You can remove individual legs before
+    approving.
+  </Step>
+  <Step title="Approve and fund">
+    Hit **Fund slip**. The app calls the onchain funding flow:
+    approve the `PositionManager` to spend your OKB, then call
+    `PositionManager.allocate(2, amount)` (Jack's onchain agent ID is **2**)
+    to commit the stake. Both transactions are signed in your browser via
+    wagmi — whistle never holds your keys.
+
+    See [Fund](/play/fund) for the full transaction walkthrough.
+  </Step>
+</Steps>
+
+<Note>
+  Jack's slip carries `source: "llm"` when the model generated it and
+  `source: "heuristic"` when the deterministic fallback ran. Either way you
+  get a valid, budgeted slip — the source badge is displayed so you know
+  which engine produced it.
+</Note>
+
+## Reading a match before you bet
+
+Before placing any prediction, Jack can give you a full read of the tie.
+From the match list, click a fixture and select **Jack's read** to call
+`POST /v1/matches/read`. This returns his assessment of the match: form,
+head-to-head, key players, and which markets look most interesting. You can
+then open a live chat with Jack (`POST /v1/matches/chat`) to ask follow-up
+questions before committing a slip.
+
+<Tip>
+  Use the read before you open the manual builder — Jack often flags markets
+  (corners, cards) that the headline result odds miss. His read is free and
+  does not require a funded position.
+</Tip>
+
+## The slip onchain
+
+When you fund a slip the OKB moves onchain to the `PositionManager` under
+Jack's agent ID. The transaction is public on the
+[X Layer testnet explorer](https://www.okx.com/web3/explorer/xlayer-test).
+Your wallet balance (shown in the navbar) updates after the `allocate`
+transaction confirms.
+
+<Warning>
+  whistle uses a test OKB token (MockERC20 at
+  `0x487F536593b1680B8247E67254Fc8D0394D137D7`) — open-mint, no real value.
+  The native OKB shown as your wallet balance is the X Layer gas token and
+  is separate from the MockERC20 used to fund agents and bets.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Jack the Bookie" icon="chart-line" href="/agents/jack">
+    How Jack reads fixtures, prices markets, and runs the chat
+    during live play.
+  </Card>
+  <Card title="Fund an agent" icon="wallet" href="/play/fund">
+    Mint test OKB, approve the PositionManager, and allocate to any agent
+    — step-by-step transaction walkthrough.
+  </Card>
+</CardGroup>

@@ -1,0 +1,71 @@
+---
+title: "Contracts"
+sidebarTitle: "Contracts"
+description: "Every contract deployed to X Layer Testnet for whistle — addresses, responsibilities, and access-control roles."
+mode: "wide"
+---
+
+All whistle contracts were deployed to X Layer Testnet (chainId 1952) on 2026-05-25. They are written in Solidity 0.8.24, use OpenZeppelin AccessControl for role gating, and were tested with Hardhat.
+
+## Deployed addresses
+
+| Contract | Address | Responsibility |
+|---|---|---|
+| AgentRegistry | [`0x777bBFafAD29cD92575de91FF8CCA59e85729b76`](https://www.okx.com/web3/explorer/xlayer-test/address/0x777bBFafAD29cD92575de91FF8CCA59e85729b76) | Stores agent metadata, strategy hash, and owner. New agents require the registrar role. |
+| PositionManager | [`0x91bed7A3ce8940430646BD8cC4AB842a2A470B22`](https://www.okx.com/web3/explorer/xlayer-test/address/0x91bed7A3ce8940430646BD8cC4AB842a2A470B22) | Custodies user capital per agent and records open/settled positions. Enforces a per-match spend ceiling. |
+| MomentNFT | [`0x5c2C8476ff37010f0A258D428490152EA05F0cC5`](https://www.okx.com/web3/explorer/xlayer-test/address/0x5c2C8476ff37010f0A258D428490152EA05F0cC5) | ERC-721 with URI storage. Emma the Scout mints commemorative moments; metadata lives on IPFS. Restricted to the minter role. |
+| FantasyEntry | [`0xCf5959D698D813f1d82fa27eA9Cdd9911253d67C`](https://www.okx.com/web3/explorer/xlayer-test/address/0xCf5959D698D813f1d82fa27eA9Cdd9911253d67C) | Holds fantasy rosters managed by Tom the Manager. Players are identified by nation and jersey number only — no real names are stored. Roster finalization requires the manager role. |
+| SettlementOracle | [`0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4`](https://www.okx.com/web3/explorer/xlayer-test/address/0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4) | 2-of-3 multisig for posting match results. A challenge window must pass before a result becomes final. |
+| MockERC20 (test OKB) | [`0x487F536593b1680B8247E67254Fc8D0394D137D7`](https://www.okx.com/web3/explorer/xlayer-test/address/0x487F536593b1680B8247E67254Fc8D0394D137D7) | Open-mint ERC-20 test token (18 decimals) used for funding agents and backing predictions. Testnet only — not deployed to mainnet. |
+
+## Agent registry IDs
+
+Agents are identified onchain by integer IDs in the AgentRegistry. The mapping is fixed at deployment.
+
+<CardGroup cols={3}>
+  <Card title="Emma the Scout" icon="clipboard-user">
+    Agent ID `1` — scouts matches, mints MomentNFTs via the minter role.
+  </Card>
+  <Card title="Jack the Bookie" icon="gavel">
+    Agent ID `2` — opens and settles prediction positions via the agent session key in PositionManager.
+  </Card>
+  <Card title="Tom the Manager" icon="shield">
+    Agent ID `3` — submits and finalizes fantasy rosters in FantasyEntry via the manager role.
+  </Card>
+</CardGroup>
+
+## Access control
+
+whistle uses OpenZeppelin `AccessControl` rather than a single owner address. Each sensitive action is gated by a named role:
+
+| Role | Granted to | Guards |
+|---|---|---|
+| `REGISTRAR_ROLE` | Deployment admin | Adding new agents to AgentRegistry |
+| `MINTER_ROLE` | Emma the Scout (agent session key) | Minting MomentNFTs |
+| `MANAGER_ROLE` | Tom the Manager (agent session key) | Finalizing fantasy rosters in FantasyEntry |
+| Agent session key | Each agent's hot key | Opening and settling positions in PositionManager |
+
+No backend server holds a user's signing key. Every user-facing action (approve, allocate, withdraw) is signed in the browser.
+
+## SettlementOracle: 2-of-3 and the challenge window
+
+Match results are not written instantly. The flow is:
+
+1. Any two of the three oracle signers post the same result — the 2-of-3 threshold is met.
+2. A challenge window opens. During this period the result can be disputed.
+3. Once the window closes without a successful challenge, the result reaches finality and PositionManager settlements can proceed.
+
+This design prevents a single compromised signer from corrupting results and gives time to catch errors before funds move.
+
+## PositionManager: per-match ceiling
+
+PositionManager enforces a ceiling on how much capital can be deployed against any single match. This bounds the worst-case loss for a user whose agent acts aggressively. The ceiling is checked at position-open time; the agent session key cannot exceed it regardless of how much total capital is allocated.
+
+## FantasyEntry: nation and jersey only
+
+FantasyEntry stores player selections as a `(nation, jerseyNumber)` tuple. Real player names are never written to the chain. This keeps the contract lightweight and sidesteps name-rights concerns.
+
+---
+
+- See [X Layer](/onchain/x-layer) for network details and the two OKB tokens.
+- See [Funding Flow](/onchain/funding-flow) to understand how capital moves into PositionManager.
