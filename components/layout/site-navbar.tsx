@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { label: "Fixtures", href: "/fixtures" },
   { label: "Simulate", href: "/simulate" },
+  { label: "Manager", href: "/manager" },
   { label: "Fund", href: "/allocate" },
   { label: "Play", href: "/play" },
   { label: "Activity", href: "/activity" },
