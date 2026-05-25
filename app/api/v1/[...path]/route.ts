@@ -1,6 +1,9 @@
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
+// LLM-backed routes (match read, match sim) can take 10-20s; give the proxy
+// room so the first uncached call doesn't time out and fall back.
+export const maxDuration = 60;
 
 const API_URL = process.env.WHISTLE_API_URL ?? "http://127.0.0.1:4000/v1";
 const SERVICE_KEY = process.env.WHISTLE_SERVICE_KEY ?? "";
