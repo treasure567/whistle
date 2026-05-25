@@ -64,6 +64,15 @@ jobs:
           rm -rf prod_bundle
           pnpm --filter $SVC deploy --legacy --prod prod_bundle
 
+      - name: Inject generated Prisma client into bundle
+        run: |
+          set -euo pipefail
+          src=$(find node_modules/.pnpm -type d -path '*@prisma+client@*/node_modules/.prisma/client' | head -n1)
+          dst=$(find prod_bundle/node_modules/.pnpm -type d -path '*@prisma+client@*/node_modules/.prisma/client' | head -n1)
+          if [ -z "$src" ] || [ -z "$dst" ]; then echo "prisma client dir not found (src=$src dst=$dst)" >&2; exit 1; fi
+          cp -r "$src/." "$dst/"
+          echo "injected prisma client: $src -> $dst"
+
       - name: Compute release id
         id: meta
         run: echo "release_id=$(date -u +%Y%m%dT%H%M%SZ)" >> "$GITHUB_OUTPUT"
