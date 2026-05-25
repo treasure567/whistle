@@ -30,6 +30,18 @@ export function LandingHero() {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 md:grid-cols-[1.05fr_1fr] md:gap-10 md:px-10">
         <div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={heroSpring}
+            className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-3 py-1"
+          >
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
+              Live on X Layer Testnet
+            </span>
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -47,7 +59,7 @@ export function LandingHero() {
             transition={{ ...heroSpring, delay: 0.18 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-zinc-400"
           >
-            Whistle gives you three AI helpers for football. Emma saves the best moments. Jack bets on what happens next. Tom picks which players to back. You choose who to fund — they do the work.
+            Whistle gives you three AI helpers for football. Emma mints the best moments as NFTs, Jack places match bets, and Tom drafts your fantasy team. You choose who to fund with test USDT; they act onchain while you watch.
           </motion.p>
 
           <motion.div
@@ -77,8 +89,8 @@ export function LandingHero() {
             className="mt-10 grid max-w-xl grid-cols-3 gap-6 border-t border-white/5 pt-6"
           >
             <HeroStat label="AI helpers" value="3" hint="Emma · Jack · Tom" />
-            <HeroStat label="Actions logged" value="412" hint="across 18 matches" />
-            <HeroStat label="Money funded" value="$107.3k" hint="with spending limits you set" />
+            <HeroStat label="Every action" value="Onchain" hint="verify each tx" />
+            <HeroStat label="To play" value="Free" hint="test USDT, no real money" />
           </motion.div>
         </div>
 

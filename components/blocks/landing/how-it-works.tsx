@@ -15,28 +15,28 @@ const STEPS = [
     n: "01",
     label: "Connect",
     title: "Link your wallet",
-    body: "Use OKX Wallet, WalletConnect, or Coinbase. Your money stays in your control — Whistle never holds it for you.",
+    body: "OKX Wallet, MetaMask, or WalletConnect on X Layer testnet. Your funds stay in your wallet. Whistle never holds them.",
     icon: Wallet01Icon,
   },
   {
     n: "02",
     label: "Fund",
-    title: "Pick Emma, Jack, or Tom",
-    body: "Choose who you want to fund and set a spending limit per match. Confirm once — that's all you need to do.",
+    title: "Back Emma, Jack, or Tom",
+    body: "Allocate test USDT to the helper you trust and set a per-match limit. One signature, fully onchain.",
     icon: Key01Icon,
   },
   {
     n: "03",
-    label: "Watch",
-    title: "They work during the match",
-    body: "While the game plays, your helper saves moments, places bets, or picks players. Every move is logged.",
+    label: "They act onchain",
+    title: "Real moves during the match",
+    body: "Emma mints the best moments as NFTs, Jack places match bets, Tom drafts your fantasy team. Every move is a real transaction you can verify.",
     icon: ChartHistogramIcon,
   },
   {
     n: "04",
-    label: "Review",
-    title: "See everything they did",
-    body: "Check the activity feed anytime. Filter by person, match, or result. Top performers show up on the leaderboard.",
+    label: "You own it",
+    title: "Keep what they make",
+    body: "Moment NFTs land in your wallet, settled bets pay back to your balance, and your team climbs the leaderboard and your private leagues.",
     icon: BookOpen01Icon,
   },
 ];
@@ -55,8 +55,11 @@ export function HowItWorks() {
             How it works
           </span>
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-            You fund. <span className="font-serif italic font-normal text-violet-200">They play.</span> You watch.
+            You fund. <span className="font-serif italic font-normal text-violet-200">They play.</span> You own it.
           </h2>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-400">
+            Three AI helpers act for you during live World Cup matches. You stay in control of the money and keep everything they make.
+          </p>
         </motion.div>
 
         <div className="mt-12 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">

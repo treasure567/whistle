@@ -25,8 +25,9 @@ export function AgentsSection() {
             </h2>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-zinc-400">
-            Each person has a clear job. You set a spending limit. They work
-            inside it — and every action is logged so you can see what happened.
+            Each one has a clear job and acts onchain: Emma mints moment NFTs,
+            Jack places match bets, Tom drafts your fantasy team. You set the
+            spending limit; they work inside it.
           </p>
         </motion.div>
 
