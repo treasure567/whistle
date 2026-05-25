@@ -4,13 +4,15 @@ import { useMemo, useState } from "react";
 import { ArrowLeft01Icon, FootballIcon } from "hugeicons-react";
 
 import { Button } from "@/components/ui/button";
+import { CountryPicker } from "@/components/ui/country-picker";
 import { FlagOrb } from "@/components/ui/flag-orb";
+import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { FlatPitch } from "@/components/blocks/manager/flat-pitch";
 import { MatchSim } from "@/components/blocks/simulate/match-sim";
 import type { SimTeam } from "@/lib/sim/engine";
 import { cn } from "@/lib/utils";
 
-export type ManagerPlayer = { id: string; name: string; position: string; price: number };
+export type ManagerPlayer = { id: string; name: string; position: string; price: number; photo?: string | null };
 export type ManagerTeam = { code: string; name: string; players: ManagerPlayer[] };
 
 const FORMATIONS: Record<string, { DEF: number; MID: number; FWD: number }> = {
@@ -128,23 +130,14 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Pick your nation</h2>
           <div className="mt-5">
-            <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               Country
-            </label>
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-foreground/[0.02] px-3 py-2">
-              <FlagOrb code={country} size={28} />
-              <select
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="w-full bg-transparent text-sm text-foreground outline-none"
-              >
-                {teams.map((t) => (
-                  <option key={t.code} value={t.code} className="bg-background text-foreground">
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            </span>
+            <CountryPicker
+              value={country}
+              options={teams.map((t) => ({ code: t.code, name: t.name }))}
+              onChange={setCountry}
+            />
           </div>
           <div className="mt-4">
             <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
@@ -207,10 +200,13 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                         : "border-border opacity-60",
                     )}
                   >
-                    <span className="min-w-0">
-                      <span className="block truncate text-[13px] text-foreground">{p.name}</span>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                        {p.position}
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <PlayerAvatar src={p.photo ?? undefined} name={p.name} size={30} />
+                      <span className="min-w-0">
+                        <span className="block truncate text-[13px] text-foreground">{p.name}</span>
+                        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                          {p.position}
+                        </span>
                       </span>
                     </span>
                     <span className="font-mono text-[12px] tabular-nums text-violet-300">{p.price.toFixed(1)}</span>

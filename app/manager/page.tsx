@@ -23,7 +23,7 @@ function buildTeams(players: PlayerRecord[]): ManagerTeam[] {
     teams.push({
       code,
       name: teamName(code),
-      players: list.map((p) => ({ id: p.id, name: p.name, position: p.position, price: p.priceMillions })),
+      players: list.map((p) => ({ id: p.id, name: p.name, position: p.position, price: p.priceMillions, photo: p.photo })),
     });
   }
   return teams.sort((a, b) => a.name.localeCompare(b.name));

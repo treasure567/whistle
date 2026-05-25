@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowDataTransferHorizontalIcon, DiceIcon } from "hugeicons-react";
 
 import { Button } from "@/components/ui/button";
-import { FlagOrb } from "@/components/ui/flag-orb";
+import { CountryPicker } from "@/components/ui/country-picker";
 import { MatchSim } from "./match-sim";
 import { TournamentSim } from "./tournament-sim";
 import { useSimBackground } from "@/components/providers/sim-background";
@@ -126,25 +126,16 @@ function TeamSelect({
   teams: SimTeam[];
   onChange: (code: string) => void;
 }) {
-  const current = teams.find((t) => t.code === value);
   return (
-    <label className="block">
+    <div className="block">
       <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</span>
-      <div className="flex items-center gap-3 rounded-xl border border-border bg-foreground/[0.02] px-3 py-2">
-        {current ? <FlagOrb code={current.code} size={26} /> : null}
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-transparent text-sm text-foreground outline-none"
-        >
-          {teams.map((t) => (
-            <option key={t.code} value={t.code} disabled={t.code === exclude} className="bg-background text-foreground">
-              {t.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    </label>
+      <CountryPicker
+        value={value}
+        exclude={exclude}
+        options={teams.map((t) => ({ code: t.code, name: t.name }))}
+        onChange={onChange}
+      />
+    </div>
   );
 }
 
