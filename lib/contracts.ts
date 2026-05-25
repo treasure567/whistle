@@ -11,16 +11,16 @@ type ContractName =
 
 type AddressBook = Record<ContractName, Address>;
 
-const MOCK_ADDRESSES: AddressBook = {
-  AgentRegistry: "0xA9eB13e07caC9F0428B17B4D45e0d2a7e9ED4C21",
-  PositionManager: "0xB17b5C4fE9c4d3a02bC8fD9F2F1c1E2bDcCe3F44",
-  MomentNFT: "0xC4eEdaB52fD58afA6E5f0bC1aE2b3A48Db8bA1cE",
-  FantasyEntry: "0xD30f7E1Cf3c2a40dE9B82A4dB1bCa84e4F8b3aA7",
-  SettlementOracle: "0xE82dAa7c8c3E5BF1D26B6A8d4f57b4BfA8d9E6C0",
+const X_LAYER_TESTNET_ADDRESSES: AddressBook = {
+  AgentRegistry: "0x777bBFafAD29cD92575de91FF8CCA59e85729b76",
+  PositionManager: "0x91bed7A3ce8940430646BD8cC4AB842a2A470B22",
+  MomentNFT: "0x5c2C8476ff37010f0A258D428490152EA05F0cC5",
+  FantasyEntry: "0xCf5959D698D813f1d82fa27eA9Cdd9911253d67C",
+  SettlementOracle: "0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4",
 };
 
 export const CONTRACTS: Record<number, AddressBook> = {
-  [X_LAYER_CHAIN_ID]: MOCK_ADDRESSES,
+  [X_LAYER_CHAIN_ID]: X_LAYER_TESTNET_ADDRESSES,
 };
 
 export function getContract(chainId: number, name: ContractName): Address {
@@ -37,31 +37,31 @@ export const CONTRACT_LIST: ReadonlyArray<{
 }> = [
   {
     name: "AgentRegistry",
-    address: MOCK_ADDRESSES.AgentRegistry,
+    address: X_LAYER_TESTNET_ADDRESSES.AgentRegistry,
     lines: 80,
     description: "Stores who each helper is and how they behave.",
   },
   {
     name: "PositionManager",
-    address: MOCK_ADDRESSES.PositionManager,
+    address: X_LAYER_TESTNET_ADDRESSES.PositionManager,
     lines: 150,
     description: "Holds your money and tracks what each helper spends.",
   },
   {
     name: "MomentNFT",
-    address: MOCK_ADDRESSES.MomentNFT,
+    address: X_LAYER_TESTNET_ADDRESSES.MomentNFT,
     lines: 90,
     description: "Where Emma saves match moments for you to keep.",
   },
   {
     name: "FantasyEntry",
-    address: MOCK_ADDRESSES.FantasyEntry,
+    address: X_LAYER_TESTNET_ADDRESSES.FantasyEntry,
     lines: 110,
     description: "Where Tom registers player picks for each match.",
   },
   {
     name: "SettlementOracle",
-    address: MOCK_ADDRESSES.SettlementOracle,
+    address: X_LAYER_TESTNET_ADDRESSES.SettlementOracle,
     lines: 70,
     description: "Posts official match results so bets can settle fairly.",
   },
