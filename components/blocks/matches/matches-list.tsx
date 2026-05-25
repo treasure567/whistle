@@ -152,8 +152,12 @@ function MatchSection({
   );
 }
 
-export function MatchesList() {
-  const { live, upcoming, finished } = groupMatches(MATCHES);
+export function MatchesList({
+  matches = MATCHES,
+}: {
+  matches?: ReadonlyArray<MatchInfo>;
+}) {
+  const { live, upcoming, finished } = groupMatches(matches);
 
   return (
     <div className="mx-auto max-w-4xl space-y-12 px-6 md:px-10">
