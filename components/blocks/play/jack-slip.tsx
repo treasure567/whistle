@@ -245,7 +245,7 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
                   {pick.note ? <p className="mt-0.5 truncate text-[11px] italic text-zinc-500">{pick.note}</p> : null}
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="font-mono text-sm tabular-nums text-zinc-100">{pick.stake} USDT</p>
+                  <p className="font-mono text-sm tabular-nums text-zinc-100">{pick.stake} OKB</p>
                   <Confidence value={pick.confidence} />
                 </div>
               </button>

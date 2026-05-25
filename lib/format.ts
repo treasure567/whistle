@@ -22,16 +22,16 @@ const compactFormatter = new Intl.NumberFormat("en-US", {
 
 export function formatUsdt(amount: number, opts?: { compact?: boolean }): string {
   if (opts?.compact && Math.abs(amount) >= 10_000) {
-    return `${compactFormatter.format(amount)} USDT`;
+    return `${compactFormatter.format(amount)} OKB`;
   }
-  return `${usdtFormatter.format(amount)} USDT`;
+  return `${usdtFormatter.format(amount)} OKB`;
 }
 
 export function formatPercent(value: number, digits = 1): string {
   return `${value.toFixed(digits)}%`;
 }
 
-export function formatDelta(value: number, suffix = "USDT"): string {
+export function formatDelta(value: number, suffix = "OKB"): string {
   const sign = value > 0 ? "+" : value < 0 ? "−" : "±";
   const abs = Math.abs(value);
   return `${sign}${usdtFormatter.format(abs)} ${suffix}`;

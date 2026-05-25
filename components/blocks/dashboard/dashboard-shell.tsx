@@ -251,7 +251,7 @@ function CallRow({ prediction, last }: { prediction: PredictionRecord; last: boo
           <p className="truncate text-sm text-foreground">{prediction.market}</p>
         </div>
         <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-          {prediction.side} · {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} USDT` : "free"} · {timeAgo(Date.parse(prediction.createdAt))}
+          {prediction.side} · {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} OKB` : "free"} · {timeAgo(Date.parse(prediction.createdAt))}
         </p>
       </div>
       {prediction.txHash ? <TxLink hash={prediction.txHash} chars={4} /> : null}

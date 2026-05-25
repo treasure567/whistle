@@ -59,7 +59,7 @@ export function LandingHero() {
             transition={{ ...heroSpring, delay: 0.18 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-zinc-400"
           >
-            Whistle gives you three AI helpers for football. Emma mints the best moments as NFTs, Jack places match bets, and Tom drafts your fantasy team. You choose who to fund with test USDT; they act onchain while you watch.
+            Whistle gives you three AI helpers for football. Emma mints the best moments as NFTs, Jack places match bets, and Tom drafts your fantasy team. You choose who to fund with test OKB; they act onchain while you watch.
           </motion.p>
 
           <motion.div
@@ -90,7 +90,7 @@ export function LandingHero() {
           >
             <HeroStat label="AI helpers" value="3" hint="Emma · Jack · Tom" />
             <HeroStat label="Every action" value="Onchain" hint="verify each tx" />
-            <HeroStat label="To play" value="Free" hint="test USDT, no real money" />
+            <HeroStat label="To play" value="Free" hint="test OKB, no real money" />
           </motion.div>
         </div>
 

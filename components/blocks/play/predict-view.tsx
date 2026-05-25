@@ -284,7 +284,7 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
                 key={value}
                 active={stake === value}
                 onClick={() => setStake(value)}
-                label={value === 0 ? "Free call" : `${value} USDT`}
+                label={value === 0 ? "Free call" : `${value} OKB`}
               />
             ))}
           </div>
@@ -319,7 +319,7 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
                 ? phaseLabel(fundState.phase)
                 : "Saving"
               : stake > 0
-                ? `Back with ${stake} USDT`
+                ? `Back with ${stake} OKB`
                 : "Lock in free call"}
           </Button>
         ) : (
@@ -367,7 +367,7 @@ function PredictionRow({ prediction }: { prediction: PredictionRecord }) {
       </p>
       <div className="mt-1 flex items-center justify-between gap-2">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} USDT · ` : "Free call · "}
+          {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} OKB · ` : "Free call · "}
           {timeAgo(Date.parse(prediction.createdAt))}
         </p>
         {prediction.txHash ? <TxLink hash={prediction.txHash} chars={5} /> : null}
