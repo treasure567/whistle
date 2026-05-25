@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ACTIVITY, AGENT_LIST } from "@/lib/mock";
+import { AGENT_LIST } from "@/lib/mock";
 import { useLiveFeed } from "@/hooks/use-live-feed";
 import { cn } from "@/lib/utils";
 import type { ActivityItem, AgentSlug } from "@/types";
@@ -27,7 +27,7 @@ interface ActivityFeedProps {
   items?: ReadonlyArray<ActivityItem>;
 }
 
-export function ActivityFeed({ initialAgent = "all", items = ACTIVITY }: ActivityFeedProps) {
+export function ActivityFeed({ initialAgent = "all", items = [] }: ActivityFeedProps) {
   const [agent, setAgent] = useState<AgentFilter>(initialAgent);
   const [kind, setKind] = useState<KindFilter>("all");
   const live = useLiveFeed();

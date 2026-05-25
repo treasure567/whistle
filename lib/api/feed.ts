@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { Hex } from "viem";
 
-import { ACTIVITY } from "@/lib/mock/activity";
 import type { ActivityItem, ActivityKind, AgentSlug } from "@/types";
 import { apiGet } from "./client";
 
@@ -63,7 +62,7 @@ export async function fetchActivity(): Promise<{ items: ActivityItem[]; source: 
   try {
     const rows = await apiGet("/activity", activityRowsSchema);
     if (rows.length === 0) {
-      return { items: [...ACTIVITY], source: "sample" };
+      return { items: [], source: "sample" };
     }
     const items = rows.map<ActivityItem>((row) => {
       const action = row.action as { tool?: string; input?: Record<string, unknown> } | null;
@@ -91,6 +90,6 @@ export async function fetchActivity(): Promise<{ items: ActivityItem[]; source: 
     });
     return { items, source: "live" };
   } catch {
-    return { items: [...ACTIVITY], source: "sample" };
+    return { items: [], source: "sample" };
   }
 }

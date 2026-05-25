@@ -1,30 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import Lenis from "lenis";
+import type { ReactNode } from "react";
 
-export function SmoothScroll({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      syncTouch: false,
-    });
-
-    let rafId: number;
-    function raf(time: number) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-    };
-  }, []);
-
+// Smooth-scroll (Lenis) was removed: it hijacked the wheel without its required
+// stylesheet and trapped scrolling inside the app's nested overflow containers
+// (player pool, tables, match lists), so pages couldn't scroll past them.
+// Native scrolling is reliable on every page and handles nested scrollers.
+export function SmoothScroll({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }

@@ -53,8 +53,8 @@ export function SiteNavbar() {
         className={cn(
           "relative overflow-hidden border backdrop-blur-2xl",
           scrolled
-            ? "border-border bg-background/80 dark:border-white/10 dark:bg-[rgba(10,10,10,0.7)]"
-            : "border-transparent border-b-border bg-background/70 dark:border-b-white/5",
+            ? "border-border bg-background/90 dark:border-white/10 dark:bg-[rgba(10,10,10,0.82)]"
+            : "border-transparent border-b-border bg-background/90 dark:border-b-white/5 dark:bg-background/80",
         )}
       >
 

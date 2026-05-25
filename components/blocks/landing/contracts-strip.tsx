@@ -23,11 +23,12 @@ export function ContractsStrip() {
               Onchain
             </span>
             <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Built in the open. <span className="font-serif italic font-normal text-violet-200">Fully verified.</span>
+              Built in the open. <span className="font-serif italic font-normal text-violet-200">Live on testnet.</span>
             </h2>
           </div>
-          <span className="font-mono text-[11px] text-emerald-300">
-            X Layer mainnet · chainId 196
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-3 py-1 font-mono text-[11px] text-emerald-300">
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            X Layer Testnet · chainId 1952
           </span>
         </motion.div>
 
@@ -65,7 +66,7 @@ export function ContractsStrip() {
               <div className="col-span-2 font-mono text-[12px] text-zinc-400">~{c.lines} lines</div>
               <div className="col-span-2 flex justify-end">
                 <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
-                  Verified
+                  Live
                 </span>
               </div>
             </motion.div>
