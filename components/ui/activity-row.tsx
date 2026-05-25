@@ -39,8 +39,15 @@ interface ActivityRowProps {
   className?: string;
 }
 
+function OffChainTag() {
+  return (
+    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-600">off-chain</span>
+  );
+}
+
 export function ActivityRow({ item, index = 0, className }: ActivityRowProps) {
   const agent = AGENTS[item.agent];
+  const onchain = Boolean(item.txHash && item.txHash !== "0x" && item.txHash.length >= 42);
 
   return (
     <motion.div
@@ -80,7 +87,7 @@ export function ActivityRow({ item, index = 0, className }: ActivityRowProps) {
             <span />
           )}
           <div className="flex items-center gap-3">
-            <TxLink hash={item.txHash} chars={4} />
+            {onchain ? <TxLink hash={item.txHash} chars={4} /> : <OffChainTag />}
             <span className="font-mono text-[10px] text-zinc-700">{timeAgo(item.timestamp)}</span>
           </div>
         </div>
@@ -98,7 +105,7 @@ export function ActivityRow({ item, index = 0, className }: ActivityRowProps) {
       </div>
 
       <div className="hidden flex-col items-end gap-0.5 sm:flex">
-        <TxLink hash={item.txHash} chars={4} />
+        {onchain ? <TxLink hash={item.txHash} chars={4} /> : <OffChainTag />}
         <span className="font-mono text-[10px] text-zinc-700">{timeAgo(item.timestamp)}</span>
       </div>
     </motion.div>
