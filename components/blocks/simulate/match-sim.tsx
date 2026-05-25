@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChampionIcon, FootballIcon } from "hugeicons-react";
+import { ChampionIcon, FootballIcon, VolumeHighIcon, VolumeOffIcon } from "hugeicons-react";
 
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { fetchLlmMatch } from "@/lib/sim/llm-match";
 import { buildCommentary, type SimComment } from "@/lib/sim/commentary";
 import { useVirtualWallet } from "@/hooks/use-virtual-wallet";
 import { useOkbBalance } from "@/hooks/use-okb-balance";
+import { useStadiumAudio } from "@/hooks/use-stadium-audio";
 import { cn } from "@/lib/utils";
 
 type Pick = "home" | "draw" | "away";
@@ -48,6 +49,7 @@ export function MatchSim({
 
   const { balance, setBalance } = useVirtualWallet();
   const { balance: onchainOkb } = useOkbBalance();
+  const { enabled: soundOn, toggle: toggleSound, cheer } = useStadiumAudio();
   const odds = useMemo(() => matchOdds(home.strength, away.strength), [home.strength, away.strength]);
   const [pick, setPick] = useState<Pick>("home");
   const [stake, setStake] = useState(50);
@@ -86,6 +88,11 @@ export function MatchSim({
   const ballX = !last || last.side === "neutral" ? 50 : last.side === "home" ? (GOAL_TYPES.has(last.type) ? 92 : 68) : GOAL_TYPES.has(last.type) ? 8 : 32;
   const justGoal = last && GOAL_TYPES.has(last.type) && last.minute === minute ? last : null;
   const done = minute >= 90 && !playing && result !== null;
+
+  const justGoalKey = justGoal ? `${justGoal.minute}-${justGoal.side}` : null;
+  useEffect(() => {
+    if (justGoalKey) cheer();
+  }, [justGoalKey, cheer]);
 
   async function run(nextVariant: number) {
     if (loading) return;
@@ -239,7 +246,7 @@ export function MatchSim({
             <span className="flex items-center gap-2">
               {onchainOkb !== null ? (
                 <span className="font-mono text-[10px] text-emerald-300" title="Your real OKB on X Layer testnet">
-                  {onchainOkb.toLocaleString(undefined, { maximumFractionDigits: 2 })} onchain
+                  {onchainOkb.toLocaleString(undefined, { maximumFractionDigits: 4 })} onchain
                 </span>
               ) : null}
               <span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-300" suppressHydrationWarning>
@@ -358,6 +365,21 @@ export function MatchSim({
             </Button>
           </>
         )}
+        <button
+          type="button"
+          onClick={toggleSound}
+          title={soundOn ? "Mute crowd" : "Turn on crowd noise"}
+          aria-pressed={soundOn}
+          className={cn(
+            "ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors",
+            soundOn
+              ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-100"
+              : "border-border text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {soundOn ? <VolumeHighIcon size={13} /> : <VolumeOffIcon size={13} />}
+          {soundOn ? "Crowd on" : "Crowd off"}
+        </button>
       </div>
 
       {done && result ? <MatchReport result={result} /> : null}
@@ -419,6 +441,21 @@ const TONE_DOT: Record<SimComment["tone"], string> = {
 function MatchReport({ result }: { result: SimResult }) {
   const { stats, motm, home, away, events } = result;
   const yc = (side: "home" | "away") => events.filter((e) => e.type === "yellow" && e.side === side).length;
+  const goals = events.filter((e) => e.type === "goal" || e.type === "penalty-goal");
+  const scorers = (side: "home" | "away") => {
+    const map = new Map<string, { mins: number[]; pen: boolean }>();
+    for (const g of goals) {
+      if (g.side !== side) continue;
+      const name = g.player ?? (side === "home" ? home.code : away.code);
+      const cur = map.get(name) ?? { mins: [], pen: false };
+      cur.mins.push(g.minute);
+      if (g.type === "penalty-goal") cur.pen = true;
+      map.set(name, cur);
+    }
+    return [...map.entries()].map(([name, v]) => ({ name, mins: [...v.mins].sort((a, b) => a - b), pen: v.pen }));
+  };
+  const homeScorers = scorers("home");
+  const awayScorers = scorers("away");
   const rows: [string, number, number][] = [
     ["Shots", stats.shotsHome, stats.shotsAway],
     ["On target", stats.sotHome, stats.sotAway],
@@ -441,6 +478,48 @@ function MatchReport({ result }: { result: SimResult }) {
           <div className="bg-zinc-500" style={{ width: `${100 - stats.possessionHome}%` }} />
         </div>
       </div>
+      {goals.length > 0 ? (
+        <div className="mb-3 grid grid-cols-2 gap-3 rounded-xl border border-border bg-foreground/[0.02] p-3">
+          <div className="min-w-0">
+            <p className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <FlagOrb code={home.code} size={14} /> {home.code}
+            </p>
+            {homeScorers.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground">No scorers</p>
+            ) : (
+              homeScorers.map((s) => (
+                <p key={s.name} className="flex items-center gap-1.5 truncate text-[12px] text-foreground">
+                  <FootballIcon size={10} className="shrink-0 text-violet-400" />
+                  <span className="truncate">{s.name}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {s.mins.map((m) => `${m}'`).join(", ")}
+                    {s.pen ? " (pen)" : ""}
+                  </span>
+                </p>
+              ))
+            )}
+          </div>
+          <div className="min-w-0 text-right">
+            <p className="mb-1.5 flex items-center justify-end gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              {away.code} <FlagOrb code={away.code} size={14} />
+            </p>
+            {awayScorers.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground">No scorers</p>
+            ) : (
+              awayScorers.map((s) => (
+                <p key={s.name} className="flex items-center justify-end gap-1.5 truncate text-[12px] text-foreground">
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {s.mins.map((m) => `${m}'`).join(", ")}
+                    {s.pen ? " (pen)" : ""}
+                  </span>
+                  <span className="truncate">{s.name}</span>
+                  <FootballIcon size={10} className="shrink-0 text-violet-400" />
+                </p>
+              ))
+            )}
+          </div>
+        </div>
+      ) : null}
       <div className="flex flex-col gap-1.5">
         {rows.map(([label, h, a]) => (
           <div key={label} className="grid grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2">

@@ -1,24 +1,20 @@
 "use client";
 
-import { useAccount, useReadContract } from "wagmi";
-import { formatUnits } from "viem";
+import { useAccount, useBalance } from "wagmi";
 
-import { ERC20_ABI } from "@/lib/abis";
-import { STABLE_DECIMALS, STABLE_TOKEN_ADDRESS } from "@/lib/contracts";
 import { X_LAYER_CHAIN_ID } from "@/lib/chains";
 
-// Live onchain OKB (MockERC20) balance for the connected wallet on X Layer.
+// Live native OKB balance for the connected wallet on X Layer. This is the OKB
+// the user sees in their own wallet (the chain's native gas token), not the
+// MockERC20 funding token used to allocate to agents.
 export function useOkbBalance() {
   const { address, isConnected } = useAccount();
-  const { data, isLoading, refetch } = useReadContract({
-    address: STABLE_TOKEN_ADDRESS,
-    abi: ERC20_ABI,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
+  const { data, isLoading, refetch } = useBalance({
+    address,
     chainId: X_LAYER_CHAIN_ID,
     query: { enabled: Boolean(address), refetchInterval: 30_000 },
   });
 
-  const balance = typeof data === "bigint" ? Number(formatUnits(data, STABLE_DECIMALS)) : null;
+  const balance = data ? Number(data.formatted) : null;
   return { balance, isConnected, isLoading, refetch };
 }

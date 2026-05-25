@@ -79,7 +79,7 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
           title="Your OKB balance on X Layer testnet"
         >
           <span className="size-1.5 rounded-full bg-emerald-400" />
-          {okb.toLocaleString(undefined, { maximumFractionDigits: 2 })} OKB
+          {okb.toLocaleString(undefined, { maximumFractionDigits: 4 })} OKB
         </span>
       ) : null}
       {!onCorrectChain ? (
