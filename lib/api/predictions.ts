@@ -11,6 +11,7 @@ export type CreatePredictionInput = {
   market: string;
   side: string;
   stakeUsdt: string;
+  txHash?: string;
 };
 
 export function createPrediction(input: CreatePredictionInput): Promise<PredictionRecord> {

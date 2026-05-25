@@ -12,6 +12,7 @@ import {
 import { Menu03Icon } from "hugeicons-react";
 
 import { ConnectButton } from "@/components/ui/connect-button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { WhistleMark } from "@/components/ui/whistle-mark";
 import { cn } from "@/lib/utils";
 
@@ -52,8 +53,8 @@ export function SiteNavbar() {
         className={cn(
           "relative overflow-hidden border backdrop-blur-2xl",
           scrolled
-            ? "border-white/10 bg-[rgba(10,10,10,0.7)]"
-            : "border-transparent border-b-white/5 bg-background/70",
+            ? "border-border bg-background/80 dark:border-white/10 dark:bg-[rgba(10,10,10,0.7)]"
+            : "border-transparent border-b-border bg-background/70 dark:border-b-white/5",
         )}
       >
 
@@ -65,7 +66,7 @@ export function SiteNavbar() {
         >
           <Link href="/" className="group flex items-center gap-3" aria-label="whistle home">
             <WhistleMark size={28} className="text-violet-300" />
-            <span className="font-mono text-base tracking-tight text-zinc-100">whistle</span>
+            <span className="font-mono text-base tracking-tight text-foreground">whistle</span>
           </Link>
 
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
@@ -79,8 +80,8 @@ export function SiteNavbar() {
                   className={cn(
                     "rounded-full px-3.5 py-1.5 text-[13px] font-medium tracking-tight transition-all duration-200",
                     isActive
-                      ? "bg-white/[0.06] text-white"
-                      : "text-zinc-400 hover:bg-white/[0.04] hover:text-white",
+                      ? "bg-foreground/[0.06] text-foreground"
+                      : "text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground",
                   )}
                 >
                   {link.label}
@@ -90,12 +91,13 @@ export function SiteNavbar() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <ConnectButton compact />
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="inline-flex size-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-foreground md:hidden"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-foreground/5 text-foreground md:hidden"
             >
               <Menu03Icon className="size-4" />
             </button>
@@ -111,7 +113,7 @@ export function SiteNavbar() {
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -8, height: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 32 }}
-            className="mx-4 mt-2 w-[calc(100%-2rem)] max-w-[880px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.92)] backdrop-blur-2xl md:hidden"
+            className="mx-4 mt-2 w-[calc(100%-2rem)] max-w-[880px] overflow-hidden rounded-2xl border border-border bg-popover/95 backdrop-blur-2xl dark:border-white/10 dark:bg-[rgba(10,10,10,0.92)] md:hidden"
           >
             <div className="flex flex-col gap-1 p-5">
               {NAV_LINKS.map((link, i) => (
@@ -124,7 +126,7 @@ export function SiteNavbar() {
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-lg px-3 py-2.5 text-[15px] font-medium tracking-tight text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                    className="block rounded-lg px-3 py-2.5 text-[15px] font-medium tracking-tight text-foreground/80 transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
                   >
                     {link.label}
                   </Link>

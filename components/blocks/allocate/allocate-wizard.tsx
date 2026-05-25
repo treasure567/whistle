@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -21,21 +21,13 @@ import type { Agent, AgentSlug } from "@/types";
 import { AGENT_LIST, AGENTS } from "@/lib/mock";
 import { formatUsdt, truncateAddress } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Hex } from "viem";
+import { useFundAgent, phaseLabel, type FundState, type FundPhase } from "@/hooks/use-fund-agent";
 
 const STEP_LABELS = ["Person", "Limits", "Duration", "Confirm"] as const;
 type StepIndex = 0 | 1 | 2 | 3;
 
 interface AllocateWizardProps {
   initialAgent?: AgentSlug;
-}
-
-function mockTxHash(seed: string): Hex {
-  const hex = Array.from(seed)
-    .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
-    .join("")
-    .padEnd(64, "f");
-  return `0x${hex.slice(0, 64)}` as Hex;
 }
 
 const HOURS_OPTIONS = [
@@ -47,18 +39,20 @@ const HOURS_OPTIONS = [
 
 export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
   const { isConnected, address } = useAccount();
+  const { state, fund, reset: resetFund } = useFundAgent();
   const [step, setStep] = useState<StepIndex>(0);
   const [agentSlug, setAgentSlug] = useState<AgentSlug>(initialAgent ?? "bookie");
   const [ceiling, setCeiling] = useState(500);
   const [perMatch, setPerMatch] = useState(100);
   const [hours, setHours] = useState<number>(24);
-  const [confirmed, setConfirmed] = useState(false);
 
   const agent = AGENTS[agentSlug];
-  const finalTxHash = useMemo(
-    () => mockTxHash(`alloc-${agentSlug}-${ceiling}-${perMatch}-${hours}`),
-    [agentSlug, ceiling, perMatch, hours],
-  );
+  const confirmed = state.phase === "success";
+  const busy =
+    state.phase === "checking" ||
+    state.phase === "minting" ||
+    state.phase === "approving" ||
+    state.phase === "allocating";
 
   function next() {
     setStep((s) => Math.min(3, s + 1) as StepIndex);
@@ -67,7 +61,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
     setStep((s) => Math.max(0, s - 1) as StepIndex);
   }
   function reset() {
-    setConfirmed(false);
+    resetFund();
     setStep(0);
   }
 
@@ -111,7 +105,9 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
               subtitle={
                 confirmed
                   ? `${agent.name} can now work within the limits you set.`
-                  : "One signature to confirm. Your money stays in your wallet."
+                  : busy
+                    ? "Confirm in your wallet — funds move onchain."
+                    : `One signature funds ${agent.name} with ${formatUsdt(ceiling)} onchain.`
               }
             >
               {confirmed ? (
@@ -120,15 +116,18 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
                   ceiling={ceiling}
                   perMatch={perMatch}
                   hours={hours}
-                  txHash={finalTxHash}
+                  state={state}
                 />
               ) : (
-                <ReviewForm
-                  agent={agent}
-                  ceiling={ceiling}
-                  perMatch={perMatch}
-                  hours={hours}
-                />
+                <>
+                  <ReviewForm agent={agent} ceiling={ceiling} perMatch={perMatch} hours={hours} />
+                  {busy ? <TxProgress state={state} /> : null}
+                  {state.phase === "error" && state.error ? (
+                    <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-200">
+                      {state.error}
+                    </p>
+                  ) : null}
+                </>
               )}
             </StepShell>
           ) : null}
@@ -166,9 +165,10 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
                   <Button
                     variant="violet"
                     size="sm"
-                    onClick={() => setConfirmed(true)}
+                    onClick={() => void fund(agentSlug, ceiling)}
+                    disabled={busy}
                   >
-                    Confirm and fund
+                    {busy ? phaseLabel(state.phase) : "Confirm and fund"}
                     <Tick02Icon size={14} />
                   </Button>
                 ) : (
@@ -489,18 +489,60 @@ function ReviewForm({
   );
 }
 
+function TxProgress({ state }: { state: FundState }) {
+  const order: FundPhase[] = ["minting", "approving", "allocating"];
+  const labels: Record<string, string> = {
+    minting: "Mint test USDT",
+    approving: "Approve spend",
+    allocating: "Fund agent onchain",
+  };
+  const currentIndex = order.indexOf(state.phase);
+  return (
+    <div className="mt-6 rounded-2xl border border-violet-500/20 bg-violet-500/[0.04] p-4">
+      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+        {phaseLabel(state.phase)}…
+      </p>
+      <ul className="mt-3 space-y-2">
+        {order.map((phase, i) => {
+          const done = currentIndex > i;
+          const active = state.phase === phase;
+          return (
+            <li key={phase} className="flex items-center gap-2.5 text-[12px]">
+              <span
+                className={cn(
+                  "flex size-4 items-center justify-center rounded-full border",
+                  done
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                    : active
+                      ? "border-violet-400/50 bg-violet-500/10 text-violet-200"
+                      : "border-white/10 text-zinc-600",
+                )}
+              >
+                {done ? <Tick02Icon size={9} /> : active ? <span className="size-1.5 animate-pulse rounded-full bg-violet-300" /> : null}
+              </span>
+              <span className={cn(done ? "text-zinc-300" : active ? "text-violet-100" : "text-zinc-600")}>
+                {labels[phase]}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 function Confirmed({
   agent,
   ceiling,
   perMatch,
   hours,
-  txHash,
+  state,
 }: {
   agent: Agent;
   ceiling: number;
   perMatch: number;
   hours: number;
-  txHash: Hex;
+  state: FundState;
 }) {
   return (
     <div className="space-y-5">
@@ -510,19 +552,28 @@ function Confirmed({
         </span>
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
-            Funding confirmed
+            Funding confirmed onchain
           </p>
           <p className="mt-0.5 text-sm text-emerald-100">
-            {agent.name} is ready to work within your limits.
+            {formatUsdt(ceiling)} allocated to {agent.name}. They can now work within your limits.
           </p>
         </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
-        <ReceiptRow label="Total budget" value={formatUsdt(ceiling)} />
+        <ReceiptRow label="Allocated" value={formatUsdt(ceiling)} />
         <ReceiptRow label="Per-match limit" value={formatUsdt(perMatch)} />
         <ReceiptRow label="Window" value={`${hours} hours`} />
-        <ReceiptRow label="Tx" value={<TxLink hash={txHash} chars={6} />} />
+        <ReceiptRow
+          label="Allocate tx"
+          value={state.txHash ? <TxLink hash={state.txHash} chars={6} /> : "—"}
+        />
+        {state.approveHash ? (
+          <ReceiptRow label="Approve tx" value={<TxLink hash={state.approveHash} chars={6} />} />
+        ) : null}
+        {state.mintHash ? (
+          <ReceiptRow label="Faucet tx" value={<TxLink hash={state.mintHash} chars={6} />} />
+        ) : null}
       </div>
     </div>
   );

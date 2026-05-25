@@ -2,15 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { CoinsDollarIcon, FootballIcon, Loading03Icon } from "hugeicons-react";
+import { CoinsDollarIcon, FootballIcon, Loading03Icon, ShieldBlockchainIcon } from "hugeicons-react";
 
+import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@/components/ui/connect-button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { TxLink } from "@/components/ui/tx-link";
 import { ApiError } from "@/lib/api/client";
 import { createPrediction, fetchPredictions } from "@/lib/api/predictions";
 import type { PredictionRecord } from "@/lib/api/schemas";
-import { timeAgo } from "@/lib/format";
+import { AGENTS } from "@/lib/mock";
+import { formatUsdt, timeAgo } from "@/lib/format";
+import { useFundAgent, phaseLabel } from "@/hooks/use-fund-agent";
 import { cn } from "@/lib/utils";
 import type { MatchInfo } from "@/types";
 
@@ -36,17 +40,26 @@ function sidesFor(kind: MarketKind, match: MatchInfo | undefined): Side[] {
 
 export function PredictView({ matches }: { matches: MatchInfo[] }) {
   const { address, isConnected } = useAccount();
+  const { state: fundState, fund, reset: resetFund } = useFundAgent();
+  const jack = AGENTS.bookie;
   const [matchId, setMatchId] = useState<string>(matches[0]?.id ?? "");
   const [marketId, setMarketId] = useState<string>(MARKETS[0]!.id);
   const [sideId, setSideId] = useState<string>("home");
   const [stake, setStake] = useState<number>(0);
-  const [busy, setBusy] = useState(false);
+  const [savingFree, setSavingFree] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionRecord[]>([]);
 
   const match = matches.find((item) => item.id === matchId);
   const market = MARKETS.find((item) => item.id === marketId) ?? MARKETS[0]!;
   const sides = useMemo(() => sidesFor(market.kind, match), [market.kind, match]);
+
+  const fundBusy =
+    fundState.phase === "checking" ||
+    fundState.phase === "minting" ||
+    fundState.phase === "approving" ||
+    fundState.phase === "allocating";
+  const busy = stake > 0 ? fundBusy : savingFree;
 
   useEffect(() => {
     let active = true;
@@ -72,22 +85,30 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
 
   async function submit() {
     if (!address || !match) return;
-    setBusy(true);
     setError(null);
     const side = sides.find((item) => item.id === sideId) ?? sides[0]!;
+    const base = {
+      ownerAddress: address,
+      matchExternalId: match.id,
+      market: market.label,
+      side: side.label,
+    };
     try {
-      const created = await createPrediction({
-        ownerAddress: address,
-        matchExternalId: match.id,
-        market: market.label,
-        side: side.label,
-        stakeUsdt: String(stake),
-      });
-      setPredictions((prev) => [created, ...prev]);
+      if (stake > 0) {
+        const txHash = await fund("bookie", stake);
+        if (!txHash) return;
+        const created = await createPrediction({ ...base, stakeUsdt: String(stake), txHash });
+        setPredictions((prev) => [created, ...prev]);
+        resetFund();
+      } else {
+        setSavingFree(true);
+        const created = await createPrediction({ ...base, stakeUsdt: "0" });
+        setPredictions((prev) => [created, ...prev]);
+      }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not save your prediction");
     } finally {
-      setBusy(false);
+      setSavingFree(false);
     }
   }
 
@@ -106,8 +127,18 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
   return (
     <div className="mx-auto grid max-w-7xl items-start gap-6 px-6 md:grid-cols-[1.2fr_1fr] md:px-10">
       <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-5">
+        <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3">
+          <AgentAvatar agent="bookie" size={40} />
+          <div>
+            <p className="text-sm font-semibold text-zinc-100">{jack.name} the Bookie</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-200/80">
+              Backs your call onchain
+            </p>
+          </div>
+        </div>
+
         <Section label="Match">
-          <div className="max-h-48 divide-y divide-white/[0.04] overflow-y-auto rounded-xl border border-white/10">
+          <div className="max-h-44 divide-y divide-white/[0.04] overflow-y-auto rounded-xl border border-white/10">
             {matches.map((item) => (
               <button
                 key={item.id}
@@ -145,29 +176,50 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
           </div>
         </Section>
 
-        <Section label="Stake">
+        <Section label="Back it">
           <div className="flex flex-wrap gap-1.5">
             {STAKES.map((value) => (
               <Chip
                 key={value}
                 active={stake === value}
                 onClick={() => setStake(value)}
-                label={value === 0 ? "Free pick" : `${value} USDT`}
+                label={value === 0 ? "Free call" : `${value} USDT`}
               />
             ))}
           </div>
+          {stake > 0 ? (
+            <p className="mt-2 flex items-center gap-1.5 text-[11px] text-amber-200/80">
+              <ShieldBlockchainIcon size={12} />
+              Funds {jack.name} with {formatUsdt(stake)} onchain — one signature.
+            </p>
+          ) : (
+            <p className="mt-2 text-[11px] text-zinc-500">A free call is recorded off-chain. No wallet signature.</p>
+          )}
         </Section>
 
-        {error ? (
+        {fundBusy ? (
+          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.05] p-3 text-[12px] text-violet-100">
+            <Loading03Icon size={14} className="animate-spin" />
+            {phaseLabel(fundState.phase)}… confirm in your wallet
+          </div>
+        ) : null}
+
+        {error || (fundState.phase === "error" && fundState.error) ? (
           <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-200">
-            {error}
+            {error ?? fundState.error}
           </p>
         ) : null}
 
         {isConnected ? (
           <Button variant="violet" size="lg" onClick={submit} disabled={busy || !match}>
             {busy ? <Loading03Icon size={14} className="animate-spin" /> : null}
-            {busy ? "Saving" : "Lock in prediction"}
+            {busy
+              ? stake > 0
+                ? phaseLabel(fundState.phase)
+                : "Saving"
+              : stake > 0
+                ? `Back with ${stake} USDT`
+                : "Lock in free call"}
           </Button>
         ) : (
           <ConnectButton />
@@ -176,12 +228,12 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
 
       <div className="flex flex-col gap-3">
         <h2 className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-          Your predictions · {predictions.length}
+          Your calls · {predictions.length}
         </h2>
         {!isConnected ? (
-          <EmptyState icon={<CoinsDollarIcon size={16} />} label="CONNECT_TO_VIEW" hint="Connect your wallet to see your prediction history." />
+          <EmptyState icon={<CoinsDollarIcon size={16} />} label="CONNECT_TO_VIEW" hint="Connect your wallet to see your call history." />
         ) : predictions.length === 0 ? (
-          <EmptyState icon={<FootballIcon size={16} />} label="NO_PREDICTIONS" hint="Lock in your first call. It will show up here with its result." />
+          <EmptyState icon={<FootballIcon size={16} />} label="NO_CALLS" hint="Make your first call. It will show up here with its result." />
         ) : (
           predictions.map((item) => <PredictionRow key={item.id} prediction={item} />)
         )}
@@ -210,10 +262,13 @@ function PredictionRow({ prediction }: { prediction: PredictionRecord }) {
       <p className="mt-1.5 text-sm text-zinc-100">
         {prediction.market} · <span className="text-violet-200">{prediction.side}</span>
       </p>
-      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-        {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} USDT · ` : "Free pick · "}
-        {timeAgo(Date.parse(prediction.createdAt))}
-      </p>
+      <div className="mt-1 flex items-center justify-between gap-2">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} USDT · ` : "Free call · "}
+          {timeAgo(Date.parse(prediction.createdAt))}
+        </p>
+        {prediction.txHash ? <TxLink hash={prediction.txHash} chars={5} /> : null}
+      </div>
     </div>
   );
 }

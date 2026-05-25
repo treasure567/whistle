@@ -18,13 +18,13 @@ export default async function AgentsPage() {
       <section className="relative pt-[calc(4rem+3rem)] pb-12 md:pt-32">
         <AmbientGlow position="top" intensity="subtle" size={900} />
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
             The team
           </span>
-          <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-6xl">
+          <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-6xl">
             Emma, Jack, <span className="font-serif italic font-normal text-violet-200">and Tom.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-400">
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Three AI helpers, each with one clear job. You set a spending limit.
             They work inside it. Every action is logged so you can see exactly
             what they did.

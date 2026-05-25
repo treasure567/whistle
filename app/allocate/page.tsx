@@ -30,13 +30,13 @@ export default async function AllocatePage({
       <section className="relative pt-[calc(4rem+3rem)] pb-12 md:pt-32">
         <AmbientGlow position="top" intensity="subtle" size={900} />
         <div className="mx-auto max-w-3xl px-6 md:px-10 text-center">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
             Get started
           </span>
-          <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-5xl">
+          <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
             Fund someone <span className="font-serif italic font-normal text-violet-200">in four steps.</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-zinc-400">
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Pick Emma, Jack, or Tom. Set how much they can spend. Choose how
             long it lasts. Confirm once — they work inside your limits.
           </p>

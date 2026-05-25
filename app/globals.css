@@ -114,43 +114,44 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Obsidian canvas is the default. :root mirrors .dark so components that
-   use `dark:` prefixes keep working (see layout.tsx adding className="dark"
-   to <html>). */
+/* Obsidian dark is the default theme (next-themes sets .dark on <html> before
+   paint). :root holds the light palette used when the user toggles to light;
+   .dark below holds the obsidian palette. Tailwind's `dark:` variant keys off
+   the .dark class, so dark-mode utilities only apply in dark. */
 :root {
   --site-header-height: 4rem;
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.96 0 0);
-  --card: oklch(0.11 0 0);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.11 0 0);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.62 0.22 295);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.17 0 0);
-  --secondary-foreground: oklch(0.96 0 0);
-  --muted: oklch(0.15 0 0);
-  --muted-foreground: oklch(0.68 0 0);
-  --accent: oklch(0.55 0.2 295);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.65 0.22 25);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.62 0.22 295 / 0.55);
-  --chart-1: oklch(0.62 0.22 295);
-  --chart-2: oklch(0.72 0.18 295);
-  --chart-3: oklch(0.82 0.14 295);
-  --chart-4: oklch(0.55 0 0);
-  --chart-5: oklch(0.32 0 0);
   --radius: 0.75rem;
-  --sidebar: oklch(0.10 0 0);
-  --sidebar-foreground: oklch(0.96 0 0);
-  --sidebar-primary: oklch(0.62 0.22 295);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.15 0 0);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.62 0.22 295 / 0.55);
+  --background: oklch(0.985 0.002 270);
+  --foreground: oklch(0.21 0.01 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.01 270);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.01 270);
+  --primary: oklch(0.55 0.22 295);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.962 0.004 270);
+  --secondary-foreground: oklch(0.24 0.01 270);
+  --muted: oklch(0.965 0.004 270);
+  --muted-foreground: oklch(0.46 0.02 270);
+  --accent: oklch(0.62 0.2 295);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.58 0.22 25);
+  --border: oklch(0.21 0.01 270 / 12%);
+  --input: oklch(0.21 0.01 270 / 16%);
+  --ring: oklch(0.55 0.22 295 / 0.5);
+  --chart-1: oklch(0.55 0.22 295);
+  --chart-2: oklch(0.65 0.18 295);
+  --chart-3: oklch(0.74 0.14 295);
+  --chart-4: oklch(0.65 0 0);
+  --chart-5: oklch(0.8 0 0);
+  --sidebar: oklch(0.98 0.003 270);
+  --sidebar-foreground: oklch(0.21 0.01 270);
+  --sidebar-primary: oklch(0.55 0.22 295);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.962 0.004 270);
+  --sidebar-accent-foreground: oklch(0.24 0.01 270);
+  --sidebar-border: oklch(0.21 0.01 270 / 10%);
+  --sidebar-ring: oklch(0.55 0.22 295 / 0.5);
 }
 
 .dark {

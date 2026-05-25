@@ -1,6 +1,7 @@
 import type { Address } from "viem";
 
-import { X_LAYER_CHAIN_ID } from "./chains";
+import { X_LAYER_CHAIN_ID, X_LAYER_USDT_ADDRESS } from "./chains";
+import type { AgentSlug } from "@/types";
 
 type ContractName =
   | "AgentRegistry"
@@ -33,6 +34,18 @@ export function getContract(chainId: number, name: ContractName): Address {
   if (!book) throw new Error(`No address book for chainId ${chainId}`);
   return book[name];
 }
+
+/// Onchain agent ids assigned at registration time. Agents are registered in
+/// kind order (Scout, Bookie, Manager) so ids start at 1 and follow that order.
+export const AGENT_ONCHAIN_ID: Record<AgentSlug, bigint> = {
+  scout: 1n,
+  bookie: 2n,
+  manager: 3n,
+};
+
+/// MockERC20 test stablecoin standing in for USDT on testnet. 18 decimals.
+export const STABLE_TOKEN_ADDRESS = X_LAYER_USDT_ADDRESS as Address;
+export const STABLE_DECIMALS = 18;
 
 export const CONTRACT_LIST: ReadonlyArray<{
   name: ContractName;

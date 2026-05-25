@@ -23,15 +23,15 @@ export default async function BracketPage() {
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <Link
             href="/fixtures"
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 transition-colors hover:text-zinc-100"
+            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-zinc-100"
           >
             <ArrowLeft01Icon size={13} />
             Fixtures
           </Link>
-          <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-5xl">
+          <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
             The road to the <span className="font-serif italic font-normal text-violet-200">Final.</span>
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Thirty-two teams, six rounds, one trophy. The bracket fills in as the group stage
             settles — scroll across to follow every path to July 19.
           </p>

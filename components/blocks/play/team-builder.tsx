@@ -21,6 +21,7 @@ import {
 } from "@/lib/fantasy";
 import { PlayerPool } from "./player-pool";
 import { SquadBoard } from "./squad-board";
+import { ManagerCoach } from "./manager-coach";
 
 export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
   const { address, isConnected } = useAccount();
@@ -124,7 +125,9 @@ export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
   }
 
   return (
-    <div className="mx-auto grid max-w-7xl items-start gap-6 px-6 md:grid-cols-[1.4fr_1fr] md:px-10">
+    <>
+      <ManagerCoach filled={slots.length} remaining={remaining} validation={validation} />
+      <div className="mx-auto grid max-w-7xl items-start gap-6 px-6 md:grid-cols-[1.4fr_1fr] md:px-10">
       <PlayerPool
         players={players}
         selectedIds={selectedIds}
@@ -155,6 +158,7 @@ export function TeamBuilder({ players }: { players: PlayerRecord[] }) {
         }}
         onSubmit={submit}
       />
-    </div>
+      </div>
+    </>
   );
 }

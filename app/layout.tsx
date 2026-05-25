@@ -4,6 +4,7 @@ import NextTopLoader from "nextjs-toploader";
 
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { Web3Provider } from "@/components/providers/web3";
+import { ThemeProvider } from "@/components/providers/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -152,7 +153,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextTopLoader
@@ -163,9 +165,11 @@ export default function RootLayout({
           easing="cubic-bezier(0.4, 0, 0.2, 1)"
           speed={300}
         />
-        <Web3Provider>
-          <SmoothScroll>{children}</SmoothScroll>
-        </Web3Provider>
+        <ThemeProvider>
+          <Web3Provider>
+            <SmoothScroll>{children}</SmoothScroll>
+          </Web3Provider>
+        </ThemeProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
