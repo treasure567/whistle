@@ -9,6 +9,7 @@ import { FlagOrb } from "@/components/ui/flag-orb";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { FlatPitch } from "@/components/blocks/manager/flat-pitch";
 import { MatchSim } from "@/components/blocks/simulate/match-sim";
+import { PenaltyShootout, type ShootoutResult } from "@/components/blocks/simulate/penalty-shootout";
 import { fetchManagerBrief } from "@/lib/api/manager";
 import type { ManagerBriefResult } from "@/lib/api/schemas";
 import type { SimTeam } from "@/lib/sim/engine";
@@ -71,6 +72,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   const [briefLoading, setBriefLoading] = useState(false);
   const [analysis, setAnalysis] = useState<ManagerBriefResult | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [shootout, setShootout] = useState(false);
+  const [pens, setPens] = useState<{ h: number; a: number } | null>(null);
 
   const squad = useMemo(() => byCode.get(country)?.players ?? [], [byCode, country]);
   const bench = useMemo(() => {
@@ -111,6 +114,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setOutcome(null);
     setLastScore(null);
     setAnalysis(null);
+    setShootout(false);
+    setPens(null);
     setPhase("match");
   }
 
@@ -123,6 +128,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setLastScore(null);
     setBrief(null);
     setAnalysis(null);
+    setShootout(false);
+    setPens(null);
     setPhase("squad");
   }
 
@@ -132,6 +139,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setLastScore(null);
     setBrief(null);
     setAnalysis(null);
+    setShootout(false);
+    setPens(null);
     pickOpponent();
     setPhase("squad");
   }
@@ -152,17 +161,26 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
         };
       })()
     : null;
-  const homeStrength = homeSim?.strength ?? 0.5;
-  const awayStrength = awaySim?.strength ?? 0.5;
-  function handleResult({ homeScore, awayScore }: { homeScore: number; awayScore: number }) {
-    setLastScore({ h: homeScore, a: awayScore });
-    let through: boolean;
-    if (homeScore > awayScore) through = true;
-    else if (homeScore < awayScore) through = false;
-    else through = Math.random() < homeStrength / (homeStrength + awayStrength); // shootout
+  function resolveOutcome(through: boolean) {
     if (!through) setOutcome("eliminated");
     else if (round >= ROUNDS.length - 1) setOutcome("champion");
     else setOutcome("advanced");
+  }
+
+  function handleResult({ homeScore, awayScore }: { homeScore: number; awayScore: number }) {
+    setLastScore({ h: homeScore, a: awayScore });
+    setPens(null);
+    if (homeScore === awayScore) {
+      setShootout(true); // knockout tie: extra time, then penalties
+      return;
+    }
+    resolveOutcome(homeScore > awayScore);
+  }
+
+  function onShootoutResult(result: ShootoutResult) {
+    setShootout(false);
+    setPens({ h: result.homePens, a: result.awayPens });
+    resolveOutcome(result.homeWon);
   }
 
   const homeBench = bench.map((p) => p.name);
@@ -409,6 +427,15 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
             bench={{ home: homeBench, away: awayBench }}
             onResult={handleResult}
           />
+          {shootout ? (
+            <PenaltyShootout
+              homeCode={homeSim.code}
+              awayCode={awaySim.code}
+              homeStrength={homeSim.strength}
+              awayStrength={awaySim.strength}
+              onResult={onShootoutResult}
+            />
+          ) : null}
           {outcome ? (
             <div
               className={cn(
@@ -421,6 +448,11 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
               {lastScore ? (
                 <p className="mb-1 font-mono text-2xl font-semibold tabular-nums text-foreground">
                   {lastScore.h}-{lastScore.a}
+                </p>
+              ) : null}
+              {pens ? (
+                <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300">
+                  {outcome === "eliminated" ? "Lost" : "Won"} {pens.h}-{pens.a} on penalties
                 </p>
               ) : null}
               {outcome === "champion" ? (

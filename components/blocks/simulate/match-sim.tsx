@@ -211,19 +211,36 @@ export function MatchSim({
       : `My read: ${pickLabel(favPick)} at ${odds[favPick].toFixed(2)} is the value on the board. Stake what you're comfortable with.`;
   })();
 
+  const coachMine = coach ? (coach.side === "home" ? homeScore : awayScore) : 0;
+  const coachTheirs = coach ? (coach.side === "home" ? awayScore : homeScore) : 0;
+  const coachSuggestsSub = Boolean(
+    coach &&
+      coach.side === "home" &&
+      bench &&
+      result &&
+      !done &&
+      minute >= 55 &&
+      availableBench.length > 0 &&
+      subsMade.length < 5 &&
+      coachMine <= coachTheirs,
+  );
   const coachAdvice = (() => {
     if (!coach) return "";
-    const mine = coach.side === "home" ? homeScore : awayScore;
-    const theirs = coach.side === "home" ? awayScore : homeScore;
+    const mine = coachMine;
+    const theirs = coachTheirs;
     if (done) {
       if (mine > theirs) return `That's how we manage a game — composed and clinical. On to the next round.`;
       if (mine < theirs) return `Heads up. We lacked a cutting edge today. We regroup and go again.`;
-      return `A draw keeps us in it. Not our finest, but we're still standing.`;
+      return `A draw keeps us in it. Penalties, here we come — nerves of steel now.`;
     }
     if (!result) return `Stick to the shape, win your duels, trust the plan. Kick us off when you're ready.`;
     if (minute < 20) return `Settle the nerves. Keep the ball, don't force the pass that isn't on.`;
+    if (coachSuggestsSub) {
+      const on = availableBench[0];
+      return `${mine < theirs ? "We're chasing this one" : "It's there for the taking"} — fresh legs could swing it. Get ${shortName(on ?? "a sub")} ready, then hit Subs to make the change.`;
+    }
     if (mine > theirs) return `${mine}-${theirs} up. Stay disciplined at the back, see this period out.`;
-    if (mine < theirs) return `We're chasing it. Push the full-backs on, get crosses in — think about a change.`;
+    if (mine < theirs) return `We're behind. Push the full-backs on and get crosses into the box.`;
     return `All square. Lift the tempo and find a spark in the final third.`;
   })();
 
@@ -311,6 +328,18 @@ export function MatchSim({
             <span className="min-w-0">
               <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">{coach.name} · gaffer</span>
               <span className="mt-0.5 block text-[12px] leading-relaxed text-emerald-50">{coachAdvice}</span>
+              {coachSuggestsSub ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlaying(false);
+                    setSubOpen(true);
+                  }}
+                  className="mt-2 inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-100 transition-colors hover:bg-emerald-500/20"
+                >
+                  Make a change
+                </button>
+              ) : null}
             </span>
           </div>
         </div>
