@@ -14,6 +14,7 @@
     "test:integration": "vitest run --config vitest.integration.config.mts"
   },
   "dependencies": {
+    "@whistle/agent-core": "workspace:*",
     "@whistle/config": "workspace:*",
     "@whistle/db": "workspace:*",
     "@whistle/errors": "workspace:*",

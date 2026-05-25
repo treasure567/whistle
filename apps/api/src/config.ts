@@ -9,6 +9,9 @@ const schema = z.object({
   CORS_ORIGIN: z.string().default('*'),
   SERVICE_AUTH_SECRET: z.string().optional(),
   AGENTS_URL: z.string().url().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_MODEL: z.string().default('gpt-4o-mini'),
+  OPENAI_BASE_URL: z.string().url().optional(),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
 });

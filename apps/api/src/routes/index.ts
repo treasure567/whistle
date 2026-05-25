@@ -37,6 +37,7 @@ export function createRouter(deps: RouterDeps): Router {
   router.post('/fantasy/teams', deps.fantasy.createTeam);
   router.get('/fantasy/teams', deps.fantasy.getTeam);
   router.put('/fantasy/teams/:id', deps.fantasy.updateTeam);
+  router.post('/fantasy/ai-pick', deps.fantasy.aiPick);
   router.post('/leagues', deps.league.create);
   router.get('/leagues', deps.league.listPublic);
   router.post('/leagues/:id/join', deps.league.join);

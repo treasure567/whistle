@@ -35,6 +35,16 @@ export const joinLeagueBody = z.object({
   accessToken: z.string().optional(),
 });
 
+export const aiPickBody = z.object({
+  countries: z.array(z.string().min(2).max(4)).max(48).optional(),
+  strength: z.enum(['balanced', 'galacticos', 'value', 'attacking', 'defensive']).default('balanced'),
+  budget: z.coerce.number().min(50).max(200).default(100),
+  formation: z
+    .string()
+    .regex(/^\d-\d-\d$/)
+    .optional(),
+});
+
 export const createPredictionBody = z.object({
   ownerAddress: z.string().min(1),
   matchExternalId: z.string().min(1),

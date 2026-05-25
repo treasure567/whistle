@@ -33,6 +33,7 @@ import { createLeagueController } from './controllers/league.controller.js';
 import { createPredictionController } from './controllers/prediction.controller.js';
 import { createRouter } from './routes/index.js';
 import { requireServiceAuth } from './http/service-auth.js';
+import { createOpenAiClient, type LlmClient } from '@whistle/agent-core';
 
 export type AppDeps = {
   prisma: PrismaClient;
@@ -41,6 +42,7 @@ export type AppDeps = {
   serviceAuthSecret?: string;
   readinessChecks?: ReadinessCheck[];
   rateLimit?: { windowMs: number; max: number };
+  llm?: { apiKey: string; model: string; baseUrl?: string };
 };
 
 function resolveCorsOrigin(origin: string | undefined): string | string[] {
@@ -80,6 +82,14 @@ export async function createApp(deps: AppDeps): Promise<Express> {
   const leagueRepo = createLeagueRepo(deps.prisma);
   const matchRepo = createMatchRepo(deps.prisma);
 
+  const llm: LlmClient | undefined = deps.llm
+    ? createOpenAiClient({
+        apiKey: deps.llm.apiKey,
+        model: deps.llm.model,
+        ...(deps.llm.baseUrl ? { baseUrl: deps.llm.baseUrl } : {}),
+      })
+    : undefined;
+
   const router = createRouter({
     agent: createAgentController(createAgentRepo(deps.prisma)),
     match: createMatchController(matchRepo),
@@ -90,7 +100,7 @@ export async function createApp(deps: AppDeps): Promise<Express> {
     leaderboard: createLeaderboardController(createLeaderboardRepo(deps.prisma)),
     activity: createActivityController(createDecisionRepo(deps.prisma)),
     player: createPlayerController(playerRepo),
-    fantasy: createFantasyController(playerRepo, fantasyRepo, leagueRepo, matchRepo),
+    fantasy: createFantasyController(playerRepo, fantasyRepo, leagueRepo, matchRepo, llm),
     league: createLeagueController(leagueRepo, fantasyRepo),
     prediction: createPredictionController(createPredictionRepo(deps.prisma)),
     feed: deps.feedHandler ?? feedUnavailable,

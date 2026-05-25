@@ -1,13 +1,15 @@
 import type { Request, Response } from 'express';
+import type { LlmClient } from '@whistle/agent-core';
 import { AppError, ErrorCode } from '@whistle/errors';
 import { ok } from '../http/respond.js';
-import { createTeamBody, updateTeamBody } from '../schemas/fantasy.schema.js';
+import { aiPickBody, createTeamBody, updateTeamBody } from '../schemas/fantasy.schema.js';
 import {
   validateSquad,
   type Position,
   type RuleConfig,
   type SquadPlayer,
 } from '../services/fantasy-rules.js';
+import { aiPick, type PickPlayer } from '../services/ai-pick.js';
 import type { PlayerRepository } from '../repositories/player.repo.js';
 import type { FantasyRepository } from '../repositories/fantasy.repo.js';
 import type { LeagueRepository } from '../repositories/league.repo.js';
@@ -39,6 +41,7 @@ export type FantasyController = {
   createTeam: (req: Request, res: Response) => Promise<void>;
   getTeam: (req: Request, res: Response) => Promise<void>;
   updateTeam: (req: Request, res: Response) => Promise<void>;
+  aiPick: (req: Request, res: Response) => Promise<void>;
 };
 
 export function createFantasyController(
@@ -46,8 +49,36 @@ export function createFantasyController(
   fantasy: FantasyRepository,
   leagues: LeagueRepository,
   matches: MatchRepository,
+  llm?: LlmClient,
 ): FantasyController {
   return {
+    aiPick: async (req, res) => {
+      const parsed = aiPickBody.safeParse(req.body);
+      if (!parsed.success) {
+        throw new AppError(ErrorCode.VALIDATION, 'invalid criteria');
+      }
+      const roster = await players.list();
+      const pool: PickPlayer[] = roster.map((player) => ({
+        id: player.id,
+        name: player.name,
+        position: player.position as Position,
+        teamCode: player.teamCode,
+        nation: player.nation,
+        price: Number(player.priceMillions),
+      }));
+      const result = await aiPick(
+        pool,
+        {
+          countries: parsed.data.countries ?? [],
+          strength: parsed.data.strength,
+          budget: parsed.data.budget,
+          formation: parsed.data.formation,
+        },
+        llm,
+      );
+      ok(res, req, result);
+    },
+
     createTeam: async (req, res) => {
       const parsed = createTeamBody.safeParse(req.body);
       if (!parsed.success) {

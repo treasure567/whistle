@@ -35,6 +35,15 @@ async function main() {
     readinessChecks: buildReadinessChecks({ prisma }),
     rateLimit: { windowMs: env.RATE_LIMIT_WINDOW_MS, max: env.RATE_LIMIT_MAX },
     ...(env.SERVICE_AUTH_SECRET ? { serviceAuthSecret: env.SERVICE_AUTH_SECRET } : {}),
+    ...(env.OPENAI_API_KEY
+      ? {
+          llm: {
+            apiKey: env.OPENAI_API_KEY,
+            model: env.OPENAI_MODEL,
+            ...(env.OPENAI_BASE_URL ? { baseUrl: env.OPENAI_BASE_URL } : {}),
+          },
+        }
+      : {}),
   });
 
   const server = app.listen(env.PORT, '127.0.0.1', () => {

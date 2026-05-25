@@ -112,6 +112,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@whistle/agent-core':
+        specifier: workspace:*
+        version: link:../../packages/agent-core
       '@whistle/config':
         specifier: workspace:*
         version: link:../../packages/config
