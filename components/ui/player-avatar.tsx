@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { UserIcon } from "hugeicons-react";
 
 import { cn } from "@/lib/utils";
 
@@ -10,13 +11,6 @@ interface PlayerAvatarProps {
   name: string;
   size?: number;
   className?: string;
-}
-
-function initials(name: string): string {
-  const parts = name.split(/\s+/).filter(Boolean);
-  if (!parts.length) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
 export function PlayerAvatar({ src, name, size = 48, className }: PlayerAvatarProps) {
@@ -42,8 +36,12 @@ export function PlayerAvatar({ src, name, size = 48, className }: PlayerAvatarPr
           unoptimized
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center font-mono text-[11px] font-semibold tracking-tight text-zinc-300">
-          {initials(name)}
+        <div
+          className="flex h-full w-full items-center justify-center text-zinc-500"
+          role="img"
+          aria-label={name}
+        >
+          <UserIcon size={Math.round(size * 0.5)} />
         </div>
       )}
     </div>
