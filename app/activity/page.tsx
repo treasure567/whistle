@@ -2,6 +2,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteNavbar } from "@/components/layout/site-navbar";
 import { AmbientGlow } from "@/components/ui/ambient-glow";
 import { ActivityFeed } from "@/components/blocks/activity/activity-feed";
+import { fetchActivity } from "@/lib/api/feed";
 import type { AgentSlug } from "@/types";
 
 export const metadata = {
@@ -23,6 +24,7 @@ export default async function ActivityPage({
     raw && (VALID as ReadonlyArray<string>).includes(raw)
       ? (raw as AgentSlug)
       : "all";
+  const { items } = await fetchActivity();
 
   return (
     <main className="flex min-h-screen flex-col bg-background text-foreground">
@@ -43,7 +45,7 @@ export default async function ActivityPage({
         </div>
       </section>
       <section className="pb-24">
-        <ActivityFeed initialAgent={initialAgent} />
+        <ActivityFeed initialAgent={initialAgent} items={items} />
       </section>
       <SiteFooter />
     </main>
