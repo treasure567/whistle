@@ -41,6 +41,7 @@ export const createPredictionBody = z.object({
   market: z.string().min(1).max(120),
   side: z.string().min(1).max(40),
   stakeUsdt: z.string().regex(/^\d+$/).default('0'),
+  txHash: z.string().min(1).max(80).optional(),
 });
 
 export const playersQuery = z.object({

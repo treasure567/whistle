@@ -6,6 +6,7 @@ export type CreatePredictionInput = {
   market: string;
   side: string;
   stakeUsdt: string;
+  txHash?: string | undefined;
 };
 
 export type PredictionRepository = {
@@ -23,6 +24,7 @@ export function createPredictionRepo(prisma: PrismaClient): PredictionRepository
           market: input.market,
           side: input.side,
           stakeUsdt: new Prisma.Decimal(input.stakeUsdt),
+          txHash: input.txHash ?? null,
         },
       }),
     listByUser: (ownerAddress) =>
