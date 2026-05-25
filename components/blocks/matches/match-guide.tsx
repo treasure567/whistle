@@ -9,7 +9,7 @@ import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { Button } from "@/components/ui/button";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
-import { ThreeDStadium } from "@/components/ui/three-d-stadium";
+import { StadiumPitch } from "@/components/ui/stadium-pitch";
 import { fetchMatchRead, sendMatchChat, type ChatMessage } from "@/lib/api/match-read";
 import type { MatchReadResult, PlayerRecord } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
@@ -37,10 +37,14 @@ export function MatchGuide({
   match,
   homePlayers,
   awayPlayers,
+  homeXI,
+  awayXI,
 }: {
   match: GuideMatch;
   homePlayers: PlayerRecord[];
   awayPlayers: PlayerRecord[];
+  homeXI: PlayerRecord[];
+  awayXI: PlayerRecord[];
 }) {
   const { home, away, homeCode, awayCode } = match;
   const [read, setRead] = useState<MatchReadResult | null>(null);
@@ -92,8 +96,8 @@ export function MatchGuide({
 
   return (
     <div>
-      <section className="relative h-[300px] overflow-hidden border-b border-border md:h-[400px]">
-        <ThreeDStadium className="absolute inset-0 h-full w-full opacity-90" />
+      <section className="relative h-[320px] overflow-hidden border-b border-border md:h-[440px]">
+        <StadiumPitch homeXI={homeXI} awayXI={awayXI} className="absolute inset-0 h-full w-full" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/30 to-background/10" />
         <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
           {match.venue ? (

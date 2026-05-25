@@ -52,7 +52,7 @@ function MatchRow({ match, index }: { match: MatchInfo; index: number }) {
       viewport={{ once: true, margin: "-15%" }}
       transition={{ ...spring, delay: index * 0.05 }}
     >
-      <Link href={`/matches/${match.id}`} className="group block">
+      <Link href={`/guide/${match.id}`} className="group block">
         <GlowCard
           padding="none"
           className="transition-colors hover:border-violet-500/30"
