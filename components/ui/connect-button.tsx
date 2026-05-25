@@ -13,7 +13,7 @@ import {
   ArrowUpRight01Icon,
   Settings02Icon,
 } from "hugeicons-react";
-import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from "wagmi";
 
 import { Button } from "@/components/ui/button";
 import { truncateAddress, explorerAddressUrl } from "@/lib/format";
@@ -56,6 +56,7 @@ export function ConnectButton({ compact = false }: { compact?: boolean }) {
 
 function ConnectedMenu({ address, compact }: { address: string; compact: boolean }) {
   const { disconnect } = useDisconnect();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
   const chainId = useChainId();
   const [copied, setCopied] = useState(false);
   const onCorrectChain = chainId === xLayer.id;
@@ -69,7 +70,18 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
   }
 
   return (
-    <Dropdown.Root>
+    <div className="flex items-center gap-2">
+      {!onCorrectChain ? (
+        <Button
+          variant="violet"
+          size={compact ? "sm" : "default"}
+          onClick={() => switchChain({ chainId: xLayer.id })}
+          disabled={isSwitching}
+        >
+          {isSwitching ? "Adding X Layer…" : "Switch to X Layer"}
+        </Button>
+      ) : null}
+      <Dropdown.Root>
       <Dropdown.Trigger asChild>
         <Button variant="outline" size={compact ? "sm" : "default"} className="gap-2">
           <span
@@ -125,7 +137,8 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
           />
         </Dropdown.Content>
       </Dropdown.Portal>
-    </Dropdown.Root>
+      </Dropdown.Root>
+    </div>
   );
 }
 
@@ -276,15 +289,20 @@ function ConnectDialog({
 }
 
 function labelFor(name: string): string {
-  if (name.toLowerCase().includes("injected")) return "OKX Wallet · Injected";
-  if (name.toLowerCase().includes("walletconnect")) return "WalletConnect";
-  if (name.toLowerCase().includes("coinbase")) return "Coinbase Wallet";
+  const n = name.toLowerCase();
+  if (n.includes("okx")) return "OKX Wallet";
+  if (n.includes("coinbase")) return "Coinbase Wallet";
+  if (n.includes("walletconnect")) return "WalletConnect";
+  if (n.includes("injected") || n.includes("metamask") || n.includes("browser")) {
+    return "Browser Wallet";
+  }
   return name;
 }
 
 function hintFor(name: string): string {
-  if (name.toLowerCase().includes("injected")) return "Browser extension";
-  if (name.toLowerCase().includes("walletconnect")) return "Mobile QR";
-  if (name.toLowerCase().includes("coinbase")) return "Smart wallet";
-  return "Wallet";
+  const n = name.toLowerCase();
+  if (n.includes("okx")) return "Recommended · X Layer";
+  if (n.includes("coinbase")) return "Smart wallet";
+  if (n.includes("walletconnect")) return "Mobile QR";
+  return "Browser extension";
 }
