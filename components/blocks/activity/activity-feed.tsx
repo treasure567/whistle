@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ACTIVITY, AGENT_LIST } from "@/lib/mock";
+import { useLiveFeed } from "@/hooks/use-live-feed";
 import { cn } from "@/lib/utils";
 import type { ActivityItem, AgentSlug } from "@/types";
 
@@ -23,25 +24,29 @@ const KIND_OPTIONS: ReadonlyArray<{ value: KindFilter; label: string }> = [
 
 interface ActivityFeedProps {
   initialAgent?: AgentFilter;
+  items?: ReadonlyArray<ActivityItem>;
 }
 
-export function ActivityFeed({ initialAgent = "all" }: ActivityFeedProps) {
+export function ActivityFeed({ initialAgent = "all", items = ACTIVITY }: ActivityFeedProps) {
   const [agent, setAgent] = useState<AgentFilter>(initialAgent);
   const [kind, setKind] = useState<KindFilter>("all");
+  const live = useLiveFeed();
+
+  const all = useMemo(() => [...live, ...items], [live, items]);
 
   const filtered = useMemo(() => {
-    return ACTIVITY.filter((item) => {
+    return all.filter((item) => {
       if (agent !== "all" && item.agent !== agent) return false;
       if (kind !== "all" && item.kind !== kind) return false;
       return true;
     });
-  }, [agent, kind]);
+  }, [all, agent, kind]);
 
   const counts = useMemo(() => {
-    const map: Record<AgentFilter, number> = { all: ACTIVITY.length, scout: 0, bookie: 0, manager: 0 };
-    for (const item of ACTIVITY) map[item.agent] += 1;
+    const map: Record<AgentFilter, number> = { all: all.length, scout: 0, bookie: 0, manager: 0 };
+    for (const item of all) map[item.agent] += 1;
     return map;
-  }, []);
+  }, [all]);
 
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-10">
