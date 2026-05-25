@@ -1,10 +1,16 @@
 import { createConfig, http } from "wagmi";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
+import type { EIP1193Provider } from "viem";
 
 import { xLayer } from "./chains";
 
 export const WALLET_CONNECT_PROJECT_ID =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
+
+function okxProvider(): EIP1193Provider | undefined {
+  if (typeof window === "undefined") return undefined;
+  return (window as Window & { okxwallet?: EIP1193Provider }).okxwallet;
+}
 
 const APP_METADATA = {
   name: "whistle — AI helpers for football",
@@ -24,6 +30,14 @@ const APP_METADATA = {
 export const wagmiConfig = createConfig({
   chains: [xLayer],
   connectors: [
+    injected({
+      target: () => ({
+        id: "okxWallet",
+        name: "OKX Wallet",
+        provider: () => okxProvider(),
+      }),
+      shimDisconnect: true,
+    }),
     injected({ shimDisconnect: true }),
     ...(WALLET_CONNECT_PROJECT_ID
       ? [
