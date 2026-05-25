@@ -60,6 +60,22 @@ export const simMatchBody = z.object({
   variant: z.coerce.number().int().min(0).max(99).default(0),
 });
 
+const briefPlayerSchema = z.object({
+  name: z.string().min(1).max(60),
+  position: z.string().min(1).max(8),
+  price: z.coerce.number(),
+});
+
+export const managerBriefBody = z.object({
+  countryName: z.string().min(1).max(60),
+  opponentName: z.string().min(1).max(60),
+  formation: z.string().min(1).max(12),
+  ourStrength: z.coerce.number().min(0).max(1),
+  theirStrength: z.coerce.number().min(0).max(1),
+  xi: z.array(briefPlayerSchema).max(11),
+  bench: z.array(briefPlayerSchema).max(26),
+});
+
 export const matchChatBody = z.object({
   home: z.string().min(1).max(60),
   away: z.string().min(1).max(60),
