@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "motion/react";
 import { ChampionIcon, FootballIcon, VolumeHighIcon, VolumeOffIcon } from "hugeicons-react";
 
@@ -9,6 +8,7 @@ import { FlagOrb } from "@/components/ui/flag-orb";
 import { Button } from "@/components/ui/button";
 import { matchOdds, simulateMatch, type SimEvent, type SimResult, type SimTeam } from "@/lib/sim/engine";
 import { fetchLlmMatch } from "@/lib/sim/llm-match";
+import { LiveField } from "./live-field";
 import { buildCommentary, type SimComment } from "@/lib/sim/commentary";
 import { useVirtualWallet } from "@/hooks/use-virtual-wallet";
 import { useOkbBalance } from "@/hooks/use-okb-balance";
@@ -25,17 +25,6 @@ const SPEEDS = [
 ] as const;
 
 const GOAL_TYPES = new Set<SimEvent["type"]>(["goal", "penalty-goal"]);
-
-const StadiumPitch = dynamic(() => import("@/components/ui/stadium-pitch").then((m) => m.StadiumPitch), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-64 items-center justify-center font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-      Loading 3D pitch…
-    </div>
-  ),
-});
-
-const XI_433 = ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "FWD", "FWD", "FWD"].map((position) => ({ position }));
 
 function shortName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -71,7 +60,7 @@ export function MatchSim({
   const [subsMade, setSubsMade] = useState<{ off: string; on: string }[]>([]);
   const [subOpen, setSubOpen] = useState(false);
   const [pendingOff, setPendingOff] = useState<string | null>(null);
-  const [view, setView] = useState<"2d" | "3d">("2d");
+  const [view, setView] = useState<"field" | "bar">("field");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { balance, setBalance } = useVirtualWallet();
@@ -281,8 +270,8 @@ export function MatchSim({
 
       {/* Pitch view */}
       <div className="relative border-b border-border">
-        <div className="absolute right-2.5 top-2 z-10 flex gap-1">
-          {(["2d", "3d"] as const).map((v) => (
+        <div className="absolute right-2.5 top-2 z-20 flex gap-1">
+          {(["field", "bar"] as const).map((v) => (
             <button
               key={v}
               type="button"
@@ -291,15 +280,15 @@ export function MatchSim({
                 "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
                 view === v
                   ? "border-violet-400/50 bg-violet-500/[0.12] text-violet-100"
-                  : "border-border text-muted-foreground hover:text-foreground",
+                  : "border-border bg-background/60 text-muted-foreground hover:text-foreground",
               )}
             >
               {v}
             </button>
           ))}
         </div>
-        {view === "3d" ? (
-          <StadiumPitch homeXI={XI_433} awayXI={XI_433} className="h-64 w-full bg-gradient-to-b from-emerald-950/40 to-transparent" />
+        {view === "field" ? (
+          <LiveField ballX={ballX} minute={minute} />
         ) : (
           <div className="relative h-12 overflow-hidden bg-gradient-to-r from-violet-500/10 via-transparent to-zinc-400/10">
             <div className="absolute inset-y-0 left-1/2 w-px bg-foreground/10" />
