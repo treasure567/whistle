@@ -170,16 +170,16 @@ function heuristicPick(fullPool: PickPlayer[], criteria: AiPickCriteria): AiPick
 function buildTool(): { name: string; description: string; inputSchema: JsonSchema } {
   return {
     name: 'submit_squad',
-    description: 'Submit a 15-player fantasy squad with starting XI and captain.',
+    description: 'Submit a 15-player fantasy squad by candidate number.',
     inputSchema: {
       type: 'object',
       properties: {
-        playerIds: { type: 'array', items: { type: 'string' }, minItems: 15, maxItems: 15 },
-        starterIds: { type: 'array', items: { type: 'string' }, minItems: 11, maxItems: 11 },
-        captainId: { type: 'string' },
+        playerNums: { type: 'array', items: { type: 'integer' }, minItems: 15, maxItems: 15 },
+        starterNums: { type: 'array', items: { type: 'integer' }, minItems: 11, maxItems: 11 },
+        captainNum: { type: 'integer' },
         rationale: { type: 'string' },
       },
-      required: ['playerIds', 'starterIds', 'captainId'],
+      required: ['playerNums', 'starterNums', 'captainNum'],
     } as JsonSchema,
   };
 }
@@ -192,44 +192,52 @@ function shortlist(fullPool: PickPlayer[], countries: string[]): PickPlayer[] {
   );
 }
 
+function toIndices(value: unknown, max: number): number[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((v) => Number(v))
+    .filter((n) => Number.isInteger(n) && n >= 1 && n <= max);
+}
+
 async function llmPick(fullPool: PickPlayer[], criteria: AiPickCriteria, llm: LlmClient): Promise<AiPickResult | null> {
   const candidates = shortlist(fullPool, criteria.countries);
-  const byId = new Map(candidates.map((p) => [p.id, p]));
+  // Number the candidates: LLMs reliably echo small integers, not opaque ids.
   const lines = candidates
-    .map((p) => `${p.id} | ${p.name} | ${p.position} | ${p.teamCode} | ${p.price.toFixed(1)}m`)
+    .map((p, i) => `${i + 1}. ${p.name} | ${p.position} | ${p.teamCode} | ${p.price.toFixed(1)}m`)
     .join('\n');
 
   const system =
     'You are Tom, a sharp World Cup fantasy football manager. You build a balanced, ' +
-    'budget-aware squad and explain nothing outside the tool call.';
+    'budget-aware squad and respond only through the submit_squad tool.';
   const prompt = [
-    `Pick a squad of exactly 15 players: 2 GK, 5 DEF, 5 MID, 3 FWD.`,
-    `Total price must be <= ${criteria.budget}m.`,
-    `Choose 11 starters (1 GK, at least 3 DEF, at least 1 FWD) and 1 captain (must be a starter).`,
-    `Manager brief: style="${criteria.strength}"${criteria.formation ? `, preferred formation ${criteria.formation}` : ''}.`,
+    `Pick exactly 15 players by their number: 2 GK, 5 DEF, 5 MID, 3 FWD.`,
+    `The sum of the 15 prices must be <= ${criteria.budget}m (prices are shown).`,
+    `Then choose 11 starters (1 GK, at least 3 DEF, at least 1 FWD) and 1 captain (a starter).`,
+    `Return only the candidate NUMBERS (the integer before each name).`,
+    `Manager brief: style="${criteria.strength}"${criteria.formation ? `, formation ${criteria.formation}` : ''}.`,
     criteria.countries.length ? `Favour these countries: ${criteria.countries.join(', ')}.` : '',
-    `Only use ids from this list (id | name | pos | team | price):`,
+    `Candidates:`,
     lines,
   ]
     .filter(Boolean)
     .join('\n');
 
   const call = await llm.decide({ system, prompt, tools: [buildTool()] });
-  const input = call.input as { playerIds?: unknown; starterIds?: unknown; captainId?: unknown; rationale?: unknown };
-  const playerIds = Array.isArray(input.playerIds) ? input.playerIds.filter((v): v is string => typeof v === 'string') : [];
-  const starterIds = new Set(
-    Array.isArray(input.starterIds) ? input.starterIds.filter((v): v is string => typeof v === 'string') : [],
-  );
-  const captainId = typeof input.captainId === 'string' ? input.captainId : '';
+  const input = call.input as { playerNums?: unknown; starterNums?: unknown; captainNum?: unknown; rationale?: unknown };
 
-  const selected = playerIds.map((id) => byId.get(id)).filter((p): p is PickPlayer => Boolean(p));
+  const playerNums = toIndices(input.playerNums, candidates.length);
+  const selected = Array.from(
+    new Map(playerNums.map((n) => candidates[n - 1]!).filter(Boolean).map((p) => [p.id, p])).values(),
+  );
   if (selected.length !== 15) return null;
 
-  const picks: AiSquadPick[] = selected.map((p) => ({
-    playerId: p.id,
-    starter: starterIds.has(p.id),
-    captain: p.id === captainId,
-  }));
+  const starterIds = new Set<string>();
+  for (const n of toIndices(input.starterNums, candidates.length)) {
+    const player = candidates[n - 1];
+    if (player && selected.some((p) => p.id === player.id)) starterIds.add(player.id);
+  }
+  const captainNum = typeof input.captainNum === 'number' ? input.captainNum : 0;
+  const captainId = candidates[captainNum - 1]?.id ?? '';
 
   const validation = validateSquad(
     { maxBudgetMillions: criteria.budget, squadSize: 15, startingSize: 11 },
@@ -247,7 +255,11 @@ async function llmPick(fullPool: PickPlayer[], criteria: AiPickCriteria, llm: Ll
   const rationale = typeof input.rationale === 'string' ? input.rationale.slice(0, 280) : undefined;
 
   return {
-    picks,
+    picks: selected.map((p) => ({
+      playerId: p.id,
+      starter: starterIds.has(p.id),
+      captain: p.id === captainId,
+    })),
     formation: `${counts.DEF}-${counts.MID}-${counts.FWD}`,
     costMillions: validation.costMillions,
     source: 'llm',
