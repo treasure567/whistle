@@ -70,7 +70,7 @@ async function main() {
       byTeam.set(player.teamCode, list);
     }
 
-    const updates: { id: string; photo: string | null }[] = [];
+    const updates: { id: string; photo: string }[] = [];
     let squads = 0;
     let headshots = 0;
     let backoffs = 0;
@@ -106,7 +106,6 @@ async function main() {
         bySurname.set(surname, apiPlayer.photo);
       }
 
-      const haveSquad = squad.players.length > 0;
       for (const dbPlayer of dbPlayers) {
         const parts = tokens(dbPlayer.name);
         const surname = parts[parts.length - 1];
@@ -116,11 +115,11 @@ async function main() {
             : byFull.get(parts.join(' ')) ??
               byInitialSurname.get(`${parts[0]![0]}:${surname}`) ??
               (surname && surnameCount.get(surname) === 1 ? bySurname.get(surname) : undefined);
+        // Prefer the API-Football headshot; otherwise keep the existing
+        // (Wikipedia) photo rather than blanking it.
         if (photo) {
           updates.push({ id: dbPlayer.id, photo });
           headshots += 1;
-        } else if (haveSquad) {
-          updates.push({ id: dbPlayer.id, photo: null });
         }
       }
 
