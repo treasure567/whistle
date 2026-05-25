@@ -110,6 +110,14 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
         };
       })()
     : null;
+  const homeBench = bench.map((p) => p.name);
+  const awayBench = oppTeam
+    ? (() => {
+        const oppXi = bestXI(oppTeam.players, "4-3-3");
+        const xiIds = new Set(oppXi.map((p) => p.id));
+        return oppTeam.players.filter((p) => !xiIds.has(p.id)).map((p) => p.name);
+      })()
+    : [];
 
   if (teams.length < 2) {
     return (
@@ -233,7 +241,13 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
               <span className="rounded-full border border-border px-2 py-0.5">{difficulty}</span>
             </div>
           </div>
-          <MatchSim key={`${country}-${opponent}`} home={homeSim} away={awaySim} coach={{ name: "Tom", side: "home" }} />
+          <MatchSim
+            key={`${country}-${opponent}`}
+            home={homeSim}
+            away={awaySim}
+            coach={{ name: "Tom", side: "home" }}
+            bench={{ home: homeBench, away: awayBench }}
+          />
         </div>
       ) : null}
     </div>

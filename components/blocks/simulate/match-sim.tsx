@@ -25,6 +25,12 @@ const SPEEDS = [
 
 const GOAL_TYPES = new Set<SimEvent["type"]>(["goal", "penalty-goal"]);
 
+function shortName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return name;
+  return `${parts[0]![0]}. ${parts[parts.length - 1]}`;
+}
+
 type Coach = { name: string; side: "home" | "away" };
 
 export function MatchSim({
@@ -32,11 +38,13 @@ export function MatchSim({
   away,
   bettable = false,
   coach,
+  bench,
 }: {
   home: SimTeam;
   away: SimTeam;
   bettable?: boolean;
   coach?: Coach;
+  bench?: { home: string[]; away: string[] };
 }) {
   const [result, setResult] = useState<SimResult | null>(null);
   const [minute, setMinute] = useState(0);
@@ -45,6 +53,10 @@ export function MatchSim({
   const [loading, setLoading] = useState(false);
   const [variant, setVariant] = useState(0);
   const [aiModelled, setAiModelled] = useState(false);
+  const [lineup, setLineup] = useState<string[]>(home.players.slice(0, 11));
+  const [subsMade, setSubsMade] = useState<{ off: string; on: string }[]>([]);
+  const [subOpen, setSubOpen] = useState(false);
+  const [pendingOff, setPendingOff] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { balance, setBalance } = useVirtualWallet();
@@ -94,15 +106,45 @@ export function MatchSim({
     if (justGoalKey) cheer();
   }, [justGoalKey, cheer]);
 
+  const availableBench = bench ? bench.home.filter((n) => !lineup.includes(n)) : [];
+
+  function withAiSubs(res: SimResult): SimResult {
+    if (!bench || bench.away.length === 0) return res;
+    const extra: SimEvent[] = [];
+    bench.away.slice(0, 2).forEach((on, i) => {
+      const min = i === 0 ? 60 : 75;
+      const off = away.players[Math.max(0, 10 - i)] ?? away.players[0];
+      if (off) extra.push({ minute: min, type: "sub", side: "away", player: on, text: `${off} makes way for ${on} (${away.code})` });
+    });
+    return { ...res, events: [...res.events, ...extra].sort((a, b) => a.minute - b.minute) };
+  }
+
   async function run(nextVariant: number) {
     if (loading) return;
     setLoading(true);
     const modelled = await fetchLlmMatch(home, away, nextVariant);
     setLoading(false);
-    setResult(modelled ?? simulateMatch(home, away));
+    setResult(withAiSubs(modelled ?? simulateMatch(home, away)));
     setAiModelled(modelled !== null);
     setMinute(0);
     setPlaying(true);
+    setLineup(home.players);
+    setSubsMade([]);
+    setPendingOff(null);
+    setSubOpen(false);
+  }
+
+  function makeSub(off: string, on: string) {
+    if (!result || subsMade.length >= 5) return;
+    const m = Math.max(1, minute);
+    const events = result.events
+      .map((e) => (e.minute > m && e.side === "home" && e.player === off ? { ...e, player: on } : e))
+      .concat([{ minute: m, type: "sub" as const, side: "home" as const, player: on, text: `${off} makes way for ${on} (${home.code})` }])
+      .sort((a, b) => a.minute - b.minute);
+    setResult({ ...result, events });
+    setLineup((prev) => prev.map((n) => (n === off ? on : n)));
+    setSubsMade((prev) => [...prev, { off, on }]);
+    setPendingOff(null);
   }
   function kickOff() {
     void run(variant);
@@ -363,6 +405,19 @@ export function MatchSim({
             <Button variant="ghost" size="sm" onClick={replay} disabled={loading}>
               {loading ? "Modelling…" : done ? "Play again" : "Re-sim"}
             </Button>
+            {bench ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPlaying(false);
+                  setSubOpen((v) => !v);
+                }}
+                disabled={done || loading}
+              >
+                Subs {subsMade.length}/5
+              </Button>
+            ) : null}
           </>
         )}
         <button
@@ -381,6 +436,72 @@ export function MatchSim({
           {soundOn ? "Crowd on" : "Crowd off"}
         </button>
       </div>
+
+      {bench && subOpen && result && !done ? (
+        <div className="border-b border-border p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              Substitutions · {subsMade.length}/5 used
+            </span>
+            <button
+              type="button"
+              onClick={() => setSubOpen(false)}
+              className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground"
+            >
+              Close
+            </button>
+          </div>
+          <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            On the pitch — tap who comes off
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {lineup.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setPendingOff(n)}
+                className={cn(
+                  "rounded-full border px-2.5 py-1 text-[11px] transition-colors",
+                  pendingOff === n
+                    ? "border-red-400/60 bg-red-500/[0.12] text-red-200"
+                    : "border-border text-foreground hover:border-violet-400/40",
+                )}
+              >
+                {shortName(n)}
+              </button>
+            ))}
+          </div>
+          <p className="mb-1.5 mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            {pendingOff ? `Bring on for ${shortName(pendingOff)}` : "Bench — pick who comes off first"}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {availableBench.length === 0 ? (
+              <span className="text-[11px] text-muted-foreground">No subs left on the bench.</span>
+            ) : (
+              availableBench.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  disabled={!pendingOff || subsMade.length >= 5}
+                  onClick={() => pendingOff && makeSub(pendingOff, n)}
+                  className="rounded-full border border-emerald-400/40 bg-emerald-500/[0.08] px-2.5 py-1 text-[11px] text-emerald-100 transition-colors hover:bg-emerald-500/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {shortName(n)}
+                </button>
+              ))
+            )}
+          </div>
+          {subsMade.length > 0 ? (
+            <div className="mt-3 flex flex-col gap-1 border-t border-border pt-2">
+              {subsMade.map((s, i) => (
+                <p key={`${s.off}-${i}`} className="font-mono text-[10px] text-muted-foreground">
+                  {shortName(s.off)} → {shortName(s.on)}
+                </p>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {done && result ? <MatchReport result={result} /> : null}
 
