@@ -5,6 +5,7 @@ import NextTopLoader from "nextjs-toploader";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { Web3Provider } from "@/components/providers/web3";
 import { ThemeProvider } from "@/components/providers/theme";
+import { SimBackgroundProvider } from "@/components/providers/sim-background";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -167,7 +168,9 @@ export default function RootLayout({
         />
         <ThemeProvider>
           <Web3Provider>
-            <SmoothScroll>{children}</SmoothScroll>
+            <SimBackgroundProvider>
+              <SmoothScroll>{children}</SmoothScroll>
+            </SimBackgroundProvider>
           </Web3Provider>
         </ThemeProvider>
         <script

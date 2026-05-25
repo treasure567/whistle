@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { MatchSim } from "./match-sim";
 import { TournamentSim } from "./tournament-sim";
+import { useSimBackground } from "@/components/providers/sim-background";
 import type { SimTeam } from "@/lib/sim/engine";
 import { cn } from "@/lib/utils";
 
 export function SimulateView({ teams }: { teams: SimTeam[] }) {
   const byCode = useMemo(() => new Map(teams.map((t) => [t.code, t])), [teams]);
+  const { start: startBackground } = useSimBackground();
   const [homeCode, setHomeCode] = useState(teams[0]?.code ?? "");
   const [awayCode, setAwayCode] = useState(teams[1]?.code ?? "");
   const [mode, setMode] = useState<"single" | "tournament">("single");
@@ -70,9 +72,14 @@ export function SimulateView({ teams }: { teams: SimTeam[] }) {
           </button>
         </div>
         <TeamSelect label="Away" value={awayCode} exclude={homeCode} teams={teams} onChange={setAwayCode} />
-        <Button variant="outline" size="sm" onClick={random}>
-          <DiceIcon size={14} /> Random tie
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={random} className="flex-1">
+            <DiceIcon size={14} /> Random tie
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => startBackground(home, away)} className="flex-1">
+            Run in background
+          </Button>
+        </div>
         <div className="mt-1 grid grid-cols-2 gap-3 border-t border-border pt-4">
           <StrengthBar team={home} />
           <StrengthBar team={away} align="end" />
