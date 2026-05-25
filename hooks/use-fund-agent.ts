@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
-import { readContract, writeContract, waitForTransactionReceipt } from "wagmi/actions";
+import { readContract, writeContract, waitForTransactionReceipt, switchChain, getAccount } from "wagmi/actions";
 import { parseUnits, type Hex } from "viem";
 
 import { wagmiConfig } from "@/lib/wagmi";
@@ -79,6 +79,17 @@ export function useFundAgent() {
 
       try {
         setState({ phase: "checking" });
+
+        // Make sure the wallet is on X Layer before sending the tx, otherwise
+        // wagmi throws a chain-mismatch error.
+        if (getAccount(wagmiConfig).chainId !== X_LAYER_CHAIN_ID) {
+          try {
+            await switchChain(wagmiConfig, { chainId: X_LAYER_CHAIN_ID });
+          } catch {
+            setState({ phase: "error", error: "Switch your wallet to X Layer Testnet to fund." });
+            return null;
+          }
+        }
 
         const balance = await readContract(wagmiConfig, {
           address: STABLE_TOKEN_ADDRESS,

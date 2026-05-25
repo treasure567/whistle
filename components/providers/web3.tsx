@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 
 import { wagmiConfig } from "@/lib/wagmi";
+import { ChainGuard } from "@/components/providers/chain-guard";
 
 if (typeof window !== "undefined") {
   const PURGE_KEY = "__whistle_wallet_purged_v1";
@@ -39,7 +40,10 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
   return (
     <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChainGuard />
+        {children}
+      </QueryClientProvider>
     </WagmiProvider>
   );
 }
