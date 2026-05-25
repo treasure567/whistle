@@ -32,11 +32,13 @@ import { createFantasyController } from './controllers/fantasy.controller.js';
 import { createLeagueController } from './controllers/league.controller.js';
 import { createPredictionController } from './controllers/prediction.controller.js';
 import { createRouter } from './routes/index.js';
+import { requireServiceAuth } from './http/service-auth.js';
 
 export type AppDeps = {
   prisma: PrismaClient;
   feedHandler?: RequestHandler;
   corsOrigin?: string;
+  serviceAuthSecret?: string;
   readinessChecks?: ReadinessCheck[];
   rateLimit?: { windowMs: number; max: number };
 };
@@ -93,7 +95,7 @@ export async function createApp(deps: AppDeps): Promise<Express> {
     prediction: createPredictionController(createPredictionRepo(deps.prisma)),
     feed: deps.feedHandler ?? feedUnavailable,
   });
-  app.use('/v1', limiter, router);
+  app.use('/v1', limiter, requireServiceAuth(deps.serviceAuthSecret), router);
 
   app.use(notFoundMiddleware);
   app.use(errorMiddleware);

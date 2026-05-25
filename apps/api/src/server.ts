@@ -34,6 +34,7 @@ async function main() {
     corsOrigin: env.CORS_ORIGIN,
     readinessChecks: buildReadinessChecks({ prisma }),
     rateLimit: { windowMs: env.RATE_LIMIT_WINDOW_MS, max: env.RATE_LIMIT_MAX },
+    ...(env.SERVICE_AUTH_SECRET ? { serviceAuthSecret: env.SERVICE_AUTH_SECRET } : {}),
   });
 
   const server = app.listen(env.PORT, '127.0.0.1', () => {
