@@ -76,6 +76,7 @@ export default async function GuidePage({ params }: { params: Promise<{ id: stri
       <div className="pt-16">
         <MatchGuide
           match={{
+            id: fixture.id,
             home: teamName(fixture.homeCode),
             away: teamName(fixture.awayCode),
             homeCode: fixture.homeCode,

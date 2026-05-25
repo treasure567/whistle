@@ -10,8 +10,12 @@ export const metadata = {
     "Call the match result, both teams to score, and more. Your prediction record is kept honestly.",
 };
 
-export default async function PredictPage() {
-  const { matches } = await fetchMatches();
+export default async function PredictPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ match?: string }>;
+}) {
+  const [{ matches }, sp] = await Promise.all([fetchMatches(), searchParams]);
 
   return (
     <main className="flex min-h-screen flex-col bg-background text-foreground">
@@ -32,7 +36,7 @@ export default async function PredictPage() {
         </div>
       </section>
       <section className="pb-24">
-        <PredictView matches={matches} />
+        <PredictView matches={matches} {...(sp.match ? { initialMatchId: sp.match } : {})} />
       </section>
       <SiteFooter />
     </main>

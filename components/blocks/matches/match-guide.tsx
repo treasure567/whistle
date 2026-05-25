@@ -24,6 +24,7 @@ const dateFmt = new Intl.DateTimeFormat("en-US", {
 });
 
 export type GuideMatch = {
+  id: string;
   home: string;
   away: string;
   homeCode: string;
@@ -266,7 +267,7 @@ export function MatchGuide({
           <p className="text-sm text-muted-foreground">
             Like Jack&apos;s read? Back a call on this match. Staked calls fund Jack onchain.
           </p>
-          <Link href="/play/predict">
+          <Link href={`/play/predict?match=${match.id}`}>
             <Button variant="violet" size="sm">
               Make a prediction
               <ArrowRight01Icon size={13} />

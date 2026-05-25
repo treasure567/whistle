@@ -139,6 +139,26 @@ export const matchChatReplySchema = z.object({
 });
 export type MatchChatReply = z.infer<typeof matchChatReplySchema>;
 
+export const slipPickSchema = z.object({
+  matchExternalId: z.string(),
+  homeCode: z.string(),
+  awayCode: z.string(),
+  market: z.string(),
+  side: z.string(),
+  stake: z.coerce.number(),
+  confidence: z.coerce.number(),
+  note: z.string(),
+});
+export type SlipPick = z.infer<typeof slipPickSchema>;
+
+export const slipSchema = z.object({
+  picks: z.array(slipPickSchema),
+  totalStake: z.coerce.number(),
+  budget: z.coerce.number(),
+  source: z.enum(["llm", "heuristic"]),
+});
+export type Slip = z.infer<typeof slipSchema>;
+
 export const aiPickResultSchema = z.object({
   picks: z.array(
     z.object({

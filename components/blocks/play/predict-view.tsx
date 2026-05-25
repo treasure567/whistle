@@ -15,6 +15,7 @@ import type { PredictionRecord } from "@/lib/api/schemas";
 import { AGENTS } from "@/lib/mock";
 import { formatUsdt, timeAgo } from "@/lib/format";
 import { useFundAgent, phaseLabel } from "@/hooks/use-fund-agent";
+import { JackSlip } from "./jack-slip";
 import { cn } from "@/lib/utils";
 import type { MatchInfo } from "@/types";
 
@@ -110,11 +111,14 @@ function marketsIn(category: Category): Market[] {
   return MARKETS.filter((market) => market.category === category);
 }
 
-export function PredictView({ matches }: { matches: MatchInfo[] }) {
+export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[]; initialMatchId?: string }) {
   const { address, isConnected } = useAccount();
   const { state: fundState, fund, reset: resetFund } = useFundAgent();
   const jack = AGENTS.bookie;
-  const [matchId, setMatchId] = useState<string>(matches[0]?.id ?? "");
+  const [mode, setMode] = useState<"manual" | "jack">("manual");
+  const [matchId, setMatchId] = useState<string>(
+    (initialMatchId && matches.some((m) => m.id === initialMatchId) ? initialMatchId : matches[0]?.id) ?? "",
+  );
   const [category, setCategory] = useState<Category>("Match");
   const [marketId, setMarketId] = useState<string>(MARKETS[0]!.id);
   const [sideId, setSideId] = useState<string>("home");
@@ -210,7 +214,15 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
 
   return (
     <div className="mx-auto grid max-w-7xl items-start gap-6 px-6 md:grid-cols-[1.2fr_1fr] md:px-10">
-      <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-5">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-1.5">
+          <Chip active={mode === "manual"} onClick={() => setMode("manual")} label="Make a pick" />
+          <Chip active={mode === "jack"} onClick={() => setMode("jack")} label="Ask Jack to bet for me" />
+        </div>
+        {mode === "jack" ? (
+          <JackSlip onBooked={(created) => setPredictions((prev) => [...created, ...prev])} />
+        ) : (
+        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-5">
         <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3">
           <AgentAvatar agent="bookie" size={40} />
           <div>
@@ -312,6 +324,8 @@ export function PredictView({ matches }: { matches: MatchInfo[] }) {
           </Button>
         ) : (
           <ConnectButton />
+        )}
+        </div>
         )}
       </div>
 

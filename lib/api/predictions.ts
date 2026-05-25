@@ -2,8 +2,21 @@ import { apiGet, apiPost } from "./client";
 import {
   predictionSchema,
   predictionsSchema,
+  slipSchema,
   type PredictionRecord,
+  type Slip,
 } from "./schemas";
+
+export type SlipInput = {
+  budget: number;
+  preferences?: string;
+  risk?: "safe" | "balanced" | "aggressive";
+  count?: number;
+};
+
+export function buildSlip(input: SlipInput): Promise<Slip> {
+  return apiPost("/predictions/slip", input, slipSchema);
+}
 
 export type CreatePredictionInput = {
   ownerAddress: string;
