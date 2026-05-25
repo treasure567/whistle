@@ -121,6 +121,22 @@ export const predictionSchema = z.object({
 export type PredictionRecord = z.infer<typeof predictionSchema>;
 export const predictionsSchema = z.array(predictionSchema);
 
+export const matchReadSchema = z.object({
+  home: z.string(),
+  away: z.string(),
+  outcomes: z.array(z.object({ label: z.string(), pct: z.coerce.number() })),
+  markets: z.array(z.object({ label: z.string(), lean: z.string(), note: z.string() })),
+  summary: z.string(),
+  source: z.enum(["llm", "heuristic"]),
+});
+export type MatchReadResult = z.infer<typeof matchReadSchema>;
+
+export const matchChatReplySchema = z.object({
+  reply: z.string(),
+  source: z.enum(["llm", "heuristic"]),
+});
+export type MatchChatReply = z.infer<typeof matchChatReplySchema>;
+
 export const aiPickResultSchema = z.object({
   picks: z.array(
     z.object({
