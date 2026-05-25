@@ -1,0 +1,85 @@
+import express, { type Express, type RequestHandler } from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import {
+  requestIdMiddleware,
+  healthRouter,
+  readyRouter,
+  metricsRouter,
+  type ReadinessCheck,
+} from '@whistle/observability';
+import { httpLogger } from '@whistle/logger';
+import { errorMiddleware, notFoundMiddleware } from '@whistle/errors';
+import type { PrismaClient } from '@whistle/db';
+import { createAgentRepo } from './repositories/agent.repo.js';
+import { createMatchRepo } from './repositories/match.repo.js';
+import { createAllocationRepo } from './repositories/allocation.repo.js';
+import { createDecisionRepo } from './repositories/decision.repo.js';
+import { createLeaderboardRepo } from './repositories/leaderboard.repo.js';
+import { createAgentController } from './controllers/agent.controller.js';
+import { createMatchController } from './controllers/match.controller.js';
+import { createAllocationController } from './controllers/allocation.controller.js';
+import { createLeaderboardController } from './controllers/leaderboard.controller.js';
+import { createActivityController } from './controllers/activity.controller.js';
+import { createRouter } from './routes/index.js';
+
+export type AppDeps = {
+  prisma: PrismaClient;
+  feedHandler?: RequestHandler;
+  corsOrigin?: string;
+  readinessChecks?: ReadinessCheck[];
+  rateLimit?: { windowMs: number; max: number };
+};
+
+function resolveCorsOrigin(origin: string | undefined): string | string[] {
+  if (!origin || origin === '*') {
+    return '*';
+  }
+  return origin.split(',').map((value) => value.trim());
+}
+
+const feedUnavailable: RequestHandler = (_req, res) => {
+  res.status(503).json({ ok: false, code: 'INTERNAL', message: 'live feed unavailable' });
+};
+
+export async function createApp(deps: AppDeps): Promise<Express> {
+  const app = express();
+
+  app.use(helmet());
+  app.use(cors({ origin: resolveCorsOrigin(deps.corsOrigin) }));
+  app.use(requestIdMiddleware);
+  app.use(express.json({ limit: '1mb' }));
+  app.use(cookieParser());
+  app.use(httpLogger);
+
+  app.use('/healthz', healthRouter());
+  app.use('/readyz', readyRouter(deps.readinessChecks ?? []));
+  app.use('/metrics', metricsRouter());
+
+  const limiter = rateLimit({
+    windowMs: deps.rateLimit?.windowMs ?? 60_000,
+    max: deps.rateLimit?.max ?? 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const router = createRouter({
+    agent: createAgentController(createAgentRepo(deps.prisma)),
+    match: createMatchController(createMatchRepo(deps.prisma)),
+    allocation: createAllocationController(
+      createAllocationRepo(deps.prisma),
+      createAgentRepo(deps.prisma),
+    ),
+    leaderboard: createLeaderboardController(createLeaderboardRepo(deps.prisma)),
+    activity: createActivityController(createDecisionRepo(deps.prisma)),
+    feed: deps.feedHandler ?? feedUnavailable,
+  });
+  app.use('/v1', limiter, router);
+
+  app.use(notFoundMiddleware);
+  app.use(errorMiddleware);
+
+  return app;
+}

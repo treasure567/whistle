@@ -1,0 +1,91 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AgentKind {
+  SCOUT
+  BOOKIE
+  MANAGER
+}
+
+enum DecisionStatus {
+  PENDING
+  SUBMITTED
+  CONFIRMED
+  FAILED
+}
+
+model Agent {
+  id           String    @id @default(cuid())
+  kind         AgentKind @unique
+  name         String
+  strategyHash String
+  ownerAddress String
+  registryId   Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  allocations Allocation[]
+  decisions   Decision[]
+
+  @@map("agents")
+}
+
+model Match {
+  id         String   @id @default(cuid())
+  externalId String   @unique
+  homeCode   String
+  awayCode   String
+  kickoffAt  DateTime
+  status     String
+  payload    Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  decisions Decision[]
+
+  @@index([kickoffAt])
+  @@map("matches")
+}
+
+model Allocation {
+  id          String   @id @default(cuid())
+  agentId     String
+  userAddress String
+  amount      Decimal  @db.Decimal(38, 0)
+  asset       String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@index([userAddress])
+  @@index([agentId])
+  @@map("allocations")
+}
+
+model Decision {
+  id        String         @id @default(cuid())
+  agentId   String
+  matchId   String?
+  status    DecisionStatus @default(PENDING)
+  prompt    Json
+  response  Json
+  action    Json
+  txHash    String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  agent Agent  @relation(fields: [agentId], references: [id])
+  match Match? @relation(fields: [matchId], references: [id])
+
+  @@index([agentId, createdAt])
+  @@index([txHash])
+  @@map("decisions")
+}

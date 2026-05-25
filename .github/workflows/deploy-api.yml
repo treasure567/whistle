@@ -1,0 +1,130 @@
+name: Deploy api
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/api/**
+      - packages/types/**
+      - packages/errors/**
+      - packages/config/**
+      - packages/logger/**
+      - packages/observability/**
+  workflow_dispatch:
+
+env:
+  SVC: "@whistle/api"
+  APP_NAME: api
+  DEPLOY_PATH: ${{ vars.API_DEPLOY_PATH }}
+  HEALTH_URL: http://127.0.0.1:4000/healthz
+
+jobs:
+  ci:
+    name: CI (typecheck + lint + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+        with: { version: 10.5.0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: 24.3.0 }
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm turbo run typecheck lint test --filter=$SVC
+
+  deploy:
+    name: Deploy
+    needs: ci
+    if: needs.ci.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+        with: { version: 10.5.0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: 24.3.0 }
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm turbo run build --filter=$SVC
+
+      - name: Bundle production node_modules
+        run: |
+          set -euo pipefail
+          rm -rf prod_bundle
+          pnpm --filter $SVC deploy --legacy --prod prod_bundle
+
+      - name: Compute release id
+        id: meta
+        run: echo "release_id=$(date -u +%Y%m%dT%H%M%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Package release
+        env:
+          RELEASE_ID: ${{ steps.meta.outputs.release_id }}
+        run: |
+          set -euo pipefail
+          rm -rf release_pkg
+          mkdir release_pkg
+          cp -r apps/api/dist release_pkg/
+          cp -r apps/api/deploy release_pkg/
+          cp apps/api/ecosystem.config.cjs release_pkg/
+          cp apps/api/package.json release_pkg/
+          cp -r prod_bundle/node_modules release_pkg/
+          tar -czf "$APP_NAME-${RELEASE_ID}.tar.gz" -C release_pkg .
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Upload tarball
+        env:
+          SSHPASS: ${{ secrets.VPS_SSH_PASSWORD }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          RELEASE_ID: ${{ steps.meta.outputs.release_id }}
+        run: |
+          set -euo pipefail
+          sshpass -e ssh -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" \
+            "mkdir -p ~/$DEPLOY_PATH/{releases,incoming,shared/logs}"
+          sshpass -e scp -o StrictHostKeyChecking=no \
+            "$APP_NAME-${RELEASE_ID}.tar.gz" \
+            "$VPS_USER@$VPS_HOST:~/$DEPLOY_PATH/incoming/"
+
+      - name: Release on VPS
+        env:
+          SSHPASS: ${{ secrets.VPS_SSH_PASSWORD }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          RELEASE_ID: ${{ steps.meta.outputs.release_id }}
+        run: |
+          set -euo pipefail
+          cat > remote.sh <<EOF
+          set -euo pipefail
+          export NVM_DIR="\$HOME/.nvm"
+          [ -s "\$NVM_DIR/nvm.sh" ] && . "\$NVM_DIR/nvm.sh"
+          nvm install 24 --no-progress || true
+          nvm use 24 || true
+          npm install -g pm2@5.4.3
+
+          cd ~/${DEPLOY_PATH}
+          mkdir -p releases/${RELEASE_ID}
+          tar -xzf incoming/$APP_NAME-${RELEASE_ID}.tar.gz -C releases/${RELEASE_ID}
+          rm incoming/$APP_NAME-${RELEASE_ID}.tar.gz
+          chmod +x releases/${RELEASE_ID}/deploy/dev/*.sh
+
+          export APP_NAME=$APP_NAME
+          export HEALTH_URL=$HEALTH_URL
+          releases/${RELEASE_ID}/deploy/dev/release.sh ${RELEASE_ID}
+
+          pm2 logs $APP_NAME --lines 80 --nostream || true
+          EOF
+          sshpass -e ssh -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" 'bash -s' < remote.sh

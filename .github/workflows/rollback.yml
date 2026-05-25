@@ -1,0 +1,56 @@
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Which app to roll back"
+        required: true
+        type: choice
+        options:
+          - api
+          - agents
+      target_release:
+        description: "Release id to roll back to. Leave blank for the previous release."
+        required: false
+        default: ""
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve deploy path
+        id: ctx
+        run: |
+          case "${{ inputs.service }}" in
+            api)    echo "deploy_path=${{ vars.API_DEPLOY_PATH }}"    >> "$GITHUB_OUTPUT" ;;
+            agents) echo "deploy_path=${{ vars.AGENTS_DEPLOY_PATH }}" >> "$GITHUB_OUTPUT" ;;
+            *) echo "unknown service" >&2; exit 1 ;;
+          esac
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Roll back on VPS
+        env:
+          SSHPASS: ${{ secrets.VPS_SSH_PASSWORD }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          SVC: ${{ inputs.service }}
+          DEPLOY_PATH: ${{ steps.ctx.outputs.deploy_path }}
+          TARGET: ${{ inputs.target_release }}
+        run: |
+          set -euo pipefail
+          cat > remote.sh <<EOF
+          set -euo pipefail
+          export NVM_DIR="\$HOME/.nvm"
+          [ -s "\$NVM_DIR/nvm.sh" ] && . "\$NVM_DIR/nvm.sh"
+          nvm use 24 || true
+
+          cd ~/${DEPLOY_PATH}/current
+          export APP_NAME=$SVC
+          ./deploy/dev/rollback.sh "${TARGET}"
+
+          pm2 logs $SVC --lines 80 --nostream || true
+          EOF
+          sshpass -e ssh -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" 'bash -s' < remote.sh

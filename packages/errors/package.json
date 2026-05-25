@@ -1,0 +1,30 @@
+{
+  "name": "@whistle/errors",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@whistle/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.0",
+    "express": "5.0.1",
+    "typescript": "5.8.2",
+    "vitest": "3.0.5"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "@whistle/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.mts"
+  },
+  "dependencies": {
+    "@whistle/config": "workspace:*",
+    "@whistle/db": "workspace:*",
+    "@whistle/errors": "workspace:*",
+    "@whistle/logger": "workspace:*",
+    "@whistle/observability": "workspace:*",
+    "@whistle/types": "workspace:*",
+    "cookie-parser": "1.4.7",
+    "cors": "2.8.5",
+    "express": "5.0.1",
+    "express-rate-limit": "7.5.0",
+    "helmet": "8.0.0",
+    "ioredis": "5.4.2",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "1.4.8",
+    "@types/cors": "2.8.17",
+    "@types/express": "5.0.0",
+    "@types/node": "24.0.0",
+    "@types/supertest": "6.0.2",
+    "nodemon": "3.1.9",
+    "supertest": "7.1.4",
+    "tsx": "4.19.2",
+    "typescript": "5.8.2",
+    "vitest": "3.0.5"
+  }
+}

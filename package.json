@@ -1,0 +1,54 @@
+{
+  "name": "whistle",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Whistle backend monorepo: an AI agent stable acting onchain on X Layer during every World Cup match.",
+  "engines": {
+    "node": ">=24.3.0",
+    "pnpm": ">=10.5.0"
+  },
+  "packageManager": "pnpm@10.5.0",
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "dev": "turbo run dev --parallel --filter=./apps/*",
+    "dev:api": "pnpm --filter @whistle/api dev",
+    "dev:agents": "pnpm --filter @whistle/agents dev",
+    "start:api": "pnpm --filter @whistle/api start",
+    "start:agents": "pnpm --filter @whistle/agents start",
+    "db:generate": "pnpm --filter @whistle/db prisma:generate",
+    "db:migrate": "pnpm --filter @whistle/db prisma:migrate",
+    "db:deploy": "pnpm --filter @whistle/db prisma:deploy",
+    "db:seed": "pnpm --filter @whistle/db seed",
+    "cve:check": "pnpm audit --prod --audit-level=high"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.18.0",
+    "@eslint/markdown": "6.5.0",
+    "@typescript-eslint/eslint-plugin": "8.21.0",
+    "@typescript-eslint/parser": "8.21.0",
+    "@vitest/eslint-plugin": "1.1.44",
+    "eslint": "9.18.0",
+    "eslint-plugin-import": "2.31.0",
+    "jsonc-eslint-parser": "2.4.0",
+    "prettier": "3.4.2",
+    "tsx": "4.19.2",
+    "turbo": "2.4.2",
+    "typescript": "5.8.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ],
+    "overrides": {
+      "qs": ">=6.15.2",
+      "ws": ">=8.20.1"
+    }
+  }
+}

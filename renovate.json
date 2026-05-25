@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    ":pinAllExceptPeerDependencies",
+    ":semanticCommits"
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security", "vulnerability"],
+    "schedule": ["at any time"],
+    "prCreation": "immediate"
+  },
+  "osvVulnerabilityAlerts": true,
+  "schedule": ["before 06:00 on monday"],
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 06:00 on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "Group all minor and patch upgrades into one weekly PR",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "non-major dependencies"
+    },
+    {
+      "description": "Major bumps land as individual PRs for review",
+      "matchUpdateTypes": ["major"],
+      "labels": ["major-upgrade"]
+    }
+  ],
+  "labels": ["dependencies"],
+  "prHourlyLimit": 4,
+  "prConcurrentLimit": 10,
+  "ignorePaths": ["**/node_modules/**", "**/dist/**"]
+}

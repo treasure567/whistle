@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+
+# Internal planning and progress docs stay local-only.
+docs/
+
+.env
+.env.local
+.env.*.local
+!.env.example
+
+.DS_Store
+.idea/
+.vscode/
+
+*.log
+pids/
+*.pid
+
+prisma/migrations/.tmp/
