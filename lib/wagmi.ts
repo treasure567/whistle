@@ -2,7 +2,7 @@ import { createConfig, http } from "wagmi";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 import type { EIP1193Provider } from "viem";
 
-import { xLayer } from "./chains";
+import { xLayer, X_LAYER_RPC_URL } from "./chains";
 
 export const WALLET_CONNECT_PROJECT_ID =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
@@ -54,9 +54,7 @@ export const wagmiConfig = createConfig({
     }),
   ],
   transports: {
-    [xLayer.id]: http(
-      process.env.NEXT_PUBLIC_X_LAYER_RPC_URL ?? "https://rpc.xlayer.tech",
-    ),
+    [xLayer.id]: http(X_LAYER_RPC_URL),
   },
   ssr: true,
 });
