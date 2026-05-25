@@ -35,6 +35,7 @@ import { createMatchReadController } from './controllers/match-read.controller.j
 import { createRouter } from './routes/index.js';
 import { requireServiceAuth } from './http/service-auth.js';
 import { createOpenAiClient, type LlmClient } from '@whistle/agent-core';
+import type { Redis } from './redis.js';
 
 export type AppDeps = {
   prisma: PrismaClient;
@@ -44,6 +45,7 @@ export type AppDeps = {
   readinessChecks?: ReadinessCheck[];
   rateLimit?: { windowMs: number; max: number };
   llm?: { apiKey: string; model: string; baseUrl?: string };
+  cache?: Redis;
 };
 
 function resolveCorsOrigin(origin: string | undefined): string | string[] {
@@ -104,7 +106,7 @@ export async function createApp(deps: AppDeps): Promise<Express> {
     fantasy: createFantasyController(playerRepo, fantasyRepo, leagueRepo, matchRepo, llm),
     league: createLeagueController(leagueRepo, fantasyRepo),
     prediction: createPredictionController(createPredictionRepo(deps.prisma), matchRepo, llm),
-    matchRead: createMatchReadController(llm),
+    matchRead: createMatchReadController(llm, deps.cache),
     feed: deps.feedHandler ?? feedUnavailable,
   });
   app.use('/v1', limiter, requireServiceAuth(deps.serviceAuthSecret), router);

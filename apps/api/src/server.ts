@@ -25,6 +25,7 @@ async function main() {
   const env = loadEnv();
   const prisma = createPrismaClient({ databaseUrl: env.DATABASE_URL });
   const subscriber = createRedis(env.REDIS_URL);
+  const cache = createRedis(env.REDIS_URL);
   const feed = createLiveFeed(subscriber);
   await feed.start().catch((err) => log.error({ err }, 'live feed subscription failed'));
 
@@ -34,6 +35,7 @@ async function main() {
     corsOrigin: env.CORS_ORIGIN,
     readinessChecks: buildReadinessChecks({ prisma }),
     rateLimit: { windowMs: env.RATE_LIMIT_WINDOW_MS, max: env.RATE_LIMIT_MAX },
+    cache,
     ...(env.SERVICE_AUTH_SECRET ? { serviceAuthSecret: env.SERVICE_AUTH_SECRET } : {}),
     ...(env.OPENAI_API_KEY
       ? {
@@ -53,6 +55,7 @@ async function main() {
   const shutdown = async (signal: string) => {
     log.info({ signal }, 'shutdown initiated');
     await feed.close().catch(() => undefined);
+    await cache.quit().catch(() => undefined);
     await prisma.$disconnect().catch(() => undefined);
     server.close(() => {
       log.info({}, 'http server closed');
