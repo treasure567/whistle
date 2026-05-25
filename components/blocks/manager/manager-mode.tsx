@@ -69,6 +69,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   const [lastScore, setLastScore] = useState<{ h: number; a: number } | null>(null);
   const [brief, setBrief] = useState<ManagerBriefResult | null>(null);
   const [briefLoading, setBriefLoading] = useState(false);
+  const [analysis, setAnalysis] = useState<ManagerBriefResult | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   const squad = useMemo(() => byCode.get(country)?.players ?? [], [byCode, country]);
   const bench = useMemo(() => {
@@ -86,6 +88,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setXi(bestXI(squad, formation));
     setActiveId(null);
     setBrief(null);
+    setAnalysis(null);
+    setRound(0);
     pickOpponent();
     setPhase("squad");
   }
@@ -104,25 +108,31 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   }
 
   function kickOff() {
-    setRound(0);
     setOutcome(null);
     setLastScore(null);
+    setAnalysis(null);
     setPhase("match");
   }
 
-  function nextMatch() {
+  function advanceRound() {
     const others = teams.filter((t) => t.code !== country && t.code !== opponent);
     const opp = others[Math.floor(Math.random() * others.length)];
     if (opp) setOpponent(opp.code);
     setRound((r) => r + 1);
     setOutcome(null);
     setLastScore(null);
+    setBrief(null);
+    setAnalysis(null);
+    setPhase("squad");
   }
 
   function restartRun() {
     setRound(0);
     setOutcome(null);
     setLastScore(null);
+    setBrief(null);
+    setAnalysis(null);
+    pickOpponent();
     setPhase("squad");
   }
 
@@ -182,6 +192,28 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
       setBrief(null);
     } finally {
       setBriefLoading(false);
+    }
+  }
+
+  async function askTomAnalysis() {
+    if (!homeSim || !awaySim || !lastScore || analysisLoading) return;
+    setAnalysisLoading(true);
+    try {
+      const result = await fetchManagerBrief({
+        countryName: homeSim.name,
+        opponentName: awaySim.name,
+        formation,
+        ourStrength: homeSim.strength,
+        theirStrength: awaySim.strength,
+        xi: xi.map((p) => ({ name: p.name, position: p.position, price: p.price })),
+        bench: bench.map((p) => ({ name: p.name, position: p.position, price: p.price })),
+        played: { ourScore: lastScore.h, theirScore: lastScore.a },
+      });
+      setAnalysis(result);
+    } catch {
+      setAnalysis(null);
+    } finally {
+      setAnalysisLoading(false);
     }
   }
 
@@ -283,7 +315,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
               <div>
                 <p className="text-sm font-semibold text-foreground">{byCode.get(country)?.name}</p>
                 <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Manager · {difficulty}
+                  Manager · {difficulty} · {ROUNDS[round]}
                 </p>
               </div>
             </div>
@@ -395,27 +427,58 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                 <>
                   <p className="text-lg font-semibold text-foreground">World Champions!</p>
                   <p className="mt-1 text-sm text-muted-foreground">{homeSim.name} have won the tournament. Some run, gaffer.</p>
-                  <Button variant="violet" size="lg" onClick={restartRun} className="mt-4">
-                    Start a new run
-                  </Button>
                 </>
               ) : outcome === "eliminated" ? (
                 <>
                   <p className="text-lg font-semibold text-foreground">Knocked out in the {ROUNDS[round]}</p>
                   <p className="mt-1 text-sm text-muted-foreground">Heartbreak. Reshape the squad and go again.</p>
-                  <Button variant="violet" size="lg" onClick={restartRun} className="mt-4">
-                    Try again
-                  </Button>
                 </>
               ) : (
                 <>
                   <p className="text-lg font-semibold text-foreground">Through to the {ROUNDS[round + 1]}!</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{homeSim.name} march on. Next opponent awaits.</p>
-                  <Button variant="violet" size="lg" onClick={nextMatch} className="mt-4">
-                    <FootballIcon size={14} /> Play the {ROUNDS[round + 1]}
-                  </Button>
+                  <p className="mt-1 text-sm text-muted-foreground">{homeSim.name} march on. Scout the next opponent before you play.</p>
                 </>
               )}
+
+              {analysis ? (
+                <div className="mt-4 rounded-xl border border-emerald-400/25 bg-emerald-500/[0.05] p-3 text-left">
+                  <div className="mb-1.5 flex items-center gap-2">
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 font-mono text-[10px] font-semibold text-white">
+                      T
+                    </span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300">
+                      {"Tom's analysis"}
+                    </span>
+                    <span className="ml-auto rounded-full border border-emerald-400/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-300">
+                      {analysis.verdict}
+                    </span>
+                  </div>
+                  <p className="mb-2 text-[13px] leading-relaxed text-foreground">{analysis.opponentRead}</p>
+                  <ul className="flex flex-col gap-1.5">
+                    {analysis.suggestions.map((s, i) => (
+                      <li key={i} className="flex items-start gap-2 text-[13px] leading-relaxed text-muted-foreground">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-400" />
+                        <span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <Button variant="outline" size="sm" onClick={askTomAnalysis} disabled={analysisLoading}>
+                  {analysisLoading ? "Tom's reviewing the tape…" : analysis ? "Refresh analysis" : "Ask Tom for his analysis"}
+                </Button>
+                {outcome === "advanced" ? (
+                  <Button variant="violet" size="sm" onClick={advanceRound}>
+                    <FootballIcon size={14} /> Prepare for the {ROUNDS[round + 1]}
+                  </Button>
+                ) : (
+                  <Button variant="violet" size="sm" onClick={restartRun}>
+                    {outcome === "champion" ? "Start a new run" : "Try again"}
+                  </Button>
+                )}
+              </div>
             </div>
           ) : null}
         </div>

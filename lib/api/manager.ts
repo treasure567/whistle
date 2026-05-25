@@ -11,6 +11,7 @@ export type ManagerBriefInput = {
   theirStrength: number;
   xi: BriefPlayer[];
   bench: BriefPlayer[];
+  played?: { ourScore: number; theirScore: number };
 };
 
 export function fetchManagerBrief(input: ManagerBriefInput): Promise<ManagerBriefResult> {
