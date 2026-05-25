@@ -2,7 +2,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteNavbar } from "@/components/layout/site-navbar";
 import { AmbientGlow } from "@/components/ui/ambient-glow";
 import { AgentCard } from "@/components/ui/agent-card";
-import { AGENT_LIST } from "@/lib/mock";
+import { fetchAgents } from "@/lib/api/agents";
 
 export const metadata = {
   title: "Emma · Jack · Tom",
@@ -10,7 +10,8 @@ export const metadata = {
     "Meet the three AI helpers behind Whistle. Read what each one does, then fund who you trust.",
 };
 
-export default function AgentsPage() {
+export default async function AgentsPage() {
+  const agents = await fetchAgents();
   return (
     <main className="flex min-h-screen flex-col bg-background text-foreground">
       <SiteNavbar />
@@ -34,7 +35,7 @@ export default function AgentsPage() {
       <section className="pb-32">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <div className="grid gap-5 md:grid-cols-3">
-            {AGENT_LIST.map((agent) => (
+            {agents.map((agent) => (
               <AgentCard key={agent.slug} agent={agent} />
             ))}
           </div>
