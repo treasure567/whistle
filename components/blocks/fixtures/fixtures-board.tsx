@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Calendar01Icon, Location01Icon } from "hugeicons-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { FlagOrb } from "@/components/ui/flag-orb";
-import { JackReadDrawer, type JackMatch } from "@/components/blocks/matches/jack-read-drawer";
 import type { Fixture } from "@/lib/api/fixtures";
 import { teamName } from "@/lib/wc-teams";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,6 @@ const timeFmt = new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-d
 
 export function FixturesBoard({ fixtures }: { fixtures: Fixture[] }) {
   const [mode, setMode] = useState<Mode>("all");
-  const [selected, setSelected] = useState<JackMatch | null>(null);
 
   const byDay = useMemo(() => {
     const filtered = fixtures.filter((fixture) => {
@@ -78,21 +77,13 @@ export function FixturesBoard({ fixtures }: { fixtures: Fixture[] }) {
               </div>
               <div className="divide-y divide-white/[0.04] overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
                 {dayFixtures.map((fixture) => (
-                  <FixtureRow
-                    key={fixture.id}
-                    fixture={fixture}
-                    onOpen={() =>
-                      setSelected({ home: teamName(fixture.homeCode), away: teamName(fixture.awayCode) })
-                    }
-                  />
+                  <FixtureRow key={fixture.id} fixture={fixture} />
                 ))}
               </div>
             </div>
           ))}
         </div>
       )}
-
-      <JackReadDrawer match={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }
@@ -104,13 +95,12 @@ function venueLabel(fixture: Fixture): string {
   return `${venue} · ${city}`;
 }
 
-function FixtureRow({ fixture, onOpen }: { fixture: Fixture; onOpen: () => void }) {
+function FixtureRow({ fixture }: { fixture: Fixture }) {
   const label = fixture.group ? `Group ${fixture.group.replace(/^Group\s*/i, "")}` : fixture.stage ?? "Knockout";
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      title={`Ask Jack about ${teamName(fixture.homeCode)} v ${teamName(fixture.awayCode)}`}
+    <Link
+      href={`/guide/${fixture.id}`}
+      title={`Jack's read on ${teamName(fixture.homeCode)} v ${teamName(fixture.awayCode)}`}
       className="grid w-full grid-cols-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.025] md:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,12.5rem)]"
     >
       <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-1">
@@ -140,6 +130,6 @@ function FixtureRow({ fixture, onOpen }: { fixture: Fixture; onOpen: () => void 
           {venueLabel(fixture)}
         </span>
       </div>
-    </button>
+    </Link>
   );
 }

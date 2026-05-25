@@ -127,12 +127,14 @@ export const matchReadSchema = z.object({
   outcomes: z.array(z.object({ label: z.string(), pct: z.coerce.number() })),
   markets: z.array(z.object({ label: z.string(), lean: z.string(), note: z.string() })),
   summary: z.string(),
+  suggestions: z.array(z.string()).default([]),
   source: z.enum(["llm", "heuristic"]),
 });
 export type MatchReadResult = z.infer<typeof matchReadSchema>;
 
 export const matchChatReplySchema = z.object({
   reply: z.string(),
+  suggestions: z.array(z.string()).default([]),
   source: z.enum(["llm", "heuristic"]),
 });
 export type MatchChatReply = z.infer<typeof matchChatReplySchema>;
