@@ -103,7 +103,7 @@ export async function createApp(deps: AppDeps): Promise<Express> {
     player: createPlayerController(playerRepo),
     fantasy: createFantasyController(playerRepo, fantasyRepo, leagueRepo, matchRepo, llm),
     league: createLeagueController(leagueRepo, fantasyRepo),
-    prediction: createPredictionController(createPredictionRepo(deps.prisma)),
+    prediction: createPredictionController(createPredictionRepo(deps.prisma), matchRepo, llm),
     matchRead: createMatchReadController(llm),
     feed: deps.feedHandler ?? feedUnavailable,
   });

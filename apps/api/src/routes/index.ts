@@ -46,6 +46,7 @@ export function createRouter(deps: RouterDeps): Router {
   router.get('/leagues/:id/leaderboard', deps.league.leaderboard);
   router.post('/predictions', deps.prediction.create);
   router.get('/predictions', deps.prediction.list);
+  router.post('/predictions/slip', deps.prediction.slip);
   router.post('/matches/read', deps.matchRead.read);
   router.post('/matches/chat', deps.matchRead.chat);
 

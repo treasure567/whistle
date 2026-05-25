@@ -35,6 +35,13 @@ export const joinLeagueBody = z.object({
   accessToken: z.string().optional(),
 });
 
+export const predictSlipBody = z.object({
+  budget: z.coerce.number().min(5).max(1000),
+  preferences: z.string().max(280).optional(),
+  risk: z.enum(['safe', 'balanced', 'aggressive']).optional(),
+  count: z.coerce.number().int().min(2).max(8).optional(),
+});
+
 export const matchReadBody = z.object({
   home: z.string().min(1).max(60),
   away: z.string().min(1).max(60),
