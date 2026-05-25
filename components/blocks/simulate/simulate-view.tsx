@@ -6,6 +6,7 @@ import { ArrowDataTransferHorizontalIcon, DiceIcon } from "hugeicons-react";
 import { Button } from "@/components/ui/button";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { MatchSim } from "./match-sim";
+import { TournamentSim } from "./tournament-sim";
 import type { SimTeam } from "@/lib/sim/engine";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,7 @@ export function SimulateView({ teams }: { teams: SimTeam[] }) {
   const byCode = useMemo(() => new Map(teams.map((t) => [t.code, t])), [teams]);
   const [homeCode, setHomeCode] = useState(teams[0]?.code ?? "");
   const [awayCode, setAwayCode] = useState(teams[1]?.code ?? "");
+  const [mode, setMode] = useState<"single" | "tournament">("single");
 
   const home = byCode.get(homeCode);
   const away = byCode.get(awayCode);
@@ -41,7 +43,19 @@ export function SimulateView({ teams }: { teams: SimTeam[] }) {
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl items-start gap-6 px-6 md:grid-cols-[1fr_1.4fr] md:px-10">
+    <div className="mx-auto max-w-6xl px-6 md:px-10">
+      <div className="mb-6 flex flex-wrap gap-1.5">
+        <button type="button" onClick={() => setMode("single")} className={modeChip(mode === "single")}>
+          Single match
+        </button>
+        <button type="button" onClick={() => setMode("tournament")} className={modeChip(mode === "tournament")}>
+          Full tournament
+        </button>
+      </div>
+      {mode === "tournament" ? (
+        <TournamentSim teams={teams} />
+      ) : (
+        <div className="grid items-start gap-6 md:grid-cols-[1fr_1.4fr]">
       <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
         <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Choose the tie</p>
         <TeamSelect label="Home" value={homeCode} exclude={awayCode} teams={teams} onChange={setHomeCode} />
@@ -66,7 +80,18 @@ export function SimulateView({ teams }: { teams: SimTeam[] }) {
       </div>
 
       <MatchSim key={`${homeCode}-${awayCode}`} home={home} away={away} />
+        </div>
+      )}
     </div>
+  );
+}
+
+function modeChip(active: boolean): string {
+  return cn(
+    "rounded-full border px-4 py-1.5 text-[12px] transition-colors",
+    active
+      ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-100"
+      : "border-border text-muted-foreground hover:border-violet-400/30 hover:text-foreground",
   );
 }
 
