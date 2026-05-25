@@ -67,6 +67,31 @@ describe('simulateMatchLlm', () => {
     expect(result.stats.sotHome).toBeLessThanOrEqual(result.stats.shotsHome);
   });
 
+  it('maps event side given as a team code or name back to home/away', async () => {
+    const llm = mockLlm({
+      events: [
+        { minute: 20, type: 'goal', side: 'ARG', player: 'Messi' },
+        { minute: 55, type: 'goal', side: 'Brazil', scorer: 'Rodrygo' },
+      ],
+      possessionHome: 55,
+      shotsHome: 10,
+      shotsAway: 8,
+      sotHome: 4,
+      sotAway: 3,
+      cornersHome: 5,
+      cornersAway: 3,
+      motmPlayer: 'Messi',
+      motmSide: 'home',
+      motmRating: 8.4,
+    });
+    const result = await simulateMatchLlm(HOME, AWAY, 2, llm);
+    expect(result.source).toBe('llm');
+    expect(result.homeScore).toBe(1);
+    expect(result.awayScore).toBe(1);
+    // alternate field "scorer" is picked up as the player
+    expect(result.events.find((e) => e.minute === 55)?.player).toBe('Rodrygo');
+  });
+
   it('falls back to a heuristic stub when the model returns no usable events', async () => {
     const llm = mockLlm({ events: 'not-an-array', possessionHome: 50 });
     const result = await simulateMatchLlm(HOME, AWAY, 0, llm);

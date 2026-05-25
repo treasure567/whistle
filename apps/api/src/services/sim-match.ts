@@ -1,4 +1,7 @@
 import type { JsonSchema, LlmClient } from '@whistle/agent-core';
+import { createLogger } from '@whistle/logger';
+
+const log = createLogger('sim-match');
 
 export type SimMatchSide = 'home' | 'away' | 'neutral';
 export type SimMatchEventType =
@@ -153,7 +156,24 @@ function clampRating(value: unknown): number {
   return Math.round(Math.max(6, Math.min(10, n)) * 10) / 10;
 }
 
-function sanitizeEvents(raw: unknown): SimMatchEvent[] {
+// Models sometimes label the side with a team code or name instead of
+// home/away, which would otherwise drop every event. Map it back.
+function resolveSide(raw: unknown, home: SimTeamInput, away: SimTeamInput): 'home' | 'away' | null {
+  const v = String(raw ?? '').trim().toLowerCase();
+  if (!v) return null;
+  if (v === 'home' || v === home.code.toLowerCase() || v === home.name.toLowerCase()) return 'home';
+  if (v === 'away' || v === away.code.toLowerCase() || v === away.name.toLowerCase()) return 'away';
+  return null;
+}
+
+function pickName(...vals: unknown[]): string | undefined {
+  for (const v of vals) {
+    if (typeof v === 'string' && v.trim()) return v.trim().slice(0, 40);
+  }
+  return undefined;
+}
+
+function sanitizeEvents(raw: unknown, home: SimTeamInput, away: SimTeamInput): SimMatchEvent[] {
   if (!Array.isArray(raw)) return [];
   const out: SimMatchEvent[] = [];
   for (const item of raw) {
@@ -161,12 +181,11 @@ function sanitizeEvents(raw: unknown): SimMatchEvent[] {
     const e = item as Record<string, unknown>;
     const type = String(e.type ?? '') as SimMatchEventType;
     if (!DYNAMIC_TYPES.has(type)) continue;
-    const side = String(e.side ?? '');
-    if (side !== 'home' && side !== 'away') continue;
+    const side = resolveSide(e.side ?? e.team, home, away);
+    if (!side) continue;
     const minute = Math.round(Number(e.minute));
     if (!Number.isFinite(minute)) continue;
-    const player =
-      typeof e.player === 'string' && e.player.trim() ? e.player.trim().slice(0, 40) : undefined;
+    const player = pickName(e.player, e.scorer);
     const text = typeof e.text === 'string' && e.text.trim() ? e.text.trim().slice(0, 120) : undefined;
     out.push({
       minute: Math.max(1, Math.min(90, minute)),
@@ -291,8 +310,14 @@ export async function simulateMatchLlm(
     });
 
     const input = call.input;
-    const cleaned = sanitizeEvents(input.events);
-    if (cleaned.length === 0) return heuristicStub();
+    const cleaned = sanitizeEvents(input.events, home, away);
+    if (cleaned.length === 0) {
+      log.warn(
+        { home: home.code, away: away.code, rawEvents: Array.isArray(input.events) ? input.events.length : 0 },
+        'sim-match: model returned no usable events, falling back to engine',
+      );
+      return heuristicStub();
+    }
 
     const events = withBookends(cleaned);
     const homeScore = goalsBy(events, 'home');
@@ -305,7 +330,11 @@ export async function simulateMatchLlm(
       motm: deriveMotm(input, events),
       source: 'llm',
     };
-  } catch {
+  } catch (err) {
+    log.warn(
+      { home: home.code, away: away.code, err: err instanceof Error ? err.message : String(err) },
+      'sim-match: model call failed, falling back to engine',
+    );
     return heuristicStub();
   }
 }
