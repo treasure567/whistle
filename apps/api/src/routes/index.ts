@@ -9,6 +9,7 @@ import type { FantasyController } from '../controllers/fantasy.controller.js';
 import type { LeagueController } from '../controllers/league.controller.js';
 import type { PredictionController } from '../controllers/prediction.controller.js';
 import type { MatchReadController } from '../controllers/match-read.controller.js';
+import type { SimController } from '../controllers/sim.controller.js';
 
 export type RouterDeps = {
   agent: AgentController;
@@ -21,6 +22,7 @@ export type RouterDeps = {
   league: LeagueController;
   prediction: PredictionController;
   matchRead: MatchReadController;
+  sim: SimController;
   feed: RequestHandler;
 };
 
@@ -49,6 +51,7 @@ export function createRouter(deps: RouterDeps): Router {
   router.post('/predictions/slip', deps.prediction.slip);
   router.post('/matches/read', deps.matchRead.read);
   router.post('/matches/chat', deps.matchRead.chat);
+  router.post('/sim/match', deps.sim.match);
 
   router.get('/feed', deps.feed);
   return router;

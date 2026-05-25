@@ -47,6 +47,19 @@ export const matchReadBody = z.object({
   away: z.string().min(1).max(60),
 });
 
+const simTeamSchema = z.object({
+  code: z.string().min(1).max(8),
+  name: z.string().min(1).max(60),
+  strength: z.coerce.number().min(0).max(1).default(0.6),
+  players: z.array(z.string().min(1).max(60)).max(26).default([]),
+});
+
+export const simMatchBody = z.object({
+  home: simTeamSchema,
+  away: simTeamSchema,
+  variant: z.coerce.number().int().min(0).max(99).default(0),
+});
+
 export const matchChatBody = z.object({
   home: z.string().min(1).max(60),
   away: z.string().min(1).max(60),
