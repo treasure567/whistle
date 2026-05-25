@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from "react";
 
-const KEY = "whistle_vc_v1";
-const START = 1000;
+const KEY = "whistle_okb_sim_v1";
+const START = 500;
 
 function read(): number {
   if (typeof window === "undefined") return START;
@@ -12,8 +12,9 @@ function read(): number {
   return Number.isFinite(n) ? n : START;
 }
 
-// Virtual "WC Coins" balance for betting on simulated matches. Persisted to
-// localStorage; lazy-read so there's no setState-in-effect.
+// Sandbox OKB bankroll for betting on simulated matches. Persisted to
+// localStorage; lazy-read so there's no setState-in-effect. Kept off-chain
+// because simulated ties have no settlement oracle to pay out against.
 export function useVirtualWallet() {
   const [balance, setBalanceState] = useState<number>(read);
 

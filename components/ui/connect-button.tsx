@@ -16,6 +16,7 @@ import {
 import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } from "wagmi";
 
 import { Button } from "@/components/ui/button";
+import { useOkbBalance } from "@/hooks/use-okb-balance";
 import { truncateAddress, explorerAddressUrl } from "@/lib/format";
 import { xLayer } from "@/lib/chains";
 import { cn } from "@/lib/utils";
@@ -58,6 +59,7 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
   const { disconnect } = useDisconnect();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const chainId = useChainId();
+  const { balance: okb } = useOkbBalance();
   const [copied, setCopied] = useState(false);
   const onCorrectChain = chainId === xLayer.id;
 
@@ -71,6 +73,15 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
 
   return (
     <div className="flex items-center gap-2">
+      {onCorrectChain && okb !== null ? (
+        <span
+          className="hidden items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-[11px] text-foreground sm:flex"
+          title="Your OKB balance on X Layer testnet"
+        >
+          <span className="size-1.5 rounded-full bg-emerald-400" />
+          {okb.toLocaleString(undefined, { maximumFractionDigits: 2 })} OKB
+        </span>
+      ) : null}
       {!onCorrectChain ? (
         <Button
           variant="violet"

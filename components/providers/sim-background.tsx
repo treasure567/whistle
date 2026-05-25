@@ -36,6 +36,8 @@ export function SimBackgroundProvider({ children }: { children: ReactNode }) {
   const start = useCallback((home: SimTeam, away: SimTeam) => {
     setMatches((prev) => {
       if (prev.length >= MAX_BG) return prev;
+      // don't spawn a duplicate of a tie that's already running
+      if (prev.some((m) => m.home.code === home.code && m.away.code === away.code && m.minute < 90)) return prev;
       return [
         ...prev,
         {
@@ -63,7 +65,7 @@ function SimBackgroundDock() {
   const { matches, remove } = useSimBackground();
   if (matches.length === 0) return null;
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex w-60 flex-col gap-2">
+    <div className="fixed bottom-4 right-4 z-40 flex max-h-[calc(100vh-2rem)] w-60 flex-col gap-2 overflow-y-auto">
       {matches.map((m) => {
         const seen = m.result.events.filter((e) => e.minute <= m.minute);
         const hs = seen.filter((e) => (e.type === "goal" || e.type === "penalty-goal") && e.side === "home").length;

@@ -237,7 +237,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
               <span className="rounded-full border border-border px-2 py-0.5">{difficulty}</span>
             </div>
           </div>
-          <MatchSim key={`${country}-${opponent}`} home={homeSim} away={awaySim} />
+          <MatchSim key={`${country}-${opponent}`} home={homeSim} away={awaySim} coach={{ name: "Tom", side: "home" }} />
         </div>
       ) : null}
     </div>

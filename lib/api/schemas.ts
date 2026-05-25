@@ -139,6 +139,51 @@ export const matchChatReplySchema = z.object({
 });
 export type MatchChatReply = z.infer<typeof matchChatReplySchema>;
 
+export const simMatchEventSchema = z.object({
+  minute: z.coerce.number(),
+  type: z.enum([
+    "kickoff",
+    "goal",
+    "chance",
+    "save",
+    "corner",
+    "yellow",
+    "red",
+    "penalty-goal",
+    "penalty-miss",
+    "sub",
+    "halftime",
+    "fulltime",
+  ]),
+  side: z.enum(["home", "away", "neutral"]),
+  player: z.string().optional(),
+  text: z.string().optional(),
+});
+
+export const simMatchSchema = z.object({
+  homeScore: z.coerce.number(),
+  awayScore: z.coerce.number(),
+  events: z.array(simMatchEventSchema),
+  stats: z.object({
+    possessionHome: z.coerce.number(),
+    shotsHome: z.coerce.number(),
+    shotsAway: z.coerce.number(),
+    sotHome: z.coerce.number(),
+    sotAway: z.coerce.number(),
+    cornersHome: z.coerce.number(),
+    cornersAway: z.coerce.number(),
+    foulsHome: z.coerce.number(),
+    foulsAway: z.coerce.number(),
+    offsidesHome: z.coerce.number(),
+    offsidesAway: z.coerce.number(),
+  }),
+  motm: z
+    .object({ player: z.string(), side: z.enum(["home", "away"]), rating: z.coerce.number() })
+    .nullable(),
+  source: z.enum(["llm", "heuristic"]),
+});
+export type SimMatchPayload = z.infer<typeof simMatchSchema>;
+
 export const slipPickSchema = z.object({
   matchExternalId: z.string(),
   homeCode: z.string(),

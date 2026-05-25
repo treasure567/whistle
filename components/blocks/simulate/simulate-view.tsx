@@ -13,13 +13,18 @@ import { cn } from "@/lib/utils";
 
 export function SimulateView({ teams }: { teams: SimTeam[] }) {
   const byCode = useMemo(() => new Map(teams.map((t) => [t.code, t])), [teams]);
-  const { start: startBackground } = useSimBackground();
+  const { start: startBackground, matches: bgMatches } = useSimBackground();
   const [homeCode, setHomeCode] = useState(teams[0]?.code ?? "");
   const [awayCode, setAwayCode] = useState(teams[1]?.code ?? "");
   const [mode, setMode] = useState<"single" | "tournament">("single");
 
   const home = byCode.get(homeCode);
   const away = byCode.get(awayCode);
+
+  const bgAtCap = bgMatches.length >= 4;
+  const bgRunning = bgMatches.some((m) => m.home.code === homeCode && m.away.code === awayCode && m.minute < 90);
+  const bgDisabled = bgAtCap || bgRunning;
+  const bgLabel = bgAtCap ? "Background full" : bgRunning ? "Already running" : "Run in background";
 
   function random() {
     if (teams.length < 2) return;
@@ -76,8 +81,14 @@ export function SimulateView({ teams }: { teams: SimTeam[] }) {
           <Button variant="outline" size="sm" onClick={random} className="flex-1">
             <DiceIcon size={14} /> Random tie
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => startBackground(home, away)} className="flex-1">
-            Run in background
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => startBackground(home, away)}
+            disabled={bgDisabled}
+            className="flex-1"
+          >
+            {bgLabel}
           </Button>
         </div>
         <div className="mt-1 grid grid-cols-2 gap-3 border-t border-border pt-4">

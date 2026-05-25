@@ -7,8 +7,10 @@ import { ChampionIcon, FootballIcon } from "hugeicons-react";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { Button } from "@/components/ui/button";
 import { matchOdds, simulateMatch, type SimEvent, type SimResult, type SimTeam } from "@/lib/sim/engine";
+import { fetchLlmMatch } from "@/lib/sim/llm-match";
 import { buildCommentary, type SimComment } from "@/lib/sim/commentary";
 import { useVirtualWallet } from "@/hooks/use-virtual-wallet";
+import { useOkbBalance } from "@/hooks/use-okb-balance";
 import { cn } from "@/lib/utils";
 
 type Pick = "home" | "draw" | "away";
@@ -22,14 +24,30 @@ const SPEEDS = [
 
 const GOAL_TYPES = new Set<SimEvent["type"]>(["goal", "penalty-goal"]);
 
-export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away: SimTeam; bettable?: boolean }) {
+type Coach = { name: string; side: "home" | "away" };
+
+export function MatchSim({
+  home,
+  away,
+  bettable = false,
+  coach,
+}: {
+  home: SimTeam;
+  away: SimTeam;
+  bettable?: boolean;
+  coach?: Coach;
+}) {
   const [result, setResult] = useState<SimResult | null>(null);
   const [minute, setMinute] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speedMs, setSpeedMs] = useState<number>(650);
+  const [loading, setLoading] = useState(false);
+  const [variant, setVariant] = useState(0);
+  const [aiModelled, setAiModelled] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { balance, setBalance } = useVirtualWallet();
+  const { balance: onchainOkb } = useOkbBalance();
   const odds = useMemo(() => matchOdds(home.strength, away.strength), [home.strength, away.strength]);
   const [pick, setPick] = useState<Pick>("home");
   const [stake, setStake] = useState(50);
@@ -69,17 +87,25 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
   const justGoal = last && GOAL_TYPES.has(last.type) && last.minute === minute ? last : null;
   const done = minute >= 90 && !playing && result !== null;
 
-  function kickOff() {
-    setResult(simulateMatch(home, away));
+  async function run(nextVariant: number) {
+    if (loading) return;
+    setLoading(true);
+    const modelled = await fetchLlmMatch(home, away, nextVariant);
+    setLoading(false);
+    setResult(modelled ?? simulateMatch(home, away));
+    setAiModelled(modelled !== null);
     setMinute(0);
     setPlaying(true);
   }
+  function kickOff() {
+    void run(variant);
+  }
   function replay() {
-    setResult(simulateMatch(home, away));
-    setMinute(0);
-    setPlaying(true);
+    const next = (variant + 1) % 100;
+    setVariant(next);
     setBet(null);
     setSettled(null);
+    void run(next);
   }
   function skipToEnd() {
     setPlaying(false);
@@ -100,6 +126,41 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
     setSettled({ won, payout });
   }
   const pickLabel = (p: Pick) => (p === "home" ? home.code : p === "away" ? away.code : "Draw");
+
+  const favPick = (["home", "draw", "away"] as Pick[]).reduce((best, p) => (odds[p] < odds[best] ? p : best), "home" as Pick);
+  const jackAdvice = (() => {
+    if (bet) {
+      if (settled) {
+        return settled.won
+          ? `Get in! The ${pickLabel(bet.pick)} call lands +${settled.payout} OKB. Told you I knew this one.`
+          : `Cruel game. The ${pickLabel(bet.pick)} bet didn't come off. We dust ourselves down and go again.`;
+      }
+      const lead: Pick = homeScore > awayScore ? "home" : awayScore > homeScore ? "away" : "draw";
+      if (lead === bet.pick) return `Your ${pickLabel(bet.pick)} bet is sitting pretty at ${homeScore}-${awayScore}. Hold your nerve.`;
+      return `It's ${homeScore}-${awayScore} — your ${pickLabel(bet.pick)} bet needs a swing. There's still time on the clock.`;
+    }
+    if (result) return `We're live, the book's shut. I'll tot up the slip on the final whistle.`;
+    const tight = favPick !== "draw" && Math.abs(odds.home - odds.away) < 0.5;
+    return tight
+      ? `Tight line, this. ${pickLabel(favPick)} just edge it at ${odds[favPick].toFixed(2)}, but I wouldn't write off the draw.`
+      : `My read: ${pickLabel(favPick)} at ${odds[favPick].toFixed(2)} is the value on the board. Stake what you're comfortable with.`;
+  })();
+
+  const coachAdvice = (() => {
+    if (!coach) return "";
+    const mine = coach.side === "home" ? homeScore : awayScore;
+    const theirs = coach.side === "home" ? awayScore : homeScore;
+    if (done) {
+      if (mine > theirs) return `That's how we manage a game — composed and clinical. On to the next round.`;
+      if (mine < theirs) return `Heads up. We lacked a cutting edge today. We regroup and go again.`;
+      return `A draw keeps us in it. Not our finest, but we're still standing.`;
+    }
+    if (!result) return `Stick to the shape, win your duels, trust the plan. Kick us off when you're ready.`;
+    if (minute < 20) return `Settle the nerves. Keep the ball, don't force the pass that isn't on.`;
+    if (mine > theirs) return `${mine}-${theirs} up. Stay disciplined at the back, see this period out.`;
+    if (mine < theirs) return `We're chasing it. Push the full-backs on, get crosses in — think about a change.`;
+    return `All square. Lift the tempo and find a spark in the final third.`;
+  })();
 
   const clock = minute >= 90 ? "FT" : minute === 45 ? "HT" : `${minute}'`;
 
@@ -152,13 +213,46 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
         />
       </div>
 
-      {/* Virtual bet */}
+      {/* Gaffer's touchline advice */}
+      {coach ? (
+        <div className="border-b border-border p-4">
+          <div className="flex items-start gap-2 rounded-xl border border-emerald-400/25 bg-emerald-500/[0.05] p-2.5">
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 font-mono text-[10px] font-semibold text-white">
+              {coach.name.slice(0, 1)}
+            </span>
+            <span className="min-w-0">
+              <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">{coach.name} · gaffer</span>
+              <span className="mt-0.5 block text-[12px] leading-relaxed text-emerald-50">{coachAdvice}</span>
+            </span>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Bookie desk */}
       {bettable ? (
         <div className="border-b border-border p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Virtual bet</span>
-            <span className="font-mono text-[11px] text-amber-300" suppressHydrationWarning>{balance} VC</span>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-violet-500 font-mono text-[10px] font-semibold text-white">J</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{"Jack's desk"}</span>
+            </span>
+            <span className="flex items-center gap-2">
+              {onchainOkb !== null ? (
+                <span className="font-mono text-[10px] text-emerald-300" title="Your real OKB on X Layer testnet">
+                  {onchainOkb.toLocaleString(undefined, { maximumFractionDigits: 2 })} onchain
+                </span>
+              ) : null}
+              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-300" suppressHydrationWarning>
+                {balance} OKB
+              </span>
+            </span>
           </div>
+
+          <div className="mb-3 flex items-start gap-2 rounded-xl border border-violet-400/25 bg-violet-500/[0.05] p-2.5">
+            <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-violet-400" />
+            <span className="text-[12px] leading-relaxed text-violet-100">{jackAdvice}</span>
+          </div>
+
           {!bet ? (
             <>
               <div className="grid grid-cols-3 gap-1.5">
@@ -170,11 +264,18 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
                     disabled={Boolean(result)}
                     className={cn(
                       "flex flex-col items-center rounded-xl border px-2 py-2 transition-colors disabled:opacity-50",
-                      pick === id ? "border-violet-400/50 bg-violet-500/[0.08]" : "border-border hover:border-violet-400/30",
+                      pick === id
+                        ? "border-violet-400/50 bg-violet-500/[0.08]"
+                        : id === favPick
+                          ? "border-violet-400/30 hover:border-violet-400/50"
+                          : "border-border hover:border-violet-400/30",
                     )}
                   >
                     <span className="text-[12px] text-foreground">{pickLabel(id)}</span>
                     <span className="font-mono text-[13px] font-semibold text-violet-300">{odds[id].toFixed(2)}</span>
+                    {id === favPick ? (
+                      <span className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.12em] text-violet-300/80">{"Jack's tip"}</span>
+                    ) : null}
                   </button>
                 ))}
               </div>
@@ -188,7 +289,7 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
                   disabled={Boolean(result)}
                   className="w-24 rounded-lg border border-border bg-background px-2 py-1.5 text-right font-mono text-sm text-foreground outline-none disabled:opacity-50"
                 />
-                <span className="font-mono text-[11px] text-muted-foreground">VC</span>
+                <span className="font-mono text-[11px] text-muted-foreground">OKB</span>
                 <Button variant="violet" size="sm" onClick={placeBet} disabled={Boolean(result) || stake <= 0 || stake > balance} className="ml-auto">
                   Place · win {Math.round(stake * odds[pick])}
                 </Button>
@@ -202,7 +303,7 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
               )}
             >
               <span className={cn("font-mono text-[11px] uppercase tracking-[0.18em]", settled.won ? "text-emerald-300" : "text-red-300")}>
-                {settled.won ? `Won +${settled.payout} VC` : `Lost ${bet.stake} VC`}
+                {settled.won ? `Won +${settled.payout} OKB` : `Lost ${bet.stake} OKB`}
               </span>
               <span className="font-mono text-[11px] text-muted-foreground">
                 {pickLabel(bet.pick)} @ {bet.odds.toFixed(2)}
@@ -214,7 +315,7 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
             </Button>
           ) : (
             <div className="flex items-center justify-between rounded-xl border border-violet-400/30 bg-violet-500/[0.05] p-3">
-              <span className="font-mono text-[11px] text-violet-100">Live: {pickLabel(bet.pick)} · {bet.stake} VC</span>
+              <span className="font-mono text-[11px] text-violet-100">Live: {pickLabel(bet.pick)} · {bet.stake} OKB</span>
               <span className="font-mono text-[11px] text-muted-foreground">to win {Math.round(bet.stake * bet.odds)}</span>
             </div>
           )}
@@ -224,12 +325,12 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border p-4">
         {!result ? (
-          <Button variant="violet" size="sm" onClick={kickOff}>
-            <FootballIcon size={14} /> Kick off
+          <Button variant="violet" size="sm" onClick={kickOff} disabled={loading}>
+            <FootballIcon size={14} /> {loading ? "Modelling match…" : "Kick off"}
           </Button>
         ) : (
           <>
-            <Button variant="outline" size="sm" onClick={() => setPlaying((p) => !p)} disabled={done}>
+            <Button variant="outline" size="sm" onClick={() => setPlaying((p) => !p)} disabled={done || loading}>
               {playing ? "Pause" : "Play"}
             </Button>
             <div className="flex items-center gap-1">
@@ -249,11 +350,11 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
                 </button>
               ))}
             </div>
-            <Button variant="ghost" size="sm" onClick={skipToEnd} disabled={done}>
+            <Button variant="ghost" size="sm" onClick={skipToEnd} disabled={done || loading}>
               Skip to FT
             </Button>
-            <Button variant="ghost" size="sm" onClick={replay}>
-              {done ? "Play again" : "Re-sim"}
+            <Button variant="ghost" size="sm" onClick={replay} disabled={loading}>
+              {loading ? "Modelling…" : done ? "Play again" : "Re-sim"}
             </Button>
           </>
         )}
@@ -267,11 +368,16 @@ export function MatchSim({ home, away, bettable = false }: { home: SimTeam; away
         <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
           Live commentary
         </span>
+        {aiModelled ? (
+          <span className="ml-auto rounded-full border border-violet-400/30 bg-violet-500/[0.08] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-violet-200">
+            AI-modelled
+          </span>
+        ) : null}
       </div>
       <div ref={feedRef} className="max-h-[20rem] overflow-y-auto scroll-smooth p-4">
         {!result ? (
           <p className="py-8 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-            Kick off to simulate the match
+            {loading ? "Modelling the match with AI…" : "Kick off to simulate the match"}
           </p>
         ) : (
           <div className="flex flex-col gap-2">
