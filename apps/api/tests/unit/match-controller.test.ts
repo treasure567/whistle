@@ -33,7 +33,7 @@ describe('match controller', () => {
     };
     const res = mockRes();
     await createMatchController(repo).list(mockReq({ query: {} }), res);
-    expect(repo.list).toHaveBeenCalledWith(50);
+    expect(repo.list).toHaveBeenCalledWith(150);
     expect(res.json).toHaveBeenCalledWith({ ok: true, data: [matchRow] });
   });
 
