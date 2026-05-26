@@ -4,13 +4,7 @@ import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { cn } from "@/lib/utils";
 
 export type PitchPlayer = { id: string; name: string; position: string; photo?: string | null };
-
-const ROWS: ReadonlyArray<{ pos: string; label: string }> = [
-  { pos: "FWD", label: "forwards" },
-  { pos: "MID", label: "midfield" },
-  { pos: "DEF", label: "defence" },
-  { pos: "GK", label: "keeper" },
-];
+export type PitchRow = { group: "DEF" | "MID" | "FWD"; n: number };
 
 function shortName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -20,19 +14,45 @@ function shortName(name: string): string {
 
 export function FlatPitch({
   players,
+  rows,
   activeId,
   highlightIds,
   onSelect,
   className,
 }: {
   players: PitchPlayer[];
+  rows: PitchRow[];
   activeId?: string | null;
   highlightIds?: ReadonlyArray<string>;
   onSelect?: (player: PitchPlayer) => void;
   className?: string;
 }) {
-  const byPos: Record<string, PitchPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
-  for (const p of players) (byPos[p.position] ?? byPos.MID)!.push(p);
+  // XI is ordered GK, then defenders, midfielders, forwards. Slice the
+  // outfielders into the formation's bands so split shapes (e.g. 4-2-3-1)
+  // render distinctly from flat ones (4-5-1).
+  const gk = players.find((p) => p.position === "GK") ?? null;
+  const outfield = players.filter((p) => p.id !== gk?.id);
+  const bands: PitchPlayer[][] = [];
+  let cursor = 0;
+  for (const row of rows) {
+    bands.push(outfield.slice(cursor, cursor + row.n));
+    cursor += row.n;
+  }
+  if (cursor < outfield.length && bands.length > 0) {
+    bands[bands.length - 1]!.push(...outfield.slice(cursor));
+  }
+  const displayBands = [...bands].reverse();
+
+  const renderToken = (p: PitchPlayer) => (
+    <Token
+      key={p.id}
+      player={p}
+      active={activeId === p.id}
+      valid={Boolean(highlightIds?.includes(p.id))}
+      dim={Boolean(activeId) && activeId !== p.id && !highlightIds?.includes(p.id)}
+      onSelect={onSelect ? () => onSelect(p) : undefined}
+    />
+  );
 
   return (
     <div
@@ -43,29 +63,12 @@ export function FlatPitch({
     >
       <Markings />
       <div className="relative z-10 flex aspect-[16/11] flex-col justify-evenly gap-1 px-2 py-6 sm:px-5">
-        {ROWS.map(({ pos, label }) => {
-          const line = byPos[pos] ?? [];
-          return (
-            <div key={pos} className="flex items-center justify-evenly gap-1">
-              {line.length === 0 ? (
-                <span className="flex h-[40px] items-center justify-center rounded-full border border-dashed border-white/25 px-4 font-mono text-[9px] uppercase tracking-[0.18em] text-white/40">
-                  {label}
-                </span>
-              ) : (
-                line.map((p) => (
-                  <Token
-                    key={p.id}
-                    player={p}
-                    active={activeId === p.id}
-                    valid={Boolean(highlightIds?.includes(p.id))}
-                    dim={Boolean(activeId) && activeId !== p.id && !highlightIds?.includes(p.id)}
-                    onSelect={onSelect ? () => onSelect(p) : undefined}
-                  />
-                ))
-              )}
-            </div>
-          );
-        })}
+        {displayBands.map((band, i) => (
+          <div key={i} className="flex items-center justify-evenly gap-1">
+            {band.map(renderToken)}
+          </div>
+        ))}
+        <div className="flex items-center justify-evenly gap-1">{gk ? renderToken(gk) : null}</div>
       </div>
     </div>
   );

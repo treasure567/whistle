@@ -9,7 +9,7 @@ import { TxLink } from "@/components/ui/tx-link";
 import { CountryPicker } from "@/components/ui/country-picker";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
-import { FlatPitch } from "@/components/blocks/manager/flat-pitch";
+import { FlatPitch, type PitchRow } from "@/components/blocks/manager/flat-pitch";
 import { MatchSim } from "@/components/blocks/simulate/match-sim";
 import { PenaltyShootout, type ShootoutResult } from "@/components/blocks/simulate/penalty-shootout";
 import { fetchManagerBrief } from "@/lib/api/manager";
@@ -22,21 +22,33 @@ import { cn } from "@/lib/utils";
 export type ManagerPlayer = { id: string; name: string; position: string; price: number; photo?: string | null };
 export type ManagerTeam = { code: string; name: string; players: ManagerPlayer[] };
 
-const FORMATIONS: Record<string, { DEF: number; MID: number; FWD: number }> = {
-  "4-4-2": { DEF: 4, MID: 4, FWD: 2 },
-  "4-3-3": { DEF: 4, MID: 3, FWD: 3 },
-  "4-2-4": { DEF: 4, MID: 2, FWD: 4 },
-  "3-4-3": { DEF: 3, MID: 4, FWD: 3 },
-  "3-5-2": { DEF: 3, MID: 5, FWD: 2 },
-  "4-5-1": { DEF: 4, MID: 5, FWD: 1 },
-  "5-3-2": { DEF: 5, MID: 3, FWD: 2 },
-  "5-4-1": { DEF: 5, MID: 4, FWD: 1 },
+// Each formation is an ordered list of bands from defence to attack (the GK is
+// implicit). Split shapes like 4-2-3-1 use two MID bands so they render
+// distinctly from a flat 4-5-1.
+const FORMATIONS: Record<string, PitchRow[]> = {
+  "4-4-2": [{ group: "DEF", n: 4 }, { group: "MID", n: 4 }, { group: "FWD", n: 2 }],
+  "4-3-3": [{ group: "DEF", n: 4 }, { group: "MID", n: 3 }, { group: "FWD", n: 3 }],
+  "4-2-3-1": [{ group: "DEF", n: 4 }, { group: "MID", n: 2 }, { group: "MID", n: 3 }, { group: "FWD", n: 1 }],
+  "4-1-4-1": [{ group: "DEF", n: 4 }, { group: "MID", n: 1 }, { group: "MID", n: 4 }, { group: "FWD", n: 1 }],
+  "4-3-2-1": [{ group: "DEF", n: 4 }, { group: "MID", n: 3 }, { group: "MID", n: 2 }, { group: "FWD", n: 1 }],
+  "4-2-4": [{ group: "DEF", n: 4 }, { group: "MID", n: 2 }, { group: "FWD", n: 4 }],
+  "3-4-3": [{ group: "DEF", n: 3 }, { group: "MID", n: 4 }, { group: "FWD", n: 3 }],
+  "3-5-2": [{ group: "DEF", n: 3 }, { group: "MID", n: 5 }, { group: "FWD", n: 2 }],
+  "4-5-1": [{ group: "DEF", n: 4 }, { group: "MID", n: 5 }, { group: "FWD", n: 1 }],
+  "5-3-2": [{ group: "DEF", n: 5 }, { group: "MID", n: 3 }, { group: "FWD", n: 2 }],
+  "5-4-1": [{ group: "DEF", n: 5 }, { group: "MID", n: 4 }, { group: "FWD", n: 1 }],
 };
 const FORMATION_KEYS = Object.keys(FORMATIONS);
 
-// Tom (the LLM) may suggest shapes outside our chip set (e.g. "4-2-3-1").
-// Map any formation string to the nearest known chip by its line counts
-// (defenders / midfielders / forwards), so his plan still applies.
+function totalsOf(formation: string): { DEF: number; MID: number; FWD: number } {
+  const rows = FORMATIONS[formation] ?? FORMATIONS["4-3-3"]!;
+  const totals = { DEF: 0, MID: 0, FWD: 0 };
+  for (const row of rows) totals[row.group] += row.n;
+  return totals;
+}
+
+// Tom (the LLM) may suggest a shape we don't list verbatim. Prefer an exact
+// match, otherwise map to a known formation with the same line totals.
 function normalizeFormation(f: string | undefined): string | null {
   if (!f) return null;
   if (FORMATIONS[f]) return f;
@@ -47,8 +59,8 @@ function normalizeFormation(f: string | undefined): string | null {
   const mid = nums.slice(1, -1).reduce((s, n) => s + n, 0);
   return (
     FORMATION_KEYS.find((k) => {
-      const shape = FORMATIONS[k]!;
-      return shape.DEF === def && shape.MID === mid && shape.FWD === fwd;
+      const t = totalsOf(k);
+      return t.DEF === def && t.MID === mid && t.FWD === fwd;
     }) ?? null
   );
 }
@@ -64,10 +76,10 @@ const SCORE_ORDER = ["FWD", "MID", "DEF", "GK"];
 const ROUNDS = ["Round of 16", "Quarter-final", "Semi-final", "Final"] as const;
 
 function bestXI(players: ManagerPlayer[], formation: string): ManagerPlayer[] {
-  const shape = FORMATIONS[formation]!;
+  const t = totalsOf(formation);
   const pick = (pos: string, n: number) =>
     players.filter((p) => p.position === pos).sort((a, b) => b.price - a.price).slice(0, n);
-  return [...pick("GK", 1), ...pick("DEF", shape.DEF), ...pick("MID", shape.MID), ...pick("FWD", shape.FWD)];
+  return [...pick("GK", 1), ...pick("DEF", t.DEF), ...pick("MID", t.MID), ...pick("FWD", t.FWD)];
 }
 
 function strengthFromXI(xi: ManagerPlayer[]): number {
@@ -474,6 +486,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
             </div>
             <FlatPitch
               players={xi}
+              rows={FORMATIONS[formation] ?? FORMATIONS["4-3-3"]!}
               activeId={activeId}
               highlightIds={[...validTargetIds]}
               onSelect={(p) => tapPlayer(p.id)}
