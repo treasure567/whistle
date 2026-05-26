@@ -30,4 +30,4 @@ export const xLayer = defineChain({
 });
 
 export const X_LAYER_USDT_ADDRESS =
-  process.env.NEXT_PUBLIC_USDT_ADDRESS ?? "0x487F536593b1680B8247E67254Fc8D0394D137D7";
+  process.env.NEXT_PUBLIC_USDT_ADDRESS ?? "0x2CCfFdE9e4A425cb852f96CEC5fCd0Da2Be1b10A";
