@@ -2,22 +2,24 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { CoinsDollarIcon, FootballIcon, Loading03Icon, ShieldBlockchainIcon } from "hugeicons-react";
+import { CoinsDollarIcon, FootballIcon, Loading03Icon, Search01Icon, ShieldBlockchainIcon } from "hugeicons-react";
 
 import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@/components/ui/connect-button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { FlagOrb } from "@/components/ui/flag-orb";
 import { TxLink } from "@/components/ui/tx-link";
 import { ApiError } from "@/lib/api/client";
 import { createPrediction, fetchPredictions } from "@/lib/api/predictions";
+import type { Fixture } from "@/lib/api/fixtures";
 import type { PredictionRecord } from "@/lib/api/schemas";
 import { AGENTS } from "@/lib/mock";
 import { formatUsdt, timeAgo } from "@/lib/format";
+import { teamName } from "@/lib/wc-teams";
 import { useFundAgent, phaseLabel } from "@/hooks/use-fund-agent";
 import { JackSlip } from "./jack-slip";
 import { cn } from "@/lib/utils";
-import type { MatchInfo } from "@/types";
 
 type Side = { id: string; label: string };
 type Category = "Match" | "Goals" | "Corners" | "Cards" | "Fouls" | "Specials";
@@ -107,18 +109,27 @@ const MARKETS: ReadonlyArray<Market> = [
 
 const STAKES = [0, 5, 10, 25] as const;
 
+const KICK_FMT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
+
+function fixtureTag(f: Fixture): string {
+  if (f.group) return `Grp ${f.group.replace(/^Group\s*/i, "")}`;
+  if (f.stage) return f.stage;
+  return KICK_FMT.format(f.kickoffAt);
+}
+
 function marketsIn(category: Category): Market[] {
   return MARKETS.filter((market) => market.category === category);
 }
 
-export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[]; initialMatchId?: string }) {
+export function PredictView({ fixtures, initialMatchId }: { fixtures: Fixture[]; initialMatchId?: string }) {
   const { address, isConnected } = useAccount();
   const { state: fundState, fund, reset: resetFund } = useFundAgent();
   const jack = AGENTS.bookie;
   const [mode, setMode] = useState<"manual" | "jack">("manual");
   const [matchId, setMatchId] = useState<string>(
-    (initialMatchId && matches.some((m) => m.id === initialMatchId) ? initialMatchId : matches[0]?.id) ?? "",
+    (initialMatchId && fixtures.some((f) => f.id === initialMatchId) ? initialMatchId : fixtures[0]?.id) ?? "",
   );
+  const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("Match");
   const [marketId, setMarketId] = useState<string>(MARKETS[0]!.id);
   const [sideId, setSideId] = useState<string>("home");
@@ -127,9 +138,24 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionRecord[]>([]);
 
-  const match = matches.find((item) => item.id === matchId);
-  const homeName = match?.home ?? "Home";
-  const awayName = match?.away ?? "Away";
+  const match = fixtures.find((item) => item.id === matchId);
+  const homeName = match ? teamName(match.homeCode) : "Home";
+  const awayName = match ? teamName(match.awayCode) : "Away";
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return fixtures;
+    return fixtures.filter((f) => {
+      const h = teamName(f.homeCode).toLowerCase();
+      const a = teamName(f.awayCode).toLowerCase();
+      return (
+        h.includes(q) ||
+        a.includes(q) ||
+        f.homeCode.toLowerCase().includes(q) ||
+        f.awayCode.toLowerCase().includes(q) ||
+        (f.group ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [fixtures, query]);
   const market = MARKETS.find((item) => item.id === marketId) ?? MARKETS[0]!;
   const sides = useMemo(() => market.sides(homeName, awayName), [market, homeName, awayName]);
 
@@ -200,13 +226,13 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
     }
   }
 
-  if (matches.length === 0) {
+  if (fixtures.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-6 md:px-10">
         <EmptyState
           icon={<FootballIcon size={16} />}
-          label="NO_MATCHES"
-          hint="There are no matches to predict yet. Check back closer to kickoff."
+          label="NO_FIXTURES"
+          hint="Fixtures aren't loaded yet. Start the backend and seed the schedule, then refresh."
         />
       </div>
     );
@@ -234,25 +260,45 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
         </div>
 
         <Section label="Match">
-          <div className="max-h-44 divide-y divide-border overflow-y-auto rounded-xl border border-border">
-            {matches.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setMatchId(item.id)}
-                className={cn(
-                  "flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors",
-                  matchId === item.id ? "bg-violet-500/[0.06]" : "hover:bg-foreground/[0.02]",
-                )}
-              >
-                <span className="font-mono text-sm text-foreground">
-                  {item.home} <span className="text-muted-foreground">v</span> {item.away}
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  {item.phase.replace("-", " ")}
-                </span>
-              </button>
-            ))}
+          <div className="relative mb-2">
+            <Search01Icon size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search a team or group"
+              aria-label="Search fixtures"
+              className="h-9 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:border-violet-400/50"
+            />
+          </div>
+          <div className="max-h-64 divide-y divide-border overflow-y-auto rounded-xl border border-border">
+            {filtered.length === 0 ? (
+              <p className="px-4 py-6 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                No fixtures match
+              </p>
+            ) : (
+              filtered.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setMatchId(item.id)}
+                  className={cn(
+                    "flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition-colors",
+                    matchId === item.id ? "bg-violet-500/[0.06]" : "hover:bg-foreground/[0.02]",
+                  )}
+                >
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <FlagOrb code={item.homeCode} size={18} />
+                    <span className="truncate text-[13px] text-foreground">{teamName(item.homeCode)}</span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">v</span>
+                    <span className="truncate text-[13px] text-foreground">{teamName(item.awayCode)}</span>
+                    <FlagOrb code={item.awayCode} size={18} />
+                  </span>
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                    {fixtureTag(item)}
+                  </span>
+                </button>
+              ))
+            )}
           </div>
         </Section>
 

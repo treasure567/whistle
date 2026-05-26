@@ -2,7 +2,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteNavbar } from "@/components/layout/site-navbar";
 import { PredictView } from "@/components/blocks/play/predict-view";
 import { AmbientGlow } from "@/components/ui/ambient-glow";
-import { fetchMatches } from "@/lib/api/matches";
+import { fetchFixtures } from "@/lib/api/fixtures";
 
 export const metadata = {
   title: "Predictions",
@@ -15,7 +15,7 @@ export default async function PredictPage({
 }: {
   searchParams: Promise<{ match?: string }>;
 }) {
-  const [{ matches }, sp] = await Promise.all([fetchMatches(), searchParams]);
+  const [{ fixtures }, sp] = await Promise.all([fetchFixtures(), searchParams]);
 
   return (
     <main className="flex min-h-screen flex-col bg-background text-foreground">
@@ -36,7 +36,7 @@ export default async function PredictPage({
         </div>
       </section>
       <section className="pb-24">
-        <PredictView matches={matches} {...(sp.match ? { initialMatchId: sp.match } : {})} />
+        <PredictView fixtures={fixtures} {...(sp.match ? { initialMatchId: sp.match } : {})} />
       </section>
       <SiteFooter />
     </main>
