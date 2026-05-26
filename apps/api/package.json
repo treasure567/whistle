@@ -11,7 +11,8 @@
     "lint": "eslint src tests",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:integration": "vitest run --config vitest.integration.config.mts"
+    "test:integration": "vitest run --config vitest.integration.config.mts",
+    "backfill:funding": "tsx scripts/backfill-funding.ts"
   },
   "dependencies": {
     "@whistle/agent-core": "workspace:*",
@@ -30,6 +31,7 @@
     "zod": "3.24.1"
   },
   "devDependencies": {
+    "@whistle/chain": "workspace:*",
     "@types/cookie-parser": "1.4.8",
     "@types/cors": "2.8.17",
     "@types/express": "5.0.0",
