@@ -36,7 +36,7 @@ export default async function ActivityPage({
             Activity feed
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Everything they did. <span className="font-serif italic font-normal text-violet-200">In one place.</span>
+            Everything they did. <span className="font-serif-italic text-violet-200">In one place.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Saved highlights, predictions, and team picks from every match.

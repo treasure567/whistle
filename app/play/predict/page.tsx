@@ -27,7 +27,7 @@ export default async function PredictPage({
             Predictions
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Make the <span className="font-serif italic font-normal text-violet-200">call.</span>
+            Make the <span className="font-serif-italic text-violet-200">call.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             This is Jack&apos;s job when you fund him. Want to back your own read instead? Pick a

@@ -155,7 +155,7 @@ export function AiPickPanel({
           <motion.p
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-3 text-[12px] italic leading-relaxed text-muted-foreground"
+            className="mt-3 text-[12px] font-serif-italic leading-relaxed text-muted-foreground"
           >
             “{result.rationale}”
           </motion.p>

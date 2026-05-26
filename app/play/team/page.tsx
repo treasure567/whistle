@@ -23,7 +23,7 @@ export default async function TeamPage() {
             Pick your players
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Build your <span className="font-serif italic font-normal text-violet-200">starting XI.</span>
+            Build your <span className="font-serif-italic text-violet-200">starting XI.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Fifteen players, one budget. Two keepers, five defenders, five midfielders, three

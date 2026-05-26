@@ -55,7 +55,7 @@ export function HowItWorks() {
             How it works
           </span>
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-            You fund. <span className="font-serif italic font-normal text-violet-200">They play.</span> You own it.
+            You fund. <span className="font-serif-italic text-violet-200">They play.</span> You own it.
           </h2>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-400">
             Three AI helpers act for you during live World Cup matches. You stay in control of the money and keep everything they make.

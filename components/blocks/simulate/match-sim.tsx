@@ -617,7 +617,7 @@ const TONE_TEXT: Record<SimComment["tone"], string> = {
   card: "text-amber-300",
   chance: "text-sky-300/90",
   info: "text-violet-200",
-  color: "italic text-muted-foreground",
+  color: "font-serif-italic text-muted-foreground",
 };
 const TONE_DOT: Record<SimComment["tone"], string> = {
   goal: "bg-violet-500",

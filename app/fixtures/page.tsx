@@ -30,7 +30,7 @@ export default async function FixturesPage() {
               World Cup 2026 · 48 nations
             </span>
             <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-              Every match. <span className="font-serif italic font-normal text-violet-200">One schedule.</span>
+              Every match. <span className="font-serif-italic text-violet-200">One schedule.</span>
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
               All 104 fixtures across Canada, Mexico, and the USA — dates, kick-off times, groups,

@@ -31,7 +31,7 @@ export function AgentSpec({ agent }: AgentSpecProps) {
               How {agent.name} works
             </span>
             <h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">
-              Clear rules. <span className="font-serif italic font-normal text-violet-200">No surprises.</span>
+              Clear rules. <span className="font-serif-italic text-violet-200">No surprises.</span>
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-400">
               {agent.name}&apos;s approach is fixed and public. You always know

@@ -21,7 +21,7 @@ export function AgentsSection() {
               The team
             </span>
             <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Three helpers. <span className="font-serif italic font-normal text-violet-200">One app.</span>
+              Three helpers. <span className="font-serif-italic text-violet-200">One app.</span>
             </h2>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-zinc-400">

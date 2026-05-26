@@ -43,7 +43,7 @@ export default function PlayPage() {
             Play along
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Your turn. <span className="font-serif italic font-normal text-violet-200">Same matches.</span>
+            Your turn. <span className="font-serif-italic text-violet-200">Same matches.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Emma, Jack, and Tom do the work when you fund them. Want to play it yourself? Pick your

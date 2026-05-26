@@ -6,7 +6,7 @@ import { truncateAddress, explorerAddressUrl } from "@/lib/format";
 
 export function SiteFooter() {
   return (
-    <footer className="relative border-t border-border bg-muted/40 dark:border-white/5 dark:bg-[#050507]">
+    <footer className="relative mt-auto border-t border-border bg-muted/40 dark:border-white/5 dark:bg-[#050507]">
       <div className="mx-auto max-w-7xl px-6 py-16 md:px-10">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div>

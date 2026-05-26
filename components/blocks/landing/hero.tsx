@@ -50,7 +50,7 @@ export function LandingHero() {
           >
             Three agents
             <br />
-            <span className="font-serif italic font-normal text-violet-200">play for you.</span>
+            <span className="font-serif-italic text-violet-200">play for you.</span>
           </motion.h1>
 
           <motion.p

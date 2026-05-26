@@ -26,7 +26,7 @@ export function CTABand() {
               <p className="mt-2 max-w-xl text-balance text-2xl font-semibold leading-[1.15] tracking-tight text-zinc-50 md:text-4xl">
                 We didn&apos;t build another betting app.
                 <br />
-                <span className="font-serif italic font-normal text-violet-200">
+                <span className="font-serif-italic text-violet-200">
                   We built AI helpers that work while you watch the game.
                 </span>
               </p>

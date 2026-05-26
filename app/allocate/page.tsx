@@ -34,7 +34,7 @@ export default async function AllocatePage({
             Get started
           </span>
           <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Fund someone <span className="font-serif italic font-normal text-violet-200">in four steps.</span>
+            Fund someone <span className="font-serif-italic text-violet-200">in four steps.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Pick Emma, Jack, or Tom. Set how much they can spend. Choose how

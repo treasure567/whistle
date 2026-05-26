@@ -23,7 +23,7 @@ export function ContractsStrip() {
               Onchain
             </span>
             <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Built in the open. <span className="font-serif italic font-normal text-violet-200">Live on testnet.</span>
+              Built in the open. <span className="font-serif-italic text-violet-200">Live on testnet.</span>
             </h2>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-3 py-1 font-mono text-[11px] text-emerald-300">

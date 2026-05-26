@@ -23,7 +23,7 @@ export default async function LeaguesPage() {
             Leagues
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Play with <span className="font-serif italic font-normal text-violet-200">friends.</span>
+            Play with <span className="font-serif-italic text-violet-200">friends.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Start a public league anyone can join, or a private one with an invite code. Set the

@@ -23,6 +23,7 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
+  display: "swap",
 });
 
 const SITE_URL = "https://whistle-agents.xyz";

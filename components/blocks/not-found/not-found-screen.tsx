@@ -63,7 +63,7 @@ export function NotFoundScreen() {
             This page isn&apos;t on the pitch.
           </h1>
           <p className="mt-3 max-w-lg text-base leading-relaxed text-zinc-500 md:text-lg">
-            <span className="font-serif italic text-violet-200">
+            <span className="font-serif-italic text-violet-200">
               Wrong turn somewhere.
             </span>{" "}
             The URL doesn&apos;t match anything on whistle — head back or pick

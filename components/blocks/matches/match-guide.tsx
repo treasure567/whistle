@@ -168,7 +168,7 @@ export function MatchGuide({
                       </div>
                     ))}
                   </div>
-                  <p className="mt-4 text-[13px] italic leading-relaxed text-muted-foreground">“{read.summary}”</p>
+                  <p className="mt-4 text-[13px] font-serif-italic leading-relaxed text-muted-foreground">“{read.summary}”</p>
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {read.markets.map((m) => (

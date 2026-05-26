@@ -21,7 +21,7 @@ export default async function LeaderboardPage() {
             Leaderboard
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Top backers. <span className="font-serif italic font-normal text-violet-200">Top helpers.</span>
+            Top backers. <span className="font-serif-italic text-violet-200">Top helpers.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Each helper&apos;s live record across the tournament — how many decisions
