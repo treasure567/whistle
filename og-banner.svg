@@ -1,0 +1,84 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="Inter, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <radialGradient id="glow" cx="22%" cy="18%" r="60%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#17171A"/>
+      <stop offset="100%" stop-color="#0E0E11"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="#0A0A0A"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <rect x="0.5" y="0.5" width="1599" height="899" fill="none" stroke="#8B5CF6" stroke-opacity="0.18"/>
+
+  <!-- header -->
+  <g transform="translate(72,64)">
+    <g transform="scale(1.5)" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.10372 11.5252C4.5522 9.4378 7.06815 8.86485 8.53763 9.00054H11.0609C11.5887 9.09126 11.734 9.30978 12.3879 10.3428C12.5068 10.6673 14.4421 10.4487 14.9506 10.5017C15.5091 9.96055 14.9506 8.85082 16.1911 9.00826C18.3195 9.00826 20.359 8.91699 21.2926 9.0542C21.678 9.11085 21.8634 9.45879 21.9189 9.84439C22.1422 11.3942 21.8764 12.5285 21.6192 12.7882C20.9324 14.004 18.9502 15.1828 17.9677 14.9959C15.133 14.9959 14.52 14.9221 14.2742 15.3924L13.4101 17.6267C12.833 18.8562 10.8098 21.283 7.41618 20.9705C4.02257 20.6581 2.54699 17.9449 2.24399 16.6574C1.94099 15.8329 1.65427 13.6141 3.10372 11.5252Z"/>
+      <path d="M13.4893 5.00318V3.00195M10.9942 6.00379L9.99609 5.00318M15.9845 6.00379L16.9826 5.00318"/>
+      <circle cx="8.08398" cy="15" r="2" stroke-linecap="butt"/>
+    </g>
+    <text x="52" y="29" fill="#FAFAFA" font-size="30" font-weight="700" letter-spacing="-0.5">whistle</text>
+  </g>
+  <g transform="translate(1300,70)">
+    <rect width="228" height="40" rx="20" fill="#8B5CF6" fill-opacity="0.12" stroke="#8B5CF6" stroke-opacity="0.5"/>
+    <circle cx="26" cy="20" r="5" fill="#34D399"/>
+    <text x="44" y="26" fill="#C4B5FD" font-size="15" font-weight="600" letter-spacing="1.5">LIVE ON X LAYER</text>
+  </g>
+
+  <!-- headline -->
+  <text x="72" y="248" fill="#FFFFFF" font-size="78" font-weight="800" letter-spacing="-2">Fund AI agents who</text>
+  <text x="72" y="332" fill="#FFFFFF" font-size="78" font-weight="800" letter-spacing="-2">play the <tspan fill="#A78BFA">World Cup</tspan> for you.</text>
+  <text x="74" y="386" fill="#9CA3AF" font-size="26" font-weight="500">Three LLM agents, acting onchain on X Layer. Prediction · GameFi · NFT · AI Agent.</text>
+
+  <!-- agent cards -->
+  <g transform="translate(72,440)">
+    <g>
+      <rect width="468" height="210" rx="20" fill="url(#card)" stroke="#8B5CF6" stroke-opacity="0.28"/>
+      <circle cx="48" cy="56" r="22" fill="#8B5CF6" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.6"/>
+      <text x="48" y="63" fill="#C4B5FD" font-size="22" font-weight="700" text-anchor="middle">E</text>
+      <text x="86" y="50" fill="#FAFAFA" font-size="27" font-weight="700">Emma</text>
+      <text x="86" y="76" fill="#8B5CF6" font-size="15" font-weight="600" letter-spacing="1">THE SCOUT · NFT</text>
+      <text x="32" y="124" fill="#B6B6BE" font-size="18">Watches for the moments that</text>
+      <text x="32" y="150" fill="#B6B6BE" font-size="18">matter and mints them as</text>
+      <text x="32" y="176" fill="#B6B6BE" font-size="18">keepsakes you actually own.</text>
+    </g>
+    <g transform="translate(516,0)">
+      <rect width="468" height="210" rx="20" fill="url(#card)" stroke="#8B5CF6" stroke-opacity="0.28"/>
+      <circle cx="48" cy="56" r="22" fill="#8B5CF6" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.6"/>
+      <text x="48" y="63" fill="#C4B5FD" font-size="22" font-weight="700" text-anchor="middle">J</text>
+      <text x="86" y="50" fill="#FAFAFA" font-size="27" font-weight="700">Jack</text>
+      <text x="86" y="76" fill="#8B5CF6" font-size="15" font-weight="600" letter-spacing="1">THE BOOKIE · PREDICTION</text>
+      <text x="32" y="124" fill="#B6B6BE" font-size="18">Reads every tie, prices the</text>
+      <text x="32" y="150" fill="#B6B6BE" font-size="18">markets, builds your slip, and</text>
+      <text x="32" y="176" fill="#B6B6BE" font-size="18">calls the game live.</text>
+    </g>
+    <g transform="translate(1032,0)">
+      <rect width="468" height="210" rx="20" fill="url(#card)" stroke="#8B5CF6" stroke-opacity="0.28"/>
+      <circle cx="48" cy="56" r="22" fill="#8B5CF6" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.6"/>
+      <text x="48" y="63" fill="#C4B5FD" font-size="22" font-weight="700" text-anchor="middle">T</text>
+      <text x="86" y="50" fill="#FAFAFA" font-size="27" font-weight="700">Tom</text>
+      <text x="86" y="76" fill="#8B5CF6" font-size="15" font-weight="600" letter-spacing="1">THE MANAGER · GAMEFI</text>
+      <text x="32" y="124" fill="#B6B6BE" font-size="18">Scouts the opponent, sets your</text>
+      <text x="32" y="150" fill="#B6B6BE" font-size="18">XI, and runs the knockout to</text>
+      <text x="32" y="176" fill="#B6B6BE" font-size="18">the final. Penalties included.</text>
+    </g>
+  </g>
+
+  <!-- feature chips -->
+  <g transform="translate(72,706)" fill="#CFCFD6" font-size="17" font-weight="600">
+    <g><rect width="232" height="44" rx="22" fill="#141417" stroke="#2A2A30"/><text x="116" y="28" text-anchor="middle">LLM match simulator</text></g>
+    <g transform="translate(248,0)"><rect width="210" height="44" rx="22" fill="#141417" stroke="#2A2A30"/><text x="105" y="28" text-anchor="middle">Manager career</text></g>
+    <g transform="translate(478,0)"><rect width="208" height="44" rx="22" fill="#141417" stroke="#2A2A30"/><text x="104" y="28" text-anchor="middle">Penalty shootouts</text></g>
+    <g transform="translate(706,0)"><rect width="238" height="44" rx="22" fill="#141417" stroke="#2A2A30"/><text x="119" y="28" text-anchor="middle">Onchain OKB funding</text></g>
+    <g transform="translate(964,0)"><rect width="196" height="44" rx="22" fill="#141417" stroke="#2A2A30"/><text x="98" y="28" text-anchor="middle">Crowd audio</text></g>
+    <g transform="translate(1180,0)"><rect width="214" height="44" rx="22" fill="#141417" stroke="#2A2A30"/><text x="107" y="28" text-anchor="middle">Match reports</text></g>
+  </g>
+
+  <!-- footer -->
+  <text x="72" y="852" fill="#8B5CF6" font-size="20" font-weight="700">whistle-one.vercel.app</text>
+  <text x="350" y="852" fill="#6B7280" font-size="20">X Layer testnet · #XCup · #WorldCup2026</text>
+</svg>
