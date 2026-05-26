@@ -7,7 +7,7 @@ import { Calendar01Icon, Location01Icon } from "hugeicons-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import type { Fixture } from "@/lib/api/fixtures";
-import { teamName, WC_TEAMS } from "@/lib/wc-teams";
+import { teamName } from "@/lib/wc-teams";
 import { cn } from "@/lib/utils";
 
 type Mode = "all" | "groups" | "knockout";
@@ -95,66 +95,41 @@ function venueLabel(fixture: Fixture): string {
   return `${venue} · ${city}`;
 }
 
-function TeamSide({ code, align }: { code: string; align: "start" | "end" }) {
-  const known = Boolean(WC_TEAMS[code]);
-  const flag = <FlagOrb code={code} size={26} />;
-  const name = <span className="truncate">{teamName(code)}</span>;
-  const base = cn(
-    "flex min-w-0 items-center gap-2 text-sm text-zinc-100",
-    align === "end" ? "justify-end text-right" : "justify-start",
-  );
-  const body = align === "end" ? (
-    <>
-      {name}
-      {flag}
-    </>
-  ) : (
-    <>
-      {flag}
-      {name}
-    </>
-  );
-  if (!known) return <span className={base}>{body}</span>;
-  return (
-    <Link href={`/teams/${code}`} title={`${teamName(code)} squad`} className={cn(base, "transition-colors hover:text-violet-200")}>
-      {body}
-    </Link>
-  );
-}
-
 function FixtureRow({ fixture }: { fixture: Fixture }) {
   const label = fixture.group ? `Group ${fixture.group.replace(/^Group\s*/i, "")}` : fixture.stage ?? "Knockout";
   return (
-    <div className="grid w-full grid-cols-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.02] md:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,12.5rem)]">
-      <Link
-        href={`/guide/${fixture.id}`}
-        title={`Jack's read on ${teamName(fixture.homeCode)} v ${teamName(fixture.awayCode)}`}
-        className="flex items-center gap-3 transition-colors hover:text-violet-200 md:flex-col md:items-start md:gap-1"
-      >
+    <Link
+      href={`/guide/${fixture.id}`}
+      title={`Jack's read on ${teamName(fixture.homeCode)} v ${teamName(fixture.awayCode)}`}
+      className="grid w-full grid-cols-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.025] md:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,12.5rem)]"
+    >
+      <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-1">
         <span className="font-mono text-sm tabular-nums text-zinc-100">
           {timeFmt.format(fixture.kickoffAt)}
         </span>
         <span className="rounded-sm border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">
           {label}
         </span>
-      </Link>
-
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
-        <TeamSide code={fixture.homeCode} align="end" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">v</span>
-        <TeamSide code={fixture.awayCode} align="start" />
       </div>
 
-      <Link
-        href={`/guide/${fixture.id}`}
-        title={`Jack's read on ${teamName(fixture.homeCode)} v ${teamName(fixture.awayCode)}`}
-        className="flex min-w-0 items-center gap-1.5 text-zinc-500 transition-colors hover:text-zinc-300 md:justify-end"
-      >
-        <Location01Icon size={13} className="shrink-0" />
-        <span className="truncate font-mono text-[10px] uppercase tracking-[0.16em]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+        <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm text-zinc-100">
+          <span className="truncate">{teamName(fixture.homeCode)}</span>
+          <FlagOrb code={fixture.homeCode} size={26} />
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">v</span>
+        <span className="flex min-w-0 items-center gap-2 text-sm text-zinc-100">
+          <FlagOrb code={fixture.awayCode} size={26} />
+          <span className="truncate">{teamName(fixture.awayCode)}</span>
+        </span>
+      </div>
+
+      <div className="flex min-w-0 items-center gap-1.5 md:justify-end">
+        <Location01Icon size={13} className="shrink-0 text-zinc-600" />
+        <span className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
           {venueLabel(fixture)}
         </span>
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 }

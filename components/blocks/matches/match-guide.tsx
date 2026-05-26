@@ -303,18 +303,28 @@ function KeyPlayers({ code, name, players }: { code: string; name: string; playe
           Squad not in yet
         </p>
       ) : (
-        <div className="space-y-1.5">
-          {players.map((p) => (
-            <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-foreground/[0.02] px-3 py-2">
-              <PlayerAvatar src={p.photo ?? undefined} name={p.name} size={30} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] text-foreground">{p.name}</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{p.position}</p>
+        <>
+          <div className="space-y-1.5">
+            {players.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-foreground/[0.02] px-3 py-2">
+                <PlayerAvatar src={p.photo ?? undefined} name={p.name} size={30} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] text-foreground">{p.name}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{p.position}</p>
+                </div>
+                <span className="font-mono text-[12px] tabular-nums text-violet-300">{p.priceMillions.toFixed(1)}m</span>
               </div>
-              <span className="font-mono text-[12px] tabular-nums text-violet-300">{p.priceMillions.toFixed(1)}m</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <Link
+            href={`/teams/${code}`}
+            title={`${name} full squad`}
+            className="mt-3 flex items-center justify-center gap-1.5 rounded-xl border border-border py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:border-violet-400/40 hover:text-foreground"
+          >
+            View full squad
+            <ArrowRight01Icon size={12} />
+          </Link>
+        </>
       )}
     </div>
   );
