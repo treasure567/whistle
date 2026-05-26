@@ -73,7 +73,7 @@ export const managerBriefBody = z.object({
   ourStrength: z.coerce.number().min(0).max(1),
   theirStrength: z.coerce.number().min(0).max(1),
   xi: z.array(briefPlayerSchema).max(11),
-  bench: z.array(briefPlayerSchema).max(26),
+  bench: z.array(briefPlayerSchema).max(60),
   played: z
     .object({
       ourScore: z.coerce.number().int().min(0).max(30),
