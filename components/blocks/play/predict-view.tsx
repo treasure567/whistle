@@ -222,11 +222,11 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
         {mode === "jack" ? (
           <JackSlip onBooked={(created) => setPredictions((prev) => [...created, ...prev])} />
         ) : (
-        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-5">
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3">
           <AgentAvatar agent="bookie" size={40} />
           <div>
-            <p className="text-sm font-semibold text-zinc-100">{jack.name} the Bookie</p>
+            <p className="text-sm font-semibold text-foreground">{jack.name} the Bookie</p>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-200/80">
               Backs your call onchain
             </p>
@@ -234,7 +234,7 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
         </div>
 
         <Section label="Match">
-          <div className="max-h-44 divide-y divide-white/[0.04] overflow-y-auto rounded-xl border border-white/10">
+          <div className="max-h-44 divide-y divide-border overflow-y-auto rounded-xl border border-border">
             {matches.map((item) => (
               <button
                 key={item.id}
@@ -242,13 +242,13 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
                 onClick={() => setMatchId(item.id)}
                 className={cn(
                   "flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors",
-                  matchId === item.id ? "bg-violet-500/[0.06]" : "hover:bg-white/[0.02]",
+                  matchId === item.id ? "bg-violet-500/[0.06]" : "hover:bg-foreground/[0.02]",
                 )}
               >
-                <span className="font-mono text-sm text-zinc-100">
-                  {item.home} <span className="text-zinc-600">v</span> {item.away}
+                <span className="font-mono text-sm text-foreground">
+                  {item.home} <span className="text-muted-foreground">v</span> {item.away}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   {item.phase.replace("-", " ")}
                 </span>
               </button>
@@ -294,19 +294,19 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
               Funds {jack.name} with {formatUsdt(stake)} onchain — one signature.
             </p>
           ) : (
-            <p className="mt-2 text-[11px] text-zinc-500">A free call is recorded off-chain. No wallet signature.</p>
+            <p className="mt-2 text-[11px] text-muted-foreground">A free call is recorded off-chain. No wallet signature.</p>
           )}
         </Section>
 
         {fundBusy ? (
-          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.05] p-3 text-[12px] text-violet-100">
+          <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.05] p-3 text-[12px] text-violet-700 dark:text-violet-100">
             <Loading03Icon size={14} className="animate-spin" />
             {phaseLabel(fundState.phase)}… confirm in your wallet
           </div>
         ) : null}
 
         {error || (fundState.phase === "error" && fundState.error) ? (
-          <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-200">
+          <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-600 dark:text-red-300">
             {error ?? fundState.error}
           </p>
         ) : null}
@@ -330,7 +330,7 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
           Your calls · {predictions.length}
         </h2>
         {!isConnected ? (
@@ -348,25 +348,25 @@ export function PredictView({ matches, initialMatchId }: { matches: MatchInfo[];
 function PredictionRow({ prediction }: { prediction: PredictionRecord }) {
   const tone =
     prediction.status === "WON"
-      ? "text-emerald-300"
+      ? "text-emerald-600 dark:text-emerald-300"
       : prediction.status === "LOST"
-        ? "text-red-300"
-        : "text-zinc-400";
+        ? "text-red-600 dark:text-red-300"
+        : "text-muted-foreground";
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#0B0B0E] p-4">
+    <div className="rounded-2xl border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
           {prediction.matchExternalId}
         </span>
         <span className={cn("font-mono text-[10px] uppercase tracking-[0.18em]", tone)}>
           {prediction.status}
         </span>
       </div>
-      <p className="mt-1.5 text-sm text-zinc-100">
-        {prediction.market} · <span className="text-violet-200">{prediction.side}</span>
+      <p className="mt-1.5 text-sm text-foreground">
+        {prediction.market} · <span className="text-violet-500 dark:text-violet-300">{prediction.side}</span>
       </p>
       <div className="mt-1 flex items-center justify-between gap-2">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
           {prediction.stakeUsdt > 0 ? `${prediction.stakeUsdt} OKB · ` : "Free call · "}
           {timeAgo(Date.parse(prediction.createdAt))}
         </p>
@@ -379,7 +379,7 @@ function PredictionRow({ prediction }: { prediction: PredictionRecord }) {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</p>
+      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</p>
       {children}
     </div>
   );
@@ -393,8 +393,8 @@ function Chip({ active, onClick, label }: { active: boolean; onClick: () => void
       className={cn(
         "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
         active
-          ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-100"
-          : "border-white/10 text-zinc-400 hover:border-white/25 hover:text-zinc-100",
+          ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
+          : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
       )}
     >
       {label}

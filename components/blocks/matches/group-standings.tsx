@@ -29,14 +29,14 @@ function GroupCard({
   const sorted = sortStandings(teams);
   return (
     <GlowCard padding="none">
-      <div className="border-b border-white/10 px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+      <div className="border-b border-border px-4 py-2.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
           Group {letter}
         </span>
       </div>
       <table className="w-full">
         <thead>
-          <tr className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+          <tr className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
             <th className="px-3 py-2 text-left font-normal">Team</th>
             <th className="px-1 py-2 text-right font-normal tabular-nums">P</th>
             <th className="px-1 py-2 text-right font-normal tabular-nums">W</th>
@@ -46,7 +46,7 @@ function GroupCard({
             <th className="px-3 py-2 text-right font-normal tabular-nums">Pts</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+        <tbody className="divide-y divide-border">
           {sorted.map((row, idx) => {
             const name = SQUADS[row.code]?.country ?? row.code;
             const advancing = idx < 2;
@@ -55,19 +55,19 @@ function GroupCard({
               <tr
                 key={row.code}
                 className={cn(
-                  "text-[12px] transition-colors hover:bg-white/[0.04]",
-                  advancing ? "text-zinc-100" : "text-zinc-400",
+                  "text-[12px] transition-colors hover:bg-foreground/[0.04]",
+                  advancing ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 <td className="px-3 py-2">
                   <Link
                     href={`/teams/${row.code}`}
-                    className="flex items-center gap-2 hover:text-violet-200"
+                    className="flex items-center gap-2 hover:text-violet-500 dark:hover:text-violet-300"
                   >
                     <span
                       className={cn(
                         "h-1.5 w-1.5 rounded-full",
-                        advancing ? "bg-emerald-400" : "bg-zinc-700",
+                        advancing ? "bg-emerald-400" : "bg-muted-foreground",
                       )}
                       aria-hidden
                     />
@@ -82,7 +82,7 @@ function GroupCard({
                 <td className="px-1 py-2 text-right tabular-nums">
                   {gd > 0 ? `+${gd}` : gd}
                 </td>
-                <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums text-zinc-100">
+                <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums text-foreground">
                   {row.points}
                 </td>
               </tr>
@@ -98,10 +98,10 @@ export function GroupStandings() {
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-10">
       <div className="mb-6 flex items-baseline gap-3">
-        <h2 className="font-mono text-xs uppercase tracking-[0.22em] text-violet-300">
+        <h2 className="font-mono text-xs uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
           Group stage
         </h2>
-        <span className="font-mono text-xs text-zinc-600">12 groups · top 2 advance</span>
+        <span className="font-mono text-xs text-muted-foreground">12 groups · top 2 advance</span>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {GROUPS.map((g) => (

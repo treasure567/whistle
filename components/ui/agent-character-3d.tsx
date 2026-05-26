@@ -35,7 +35,7 @@ export function AgentCharacter3D({
 
   return (
     <div
-      className={cn("relative overflow-hidden rounded-2xl bg-[#0A0A0A]", className)}
+      className={cn("relative overflow-hidden rounded-2xl bg-card", className)}
       aria-hidden
     >
       <div

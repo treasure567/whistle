@@ -190,7 +190,7 @@ function chip(active: boolean): string {
   return cn(
     "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
     active
-      ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-100"
+      ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-700 dark:text-violet-100"
       : "border-border text-muted-foreground hover:border-violet-400/30 hover:text-foreground",
   );
 }

@@ -19,21 +19,21 @@ export function ContractsStrip() {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
               Onchain
             </span>
-            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Built in the open. <span className="font-serif-italic text-violet-200">Live on testnet.</span>
+            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
+              Built in the open. <span className="font-serif-italic text-violet-500 dark:text-violet-300">Live on testnet.</span>
             </h2>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-3 py-1 font-mono text-[11px] text-emerald-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-3 py-1 font-mono text-[11px] text-emerald-600 dark:text-emerald-300">
             <span className="size-1.5 rounded-full bg-emerald-400" />
             X Layer Testnet · chainId 1952
           </span>
         </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
-          <div className="grid grid-cols-12 border-b border-white/5 bg-white/[0.02] px-6 py-3 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+        <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-card">
+          <div className="grid grid-cols-12 border-b border-border bg-foreground/[0.02] px-6 py-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             <div className="col-span-3">Contract</div>
             <div className="col-span-5">Address</div>
             <div className="col-span-2">Lines</div>
@@ -46,26 +46,26 @@ export function ContractsStrip() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-15%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30, delay: i * 0.04 }}
-              className="group grid grid-cols-12 items-center gap-4 border-b border-white/[0.04] px-6 py-4 transition-colors last:border-b-0 hover:bg-white/[0.02]"
+              className="group grid grid-cols-12 items-center gap-4 border-b border-border px-6 py-4 transition-colors last:border-b-0 hover:bg-foreground/[0.02]"
             >
               <div className="col-span-3 flex flex-col">
-                <span className="font-mono text-sm tracking-tight text-zinc-100">{c.name}</span>
-                <span className="mt-0.5 text-[11px] text-zinc-500">{c.description}</span>
+                <span className="font-mono text-sm tracking-tight text-foreground">{c.name}</span>
+                <span className="mt-0.5 text-[11px] text-muted-foreground">{c.description}</span>
               </div>
               <div className="col-span-5">
                 <Link
                   href={explorerAddressUrl(c.address)}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="group/link inline-flex items-center gap-2 font-mono text-[12px] text-zinc-300 transition-colors hover:text-violet-200"
+                  className="group/link inline-flex items-center gap-2 font-mono text-[12px] text-muted-foreground transition-colors hover:text-violet-500 dark:hover:text-violet-300"
                 >
                   <span>{truncateAddress(c.address, 6)}</span>
                   <ArrowUpRight01Icon size={11} className="transition-transform group-hover/link:translate-x-px group-hover/link:-translate-y-px" />
                 </Link>
               </div>
-              <div className="col-span-2 font-mono text-[12px] text-zinc-400">~{c.lines} lines</div>
+              <div className="col-span-2 font-mono text-[12px] text-muted-foreground">~{c.lines} lines</div>
               <div className="col-span-2 flex justify-end">
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
                   Live
                 </span>
               </div>

@@ -35,14 +35,14 @@ export function TeamsIndex() {
                 >
                   <div className="flex flex-col items-center gap-2 p-4">
                     <FlagOrb code={squad.code} size={56} />
-                    <span className="font-mono text-[11px] tracking-wide text-zinc-100">
+                    <span className="font-mono text-[11px] tracking-wide text-foreground">
                       {squad.code}
                     </span>
-                    <span className="text-center text-[11px] leading-tight text-zinc-300 group-hover:text-zinc-100">
+                    <span className="text-center text-[11px] leading-tight text-muted-foreground group-hover:text-foreground">
                       {squad.country}
                     </span>
                     {grp && (
-                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
                         Group {grp.letter}
                       </span>
                     )}

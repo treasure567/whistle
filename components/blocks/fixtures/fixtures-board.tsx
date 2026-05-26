@@ -51,8 +51,8 @@ export function FixturesBoard({ fixtures }: { fixtures: Fixture[] }) {
             className={cn(
               "rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors",
               mode === item.id
-                ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-100"
-                : "border-white/10 text-zinc-400 hover:border-white/25 hover:text-zinc-100",
+                ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
+                : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
             )}
           >
             {item.label}
@@ -72,10 +72,10 @@ export function FixturesBoard({ fixtures }: { fixtures: Fixture[] }) {
           {byDay.map(([day, dayFixtures]) => (
             <div key={day}>
               <div className="mb-3 flex items-center gap-2">
-                <Calendar01Icon size={14} className="text-violet-300" />
-                <h3 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-300">{day}</h3>
+                <Calendar01Icon size={14} className="text-violet-500 dark:text-violet-300" />
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{day}</h3>
               </div>
-              <div className="divide-y divide-white/[0.04] overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+              <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                 {dayFixtures.map((fixture) => (
                   <FixtureRow key={fixture.id} fixture={fixture} />
                 ))}
@@ -101,32 +101,32 @@ function FixtureRow({ fixture }: { fixture: Fixture }) {
     <Link
       href={`/guide/${fixture.id}`}
       title={`Jack's read on ${teamName(fixture.homeCode)} v ${teamName(fixture.awayCode)}`}
-      className="grid w-full grid-cols-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.025] md:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,12.5rem)]"
+      className="grid w-full grid-cols-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-foreground/[0.025] md:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,12.5rem)]"
     >
       <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-1">
-        <span className="font-mono text-sm tabular-nums text-zinc-100">
+        <span className="font-mono text-sm tabular-nums text-foreground">
           {timeFmt.format(fixture.kickoffAt)}
         </span>
-        <span className="rounded-sm border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">
+        <span className="rounded-sm border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           {label}
         </span>
       </div>
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
-        <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm text-zinc-100">
+        <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm text-foreground">
           <span className="truncate">{teamName(fixture.homeCode)}</span>
           <FlagOrb code={fixture.homeCode} size={26} />
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">v</span>
-        <span className="flex min-w-0 items-center gap-2 text-sm text-zinc-100">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">v</span>
+        <span className="flex min-w-0 items-center gap-2 text-sm text-foreground">
           <FlagOrb code={fixture.awayCode} size={26} />
           <span className="truncate">{teamName(fixture.awayCode)}</span>
         </span>
       </div>
 
       <div className="flex min-w-0 items-center gap-1.5 md:justify-end">
-        <Location01Icon size={13} className="shrink-0 text-zinc-600" />
-        <span className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+        <Location01Icon size={13} className="shrink-0 text-muted-foreground" />
+        <span className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           {venueLabel(fixture)}
         </span>
       </div>

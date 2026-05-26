@@ -46,18 +46,18 @@ export function LeaderboardTable({ rows }: { rows: AgentLeaderboardRow[] }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-10%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30, delay: index * 0.05 }}
-            className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-6"
+            className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6"
           >
             <div className="flex items-center gap-3">
               <AgentAvatar agent={slug} size={44} />
               <div>
-                <p className="text-base font-semibold tracking-tight text-zinc-100">{agent.name}</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+                <p className="text-base font-semibold tracking-tight text-foreground">{agent.name}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   {agent.role}
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
+            <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
               <Cell label="Decisions" value={row.decisions.toString()} />
               <Cell label="Funded" value={formatUsdt(toUsdt(row.allocatedUsdt), { compact: true })} />
             </div>
@@ -71,8 +71,8 @@ export function LeaderboardTable({ rows }: { rows: AgentLeaderboardRow[] }) {
 function Cell({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</span>
-      <span className="font-mono text-lg tabular-nums text-zinc-100">{value}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</span>
+      <span className="font-mono text-lg tabular-nums text-foreground">{value}</span>
     </div>
   );
 }

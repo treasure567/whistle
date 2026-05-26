@@ -34,41 +34,41 @@ export function AgentCard({ agent, variant = "default", href }: AgentCardProps) 
       transition={spring}
       className={cn(
         AGENT_CLASS_MAP[agent.slug],
-        "group relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0E0E12] p-6 transition-colors hover:border-white/20",
+        "group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-6 transition-colors hover:border-foreground/30",
       )}
     >
       <div className="relative flex items-start justify-between">
         <div className="flex items-center gap-3">
           <AgentAvatar agent={agent.slug} size={44} />
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               {agent.role}
             </p>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-100">
+            <h3 className="text-lg font-semibold tracking-tight text-foreground">
               {agent.name}
             </h3>
           </div>
         </div>
         <Link
           href={linkHref}
-          className="flex size-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-100"
+          className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-all hover:border-foreground/30 hover:text-foreground"
           aria-label={`Open ${agent.name}`}
         >
           <ArrowUpRight01Icon size={14} />
         </Link>
       </div>
 
-      <p className="relative mt-4 max-w-[34ch] text-sm leading-relaxed text-zinc-300">
+      <p className="relative mt-4 max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
         {agent.tagline}
       </p>
 
       {!isCompact ? (
-        <p className="relative mt-3 border-l-2 border-white/10 pl-3 font-mono text-[11px] leading-relaxed text-zinc-500 italic">
+        <p className="relative mt-3 border-l-2 border-border pl-3 font-mono text-[11px] leading-relaxed text-muted-foreground italic">
           “{agent.personaQuote}”
         </p>
       ) : null}
 
-      <div className="relative mt-5 grid grid-cols-3 gap-3 border-t border-white/5 pt-4">
+      <div className="relative mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4">
         <Stat label="Decisions" value={agent.stats.totalDecisions.toString()} />
         <Stat
           label={agent.slug === "scout" ? "Moments saved" : "Volume"}
@@ -104,10 +104,10 @@ export function AgentCard({ agent, variant = "default", href }: AgentCardProps) 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </span>
-      <span className="font-mono text-sm text-zinc-100 tabular-nums">{value}</span>
+      <span className="font-mono text-sm text-foreground tabular-nums">{value}</span>
     </div>
   );
 }

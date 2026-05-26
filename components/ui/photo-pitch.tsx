@@ -102,7 +102,7 @@ export function PhotoPitch({ lineup, className }: PhotoPitchProps) {
   return (
     <div
       className={cn(
-        "relative w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-emerald-900/55 via-emerald-800/40 to-emerald-900/55 shadow-2xl shadow-emerald-950/40",
+        "relative w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-emerald-900/55 via-emerald-800/40 to-emerald-900/55 shadow-2xl shadow-emerald-950/40",
         className,
       )}
     >

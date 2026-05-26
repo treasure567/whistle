@@ -54,7 +54,7 @@ export function DashboardShell() {
     return (
       <div className="mx-auto max-w-3xl px-6 md:px-10">
         <div className="rounded-3xl border border-border bg-card p-10 text-center">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-full border border-violet-500/30 bg-violet-500/[0.06] text-violet-200">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-full border border-violet-500/30 bg-violet-500/[0.06] text-violet-500 dark:text-violet-200">
             <WalletAdd01Icon size={20} />
           </div>
           <h2 className="mt-5 text-2xl font-semibold tracking-tight text-foreground">
@@ -149,11 +149,11 @@ export function DashboardShell() {
                     className={cn(
                       "ml-auto inline-flex items-center gap-1.5 rounded-sm border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.22em]",
                       funded
-                        ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-300"
+                        ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-600 dark:text-emerald-300"
                         : "border-border text-muted-foreground",
                     )}
                   >
-                    <span className={cn("size-1 rounded-full", funded ? "bg-emerald-400" : "bg-zinc-500")} />
+                    <span className={cn("size-1 rounded-full", funded ? "bg-emerald-400" : "bg-muted-foreground")} />
                     {funded ? "funded" : "idle"}
                   </span>
                 </div>
@@ -237,10 +237,10 @@ export function DashboardShell() {
 function CallRow({ prediction, last }: { prediction: PredictionRecord; last: boolean }) {
   const tone =
     prediction.status === "WON"
-      ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-300"
+      ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-600 dark:text-emerald-300"
       : prediction.status === "LOST"
-        ? "border-red-500/30 bg-red-500/[0.06] text-red-300"
-        : "border-amber-500/30 bg-amber-500/[0.06] text-amber-200";
+        ? "border-red-500/30 bg-red-500/[0.06] text-red-600 dark:text-red-300"
+        : "border-amber-500/30 bg-amber-500/[0.06] text-amber-600 dark:text-amber-300";
   return (
     <div className={cn("flex items-center justify-between gap-3 px-5 py-4", !last && "border-b border-border")}>
       <div className="min-w-0">
@@ -273,7 +273,7 @@ function TeamSummary({ team }: { team: FantasyTeamRecord }) {
           </p>
         </div>
         {captain ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/40 bg-violet-500/[0.08] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-violet-200">
+          <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/40 bg-violet-500/[0.08] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-violet-500 dark:text-violet-200">
             <StarIcon size={11} /> {captain.name}
           </span>
         ) : null}
@@ -291,7 +291,7 @@ function TeamSummary({ team }: { team: FantasyTeamRecord }) {
               {pick.player.position}
             </span>
             <span className="font-mono text-[12px] text-foreground">{pick.player.teamCode}</span>
-            <span className="font-mono text-[10px] text-violet-300">{Number(pick.player.priceMillions).toFixed(1)}</span>
+            <span className="font-mono text-[10px] text-violet-500 dark:text-violet-300">{Number(pick.player.priceMillions).toFixed(1)}</span>
           </div>
         ))}
       </div>

@@ -25,7 +25,7 @@ export function MatchDetailShell({
       <div className="mx-auto max-w-2xl px-6 pt-[calc(4rem+1.5rem)] md:px-10 md:pt-24">
         <Link
           href="/matches"
-          className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500 hover:text-violet-300"
+          className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground hover:text-violet-500 dark:hover:text-violet-300"
         >
           ← All matches
         </Link>

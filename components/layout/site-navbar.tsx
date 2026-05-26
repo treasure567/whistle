@@ -20,6 +20,7 @@ const NAV_LINKS = [
   { label: "Fixtures", href: "/fixtures" },
   { label: "Simulate", href: "/simulate" },
   { label: "Manager", href: "/manager" },
+  { label: "Mint", href: "/mint" },
   { label: "Fund", href: "/allocate" },
   { label: "Play", href: "/play" },
   { label: "Activity", href: "/activity" },
@@ -67,7 +68,7 @@ export function SiteNavbar() {
           )}
         >
           <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="whistle home">
-            <WhistleMark size={28} className="text-violet-300" />
+            <WhistleMark size={28} className="text-violet-500 dark:text-violet-300" />
             <span className="font-mono text-base tracking-tight text-foreground">whistle</span>
           </Link>
 

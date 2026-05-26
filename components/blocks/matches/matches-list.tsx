@@ -65,11 +65,11 @@ function MatchRow({ match, index }: { match: MatchInfo; index: number }) {
                     <span className="text-xl" aria-hidden>
                       {match.homeFlag}
                     </span>
-                    <span className="font-mono text-sm tracking-wide text-zinc-100">
+                    <span className="font-mono text-sm tracking-wide text-foreground">
                       {match.home}
                     </span>
                   </div>
-                  <span className="font-mono text-2xl font-semibold tabular-nums text-zinc-50">
+                  <span className="font-mono text-2xl font-semibold tabular-nums text-foreground">
                     {match.phase === "scheduled" ? "—" : match.scoreHome}
                   </span>
                 </div>
@@ -78,32 +78,32 @@ function MatchRow({ match, index }: { match: MatchInfo; index: number }) {
                     <span className="text-xl" aria-hidden>
                       {match.awayFlag}
                     </span>
-                    <span className="font-mono text-sm tracking-wide text-zinc-100">
+                    <span className="font-mono text-sm tracking-wide text-foreground">
                       {match.away}
                     </span>
                   </div>
-                  <span className="font-mono text-2xl font-semibold tabular-nums text-zinc-50">
+                  <span className="font-mono text-2xl font-semibold tabular-nums text-foreground">
                     {match.phase === "scheduled" ? "—" : match.scoreAway}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-4 md:w-56 md:flex-col md:items-end md:border-t-0 md:border-l md:pl-6 md:pt-0">
+            <div className="flex items-center justify-between gap-4 border-t border-border pt-4 md:w-56 md:flex-col md:items-end md:border-t-0 md:border-l md:pl-6 md:pt-0">
               <MatchClock match={match} size="sm" />
               <div className="text-right">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   Group {match.group}
                 </p>
-                <p className="mt-1 text-sm text-zinc-400">{match.venue}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{match.venue}</p>
                 {isLive && match.minute !== null && (
-                  <p className="mt-1 font-mono text-xs text-violet-300">
+                  <p className="mt-1 font-mono text-xs text-violet-500 dark:text-violet-300">
                     {formatMatchMinute(match.minute)} played
                   </p>
                 )}
               </div>
               <ArrowRight01Icon
-                className="size-4 text-zinc-600 transition-transform group-hover:translate-x-0.5 group-hover:text-violet-300"
+                className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-violet-500 dark:group-hover:text-violet-300"
                 aria-hidden
               />
             </div>
@@ -127,10 +127,10 @@ function MatchSection({
 
   const toneClass =
     tone === "live"
-      ? "text-red-300"
+      ? "text-red-600 dark:text-red-300"
       : tone === "upcoming"
-        ? "text-violet-300"
-        : "text-zinc-500";
+        ? "text-violet-500 dark:text-violet-300"
+        : "text-muted-foreground";
 
   return (
     <section className="space-y-4">
@@ -141,7 +141,7 @@ function MatchSection({
         <h2 className={cn("font-mono text-xs uppercase tracking-[0.22em]", toneClass)}>
           {title}
         </h2>
-        <span className="font-mono text-xs text-zinc-600">{matches.length}</span>
+        <span className="font-mono text-xs text-muted-foreground">{matches.length}</span>
       </div>
       <div className="grid gap-4">
         {matches.map((match, index) => (

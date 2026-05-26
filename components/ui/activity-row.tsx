@@ -21,7 +21,7 @@ export function ActivityTableHeader({ className }: ActivityTableHeaderProps) {
     <div
       className={cn(
         ROW_GRID,
-        "border-b border-white/10 bg-white/[0.02] py-3 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500",
+        "border-b border-border bg-foreground/[0.02] py-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground",
         className,
       )}
     >
@@ -41,7 +41,7 @@ interface ActivityRowProps {
 
 function OffChainTag() {
   return (
-    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-600">off-chain</span>
+    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">off-chain</span>
   );
 }
 
@@ -57,29 +57,29 @@ export function ActivityRow({ item, index = 0, className }: ActivityRowProps) {
       transition={{ type: "spring", stiffness: 300, damping: 32, delay: index * 0.03 }}
       className={cn(
         ROW_GRID,
-        "group border-b border-white/[0.06] transition-colors last:border-b-0 hover:bg-white/[0.02]",
+        "group border-b border-border transition-colors last:border-b-0 hover:bg-foreground/[0.02]",
         className,
       )}
     >
       <div className="flex items-center gap-3">
         <AgentAvatar agent={item.agent} size={40} />
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-zinc-200">{agent.name}</p>
-          <p className="mt-0.5 truncate font-mono text-[10px] text-zinc-600">
+          <p className="truncate text-sm font-medium text-foreground">{agent.name}</p>
+          <p className="mt-0.5 truncate font-mono text-[10px] text-muted-foreground">
             {item.matchLabel}
             {item.matchMinute !== null ? (
-              <span className="ml-1.5 text-zinc-700">{formatMatchMinute(item.matchMinute)}</span>
+              <span className="ml-1.5 text-muted-foreground">{formatMatchMinute(item.matchMinute)}</span>
             ) : null}
           </p>
         </div>
       </div>
 
       <div className="min-w-0">
-        <p className="truncate text-sm text-zinc-100">{item.headline}</p>
-        <p className="mt-1 truncate text-[11px] text-zinc-600">{item.detail}</p>
+        <p className="truncate text-sm text-foreground">{item.headline}</p>
+        <p className="mt-1 truncate text-[11px] text-muted-foreground">{item.detail}</p>
         <div className="mt-2 flex items-center justify-between gap-3 sm:hidden">
           {item.amountUsdt !== undefined && item.amountUsdt !== 0 ? (
-            <span className="font-mono text-[11px] tabular-nums text-zinc-400">
+            <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
               {item.amountUsdt > 0 ? "+" : ""}
               {formatUsdt(item.amountUsdt)}
             </span>
@@ -88,25 +88,25 @@ export function ActivityRow({ item, index = 0, className }: ActivityRowProps) {
           )}
           <div className="flex items-center gap-3">
             {onchain ? <TxLink hash={item.txHash} chars={4} /> : <OffChainTag />}
-            <span className="font-mono text-[10px] text-zinc-700">{timeAgo(item.timestamp)}</span>
+            <span className="font-mono text-[10px] text-muted-foreground">{timeAgo(item.timestamp)}</span>
           </div>
         </div>
       </div>
 
       <div className="hidden text-right sm:block">
         {item.amountUsdt !== undefined && item.amountUsdt !== 0 ? (
-          <span className="font-mono text-sm tabular-nums text-zinc-300">
+          <span className="font-mono text-sm tabular-nums text-muted-foreground">
             {item.amountUsdt > 0 ? "+" : ""}
             {formatUsdt(item.amountUsdt)}
           </span>
         ) : (
-          <span className="font-mono text-sm text-zinc-700">—</span>
+          <span className="font-mono text-sm text-muted-foreground">—</span>
         )}
       </div>
 
       <div className="hidden flex-col items-end gap-0.5 sm:flex">
         {onchain ? <TxLink hash={item.txHash} chars={4} /> : <OffChainTag />}
-        <span className="font-mono text-[10px] text-zinc-700">{timeAgo(item.timestamp)}</span>
+        <span className="font-mono text-[10px] text-muted-foreground">{timeAgo(item.timestamp)}</span>
       </div>
     </motion.div>
   );

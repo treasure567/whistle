@@ -20,10 +20,10 @@ export function ActivityPreview() {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
               Live feed
             </span>
-            <h2 className="mt-3 max-w-xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
+            <h2 className="mt-3 max-w-xl text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
               See what they&apos;re doing right now.
             </h2>
           </div>
@@ -35,7 +35,7 @@ export function ActivityPreview() {
           </Link>
         </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card">
           <ActivityTableHeader />
           {RECENT_ACTIVITY.slice(0, 8).map((item, i) => (
             <ActivityRow key={item.id} item={item} index={i} />

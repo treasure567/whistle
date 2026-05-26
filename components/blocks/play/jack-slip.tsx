@@ -125,11 +125,11 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-5">
+    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
       <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3">
         <AgentAvatar agent="bookie" size={40} ring />
         <div>
-          <p className="text-sm font-semibold text-zinc-100">Let Jack build your slip</p>
+          <p className="text-sm font-semibold text-foreground">Let Jack build your slip</p>
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-200/80">
             Set a budget, he sources the matches
           </p>
@@ -139,10 +139,10 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
       {booked !== null ? (
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4">
-            <CheckmarkCircle02Icon size={18} className="text-emerald-300" />
+            <CheckmarkCircle02Icon size={18} className="text-emerald-600 dark:text-emerald-300" />
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">Jack booked your slip</p>
-              <p className="mt-0.5 text-sm text-emerald-100">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">Jack booked your slip</p>
+              <p className="mt-0.5 text-sm text-emerald-700 dark:text-emerald-100">
                 {booked} call{booked === 1 ? "" : "s"} placed and funded onchain.
               </p>
             </div>
@@ -172,7 +172,7 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
                 max={1000}
                 value={budget}
                 onChange={(e) => setBudget(Math.max(5, Number(e.target.value)))}
-                className="w-20 rounded-lg border border-white/10 bg-[#111113] px-2 py-1 text-right font-mono text-sm text-zinc-100 outline-none"
+                className="w-20 rounded-lg border border-border bg-muted px-2 py-1 text-right font-mono text-sm text-foreground outline-none"
               />
             </div>
           </Field>
@@ -191,12 +191,12 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
               onChange={(e) => setPreferences(e.target.value)}
               placeholder="e.g. back the favourites, lots of goals, avoid draws"
               maxLength={280}
-              className="h-11 w-full rounded-xl border border-white/10 bg-[#111113] px-4 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus-visible:border-violet-400/50"
+              className="h-11 w-full rounded-xl border border-border bg-muted px-4 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:border-violet-400/50"
             />
           </Field>
 
           {error ? (
-            <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-200">{error}</p>
+            <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-600 dark:text-red-300">{error}</p>
           ) : null}
 
           <Button variant="violet" size="lg" onClick={ask} disabled={building}>
@@ -207,10 +207,10 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               Jack&apos;s slip · {slip.picks.length} picks
             </p>
-            <span className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-amber-300">
+            <span className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300">
               <SparklesIcon size={11} />
               {slip.source === "llm" ? "Live AI" : "Model"}
             </span>
@@ -224,49 +224,49 @@ export function JackSlip({ onBooked }: { onBooked: (created: PredictionRecord[])
                 onClick={() => toggle(i)}
                 className={cn(
                   "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors",
-                  selected.has(i) ? "border-violet-400/40 bg-violet-500/[0.05]" : "border-white/10 opacity-60",
+                  selected.has(i) ? "border-violet-400/40 bg-violet-500/[0.05]" : "border-border opacity-60",
                 )}
               >
                 <span
                   className={cn(
                     "flex size-5 shrink-0 items-center justify-center rounded-md border",
-                    selected.has(i) ? "border-violet-400 bg-violet-500 text-white" : "border-white/20 text-transparent",
+                    selected.has(i) ? "border-violet-400 bg-violet-500 text-white" : "border-border text-transparent",
                   )}
                 >
                   <CheckmarkCircle02Icon size={12} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-zinc-100">
-                    {teamName(pick.homeCode)} <span className="text-zinc-600">v</span> {teamName(pick.awayCode)}
+                  <p className="truncate text-sm text-foreground">
+                    {teamName(pick.homeCode)} <span className="text-muted-foreground">v</span> {teamName(pick.awayCode)}
                   </p>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                    {pick.market} · <span className="text-violet-200">{displaySide(pick)}</span>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                    {pick.market} · <span className="text-violet-500 dark:text-violet-300">{displaySide(pick)}</span>
                   </p>
-                  {pick.note ? <p className="mt-0.5 truncate text-[11px] font-serif-italic text-zinc-500">{pick.note}</p> : null}
+                  {pick.note ? <p className="mt-0.5 truncate text-[11px] font-serif-italic text-muted-foreground">{pick.note}</p> : null}
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="font-mono text-sm tabular-nums text-zinc-100">{pick.stake} OKB</p>
+                  <p className="font-mono text-sm tabular-nums text-foreground">{pick.stake} OKB</p>
                   <Confidence value={pick.confidence} />
                 </div>
               </button>
             ))}
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0E0E12] px-4 py-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">Total stake</span>
-            <span className={cn("font-mono text-sm tabular-nums", totalStake > slip.budget ? "text-red-300" : "text-zinc-100")}>
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted px-4 py-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Total stake</span>
+            <span className={cn("font-mono text-sm tabular-nums", totalStake > slip.budget ? "text-red-600 dark:text-red-300" : "text-foreground")}>
               {formatUsdt(totalStake)} / {formatUsdt(slip.budget)}
             </span>
           </div>
 
           {fundBusy ? (
-            <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.05] p-3 text-[12px] text-violet-100">
+            <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.05] p-3 text-[12px] text-violet-700 dark:text-violet-100">
               <Loading03Icon size={14} className="animate-spin" />
               {phaseLabel(fundState.phase)}… confirm in your wallet
             </div>
           ) : null}
           {error || (fundState.phase === "error" && fundState.error) ? (
-            <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-200">
+            <p className="rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-600 dark:text-red-300">
               {error ?? fundState.error}
             </p>
           ) : null}
@@ -299,7 +299,7 @@ function Confidence({ value }: { value: number }) {
   return (
     <div className="mt-1 flex items-center justify-end gap-0.5">
       {[1, 2, 3, 4, 5].map((n) => (
-        <span key={n} className={cn("size-1.5 rounded-full", n <= value ? "bg-amber-400" : "bg-white/15")} />
+        <span key={n} className={cn("size-1.5 rounded-full", n <= value ? "bg-amber-400" : "bg-foreground/15")} />
       ))}
     </div>
   );
@@ -308,7 +308,7 @@ function Confidence({ value }: { value: number }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</p>
+      <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</p>
       {children}
     </div>
   );
@@ -322,8 +322,8 @@ function Chip({ active, onClick, label }: { active: boolean; onClick: () => void
       className={cn(
         "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
         active
-          ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-100"
-          : "border-white/10 text-zinc-400 hover:border-white/25 hover:text-zinc-100",
+          ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
+          : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
       )}
     >
       {label}

@@ -19,7 +19,7 @@ export function FlagOrb({ code, size = 48, className }: FlagOrbProps) {
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-full bg-zinc-900 ring-1 ring-white/15",
+        "relative shrink-0 overflow-hidden rounded-full bg-card ring-1 ring-border",
         className,
       )}
       style={{ width: size, height: size }}

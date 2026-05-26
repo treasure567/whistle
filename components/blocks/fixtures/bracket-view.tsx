@@ -36,7 +36,7 @@ export function BracketView({ fixtures }: { fixtures: Fixture[] }) {
 
   if (knockout.length === 0) {
     return (
-      <p className="mx-auto max-w-3xl px-6 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500 md:px-10">
+      <p className="mx-auto max-w-3xl px-6 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground md:px-10">
         Bracket unavailable
       </p>
     );
@@ -50,7 +50,7 @@ export function BracketView({ fixtures }: { fixtures: Fixture[] }) {
           const isFinal = round.key === "Final";
           return (
             <div key={round.key} className="flex w-52 flex-col">
-              <h3 className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+              <h3 className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
                 {round.label}
               </h3>
               <div className="flex flex-1 flex-col justify-around gap-3">
@@ -79,24 +79,24 @@ function BracketCard({
   return (
     <div
       className={cn(
-        "rounded-lg border bg-[#0B0B0E] p-3 transition-colors",
-        highlight ? "border-violet-500/40" : "border-white/10 hover:border-white/20",
+        "rounded-lg border bg-card p-3 transition-colors",
+        highlight ? "border-violet-500/40" : "border-border hover:border-foreground/30",
       )}
     >
       <div className="mb-2 flex items-center justify-between">
-        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
           {thirdPlace ? "3rd place" : `Match ${fixture.matchNumber ?? ""}`}
         </span>
-        {highlight ? <ChampionIcon size={13} className="text-violet-300" /> : null}
+        {highlight ? <ChampionIcon size={13} className="text-violet-500 dark:text-violet-300" /> : null}
       </div>
       <Slot code={fixture.homeCode} />
       <div className="my-1 flex items-center gap-2">
-        <span className="h-px flex-1 bg-white/5" />
-        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">vs</span>
-        <span className="h-px flex-1 bg-white/5" />
+        <span className="h-px flex-1 bg-foreground/5" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">vs</span>
+        <span className="h-px flex-1 bg-foreground/5" />
       </div>
       <Slot code={fixture.awayCode} />
-      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-600">
+      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
         {dateFmt.format(fixture.kickoffAt)}
         {fixture.city ? ` · ${fixture.city}` : ""}
       </p>
@@ -108,7 +108,7 @@ function Slot({ code }: { code: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className="size-1.5 shrink-0 rounded-full bg-violet-400/50" />
-      <span className="truncate text-[13px] text-zinc-200">{slotLabel(code)}</span>
+      <span className="truncate text-[13px] text-foreground">{slotLabel(code)}</span>
     </div>
   );
 }

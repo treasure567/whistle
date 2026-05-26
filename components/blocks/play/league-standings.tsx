@@ -62,9 +62,9 @@ export function LeagueStandings({ leagueId, token, initialRows }: LeagueStanding
         onJoin={join}
       />
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
-        <div className="flex items-center justify-between border-b border-white/5 px-5 py-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             Standings · {rows.length}
           </span>
           <button
@@ -72,7 +72,7 @@ export function LeagueStandings({ leagueId, token, initialRows }: LeagueStanding
             onClick={refresh}
             disabled={refreshing}
             aria-label="Refresh standings"
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:text-zinc-100 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
           >
             <RefreshIcon size={12} className={cn(refreshing && "animate-spin")} />
             Refresh
@@ -96,30 +96,30 @@ export function LeagueStandings({ leagueId, token, initialRows }: LeagueStanding
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30, delay: index * 0.03 }}
                 className={cn(
-                  "grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 border-b border-white/[0.04] px-5 py-3.5 last:border-b-0",
+                  "grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 border-b border-border px-5 py-3.5 last:border-b-0",
                   mine && "bg-violet-500/[0.05]",
                 )}
               >
                 <span
                   className={cn(
                     "font-mono text-sm tabular-nums",
-                    row.rank <= 3 ? "text-violet-200" : "text-zinc-500",
+                    row.rank <= 3 ? "text-violet-500 dark:text-violet-300" : "text-muted-foreground",
                   )}
                 >
                   {String(row.rank).padStart(2, "0")}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-zinc-100">
+                  <p className="truncate text-sm text-foreground">
                     {row.teamName}
-                    {mine ? <span className="ml-2 text-[11px] text-violet-300">you</span> : null}
+                    {mine ? <span className="ml-2 text-[11px] text-violet-500 dark:text-violet-300">you</span> : null}
                   </p>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                     {truncateAddress(row.ownerAddress, 4)}
                   </p>
                 </div>
-                <span className="font-mono text-base tabular-nums text-zinc-100">
+                <span className="font-mono text-base tabular-nums text-foreground">
                   {row.points}
-                  <span className="ml-1 text-[10px] uppercase tracking-[0.18em] text-zinc-500">pts</span>
+                  <span className="ml-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">pts</span>
                 </span>
               </motion.div>
             );
@@ -147,8 +147,8 @@ function JoinPanel({
 }) {
   if (!connected) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0B0B0E] p-4">
-        <p className="text-[13px] text-zinc-400">Connect your wallet to join this league.</p>
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
+        <p className="text-[13px] text-muted-foreground">Connect your wallet to join this league.</p>
         <ConnectButton compact />
       </div>
     );
@@ -156,7 +156,7 @@ function JoinPanel({
   if (!hasTeam) {
     return (
       <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-4">
-        <p className="text-[13px] text-amber-100">You need a team before joining.</p>
+        <p className="text-[13px] text-amber-700 dark:text-amber-100">You need a team before joining.</p>
         <Link href="/play/team">
           <Button variant="outline" size="sm">
             Pick your team
@@ -167,16 +167,16 @@ function JoinPanel({
     );
   }
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0B0B0E] p-4">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
       <div>
-        <p className="text-[13px] text-zinc-300">
+        <p className="text-[13px] text-muted-foreground">
           {alreadyIn ? "Your team is in this league." : "Add your team to this league."}
         </p>
         {message ? (
           <p
             className={cn(
               "mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em]",
-              message.kind === "ok" ? "text-emerald-300" : "text-red-300",
+              message.kind === "ok" ? "text-emerald-600 dark:text-emerald-300" : "text-red-600 dark:text-red-300",
             )}
           >
             {message.text}

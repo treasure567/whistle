@@ -42,28 +42,28 @@ export function NotFoundScreen() {
           className="flex flex-col items-start"
         >
           <div className="flex items-center gap-3">
-            <WhistleMark size={28} className="text-violet-300" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+            <WhistleMark size={28} className="text-violet-500 dark:text-violet-300" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
               Route not found
             </span>
           </div>
 
           <p
             aria-hidden
-            className="mt-8 font-mono text-[clamp(5rem,18vw,9rem)] leading-none tracking-tighter text-white/[0.04]"
+            className="mt-8 font-mono text-[clamp(5rem,18vw,9rem)] leading-none tracking-tighter text-foreground/[0.04]"
           >
             404
           </p>
 
-          <div className="mt-2 flex size-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-violet-200">
+          <div className="mt-2 flex size-12 items-center justify-center rounded-full border border-border bg-foreground/[0.04] text-violet-500 dark:text-violet-200">
             <FileNotFoundIcon size={20} strokeWidth={1.5} />
           </div>
 
-          <h1 className="mt-6 max-w-xl text-balance text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
+          <h1 className="mt-6 max-w-xl text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
             This page isn&apos;t on the pitch.
           </h1>
-          <p className="mt-3 max-w-lg text-base leading-relaxed text-zinc-500 md:text-lg">
-            <span className="font-serif-italic text-violet-200">
+          <p className="mt-3 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+            <span className="font-serif-italic text-violet-500 dark:text-violet-200">
               Wrong turn somewhere.
             </span>{" "}
             The URL doesn&apos;t match anything on whistle — head back or pick
@@ -85,8 +85,8 @@ export function NotFoundScreen() {
             </Link>
           </div>
 
-          <div className="mt-10 w-full border-t border-white/5 pt-8">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-600">
+          <div className="mt-10 w-full border-t border-border pt-8">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               Try one of these
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -99,7 +99,7 @@ export function NotFoundScreen() {
                 >
                   <Link
                     href={link.href}
-                    className="inline-flex rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-white/25 hover:bg-white/[0.08] hover:text-zinc-100"
+                    className="inline-flex rounded-full border border-border bg-foreground/[0.04] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:border-foreground/30 hover:bg-foreground/[0.08] hover:text-foreground"
                   >
                     {link.label}
                   </Link>
@@ -108,7 +108,7 @@ export function NotFoundScreen() {
             </div>
           </div>
 
-          <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700">
+          <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             ERR_404 · ROUTE_NOT_FOUND
           </p>
         </motion.div>

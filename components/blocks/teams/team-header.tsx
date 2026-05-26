@@ -20,7 +20,7 @@ export function TeamHeader({ squad }: TeamHeaderProps) {
     <div className="mx-auto max-w-5xl px-6 pt-[calc(4rem+1.5rem)] md:px-10 md:pt-24">
       <Link
         href="/teams"
-        className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500 hover:text-violet-300"
+        className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground hover:text-violet-500 dark:hover:text-violet-300"
       >
         ← All teams
       </Link>
@@ -33,10 +33,10 @@ export function TeamHeader({ squad }: TeamHeaderProps) {
         <div className="flex items-center gap-4">
           <FlagOrb code={squad.code} size={72} />
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-50 md:text-4xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
               {squad.country}
             </h1>
-            <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
               {squad.code} · {squad.players.length} players
             </p>
           </div>
@@ -44,7 +44,7 @@ export function TeamHeader({ squad }: TeamHeaderProps) {
         {grp && (
           <Link
             href="/matches"
-            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors hover:border-violet-500/30 hover:text-violet-200"
+            className="rounded-full border border-border bg-foreground/[0.04] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground transition-colors hover:border-violet-500/30 hover:text-violet-500 dark:hover:text-violet-300"
           >
             Group {grp.letter}
           </Link>

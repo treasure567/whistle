@@ -44,13 +44,13 @@ function FormationChip({
   formation: string;
 }) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-sm border border-white/20 bg-[#0A0A0A]/80 px-2 py-1 backdrop-blur-sm">
+    <div className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-card/80 px-2 py-1 backdrop-blur-sm">
       <span className="text-sm" aria-hidden>
         {flag}
       </span>
-      <span className="font-mono text-[10px] tracking-wide text-zinc-100">{side}</span>
-      <span className="font-mono text-[10px] text-zinc-400">·</span>
-      <span className="font-mono text-[10px] text-zinc-100">{formation}</span>
+      <span className="font-mono text-[10px] tracking-wide text-foreground">{side}</span>
+      <span className="font-mono text-[10px] text-muted-foreground">·</span>
+      <span className="font-mono text-[10px] text-foreground">{formation}</span>
     </div>
   );
 }
@@ -68,10 +68,10 @@ function SummaryTab({
     <div className="space-y-8">
       <section className="space-y-4">
         <div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
             Match events
           </span>
-          <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-100">
+          <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground">
             Timeline
           </h3>
         </div>
@@ -85,27 +85,27 @@ function SummaryTab({
       <section className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
               Agent activity
             </span>
-            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-100">
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground">
               What Emma, Jack, and Tom did
             </h3>
-            <p className="mt-1 max-w-2xl text-xs text-zinc-400">
+            <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
               Saved highlights, bets, and player picks tied to this match.
             </p>
           </div>
           <Link
             href="/activity"
-            className="font-mono text-xs uppercase tracking-[0.16em] text-violet-300 hover:text-violet-200"
+            className="font-mono text-xs uppercase tracking-[0.16em] text-violet-500 hover:text-violet-600 dark:text-violet-300 dark:hover:text-violet-200"
           >
             Full feed →
           </Link>
         </div>
         {matchActivity.length > 0 ? (
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#111113]">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <ActivityTableHeader />
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-border">
               {matchActivity.map((item) => (
                 <ActivityRow key={item.id} item={item} />
               ))}
@@ -158,10 +158,10 @@ function LineupsTab({
 
       <section>
         <div className="mb-4">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
             Substitutes
           </span>
-          <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-100">
+          <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground">
             On the bench
           </h3>
         </div>
@@ -183,7 +183,7 @@ export function MatchTabs({ match, lineup, events }: MatchTabsProps) {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-6 md:px-10">
-      <div className="sticky top-[calc(4rem+0.75rem)] z-20 -mx-6 mb-6 border-b border-white/10 bg-background/85 px-6 backdrop-blur md:-mx-10 md:px-10">
+      <div className="sticky top-[calc(4rem+0.75rem)] z-20 -mx-6 mb-6 border-b border-border bg-background/85 px-6 backdrop-blur md:-mx-10 md:px-10">
         <div className="flex gap-1">
           {TABS.map((t) => (
             <button
@@ -193,15 +193,15 @@ export function MatchTabs({ match, lineup, events }: MatchTabsProps) {
               className={cn(
                 "relative px-3 py-3 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors",
                 active === t.key
-                  ? "text-violet-200"
-                  : "text-zinc-500 hover:text-zinc-200",
+                  ? "text-violet-500 dark:text-violet-300"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {t.label}
               {active === t.key && (
                 <span
                   aria-hidden
-                  className="absolute inset-x-3 -bottom-px h-px bg-violet-300"
+                  className="absolute inset-x-3 -bottom-px h-px bg-violet-500 dark:bg-violet-300"
                 />
               )}
             </button>

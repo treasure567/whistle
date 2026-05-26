@@ -260,7 +260,7 @@ export function MatchSim({
           <span
             className={cn(
               "mt-1 rounded-full border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.18em]",
-              done ? "border-emerald-500/30 text-emerald-300" : "border-border text-muted-foreground",
+              done ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-300" : "border-border text-muted-foreground",
             )}
           >
             {result ? clock : "0'"}
@@ -296,7 +296,7 @@ export function MatchSim({
               className={cn(
                 "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors",
                 view === v
-                  ? "border-violet-400/50 bg-violet-500/[0.12] text-violet-100"
+                  ? "border-violet-400/50 bg-violet-500/[0.12] text-violet-700 dark:text-violet-100"
                   : "border-border bg-background/60 text-muted-foreground hover:text-foreground",
               )}
             >
@@ -326,8 +326,8 @@ export function MatchSim({
               {coach.name.slice(0, 1)}
             </span>
             <span className="min-w-0">
-              <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">{coach.name} · gaffer</span>
-              <span className="mt-0.5 block text-[12px] leading-relaxed text-emerald-50">{coachAdvice}</span>
+              <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300/80">{coach.name} · gaffer</span>
+              <span className="mt-0.5 block text-[12px] leading-relaxed text-emerald-700 dark:text-emerald-50">{coachAdvice}</span>
               {coachSuggestsSub ? (
                 <button
                   type="button"
@@ -335,7 +335,7 @@ export function MatchSim({
                     setPlaying(false);
                     setSubOpen(true);
                   }}
-                  className="mt-2 inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-100 transition-colors hover:bg-emerald-500/20"
+                  className="mt-2 inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-100 transition-colors hover:bg-emerald-500/20"
                 >
                   Make a change
                 </button>
@@ -355,11 +355,11 @@ export function MatchSim({
             </span>
             <span className="flex items-center gap-2">
               {onchainOkb !== null ? (
-                <span className="font-mono text-[10px] text-emerald-300" title="Your real OKB on X Layer testnet">
+                <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-300" title="Your real OKB on X Layer testnet">
                   {onchainOkb.toLocaleString(undefined, { maximumFractionDigits: 4 })} onchain
                 </span>
               ) : null}
-              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-300" suppressHydrationWarning>
+              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-600 dark:text-amber-300" suppressHydrationWarning>
                 {balance} OKB
               </span>
             </span>
@@ -367,7 +367,7 @@ export function MatchSim({
 
           <div className="mb-3 flex items-start gap-2 rounded-xl border border-violet-400/25 bg-violet-500/[0.05] p-2.5">
             <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-violet-400" />
-            <span className="text-[12px] leading-relaxed text-violet-100">{jackAdvice}</span>
+            <span className="text-[12px] leading-relaxed text-violet-700 dark:text-violet-100">{jackAdvice}</span>
           </div>
 
           {!bet ? (
@@ -389,9 +389,9 @@ export function MatchSim({
                     )}
                   >
                     <span className="text-[12px] text-foreground">{pickLabel(id)}</span>
-                    <span className="font-mono text-[13px] font-semibold text-violet-300">{odds[id].toFixed(2)}</span>
+                    <span className="font-mono text-[13px] font-semibold text-violet-500 dark:text-violet-300">{odds[id].toFixed(2)}</span>
                     {id === favPick ? (
-                      <span className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.12em] text-violet-300/80">{"Jack's tip"}</span>
+                      <span className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.12em] text-violet-500 dark:text-violet-300/80">{"Jack's tip"}</span>
                     ) : null}
                   </button>
                 ))}
@@ -419,7 +419,7 @@ export function MatchSim({
                 settled.won ? "border-emerald-500/30 bg-emerald-500/[0.06]" : "border-red-500/30 bg-red-500/[0.06]",
               )}
             >
-              <span className={cn("font-mono text-[11px] uppercase tracking-[0.18em]", settled.won ? "text-emerald-300" : "text-red-300")}>
+              <span className={cn("font-mono text-[11px] uppercase tracking-[0.18em]", settled.won ? "text-emerald-600 dark:text-emerald-300" : "text-red-600 dark:text-red-300")}>
                 {settled.won ? `Won +${settled.payout} OKB` : `Lost ${bet.stake} OKB`}
               </span>
               <span className="font-mono text-[11px] text-muted-foreground">
@@ -432,7 +432,7 @@ export function MatchSim({
             </Button>
           ) : (
             <div className="flex items-center justify-between rounded-xl border border-violet-400/30 bg-violet-500/[0.05] p-3">
-              <span className="font-mono text-[11px] text-violet-100">Live: {pickLabel(bet.pick)} · {bet.stake} OKB</span>
+              <span className="font-mono text-[11px] text-violet-700 dark:text-violet-100">Live: {pickLabel(bet.pick)} · {bet.stake} OKB</span>
               <span className="font-mono text-[11px] text-muted-foreground">to win {Math.round(bet.stake * bet.odds)}</span>
             </div>
           )}
@@ -459,7 +459,7 @@ export function MatchSim({
                   className={cn(
                     "rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors",
                     speedMs === s.ms
-                      ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-100"
+                      ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-700 dark:text-violet-100"
                       : "border-border text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -496,7 +496,7 @@ export function MatchSim({
           className={cn(
             "ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors",
             soundOn
-              ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-100"
+              ? "border-violet-400/50 bg-violet-500/[0.1] text-violet-700 dark:text-violet-100"
               : "border-border text-muted-foreground hover:text-foreground",
           )}
         >
@@ -531,7 +531,7 @@ export function MatchSim({
                 className={cn(
                   "rounded-full border px-2.5 py-1 text-[11px] transition-colors",
                   pendingOff === n
-                    ? "border-red-400/60 bg-red-500/[0.12] text-red-200"
+                    ? "border-red-400/60 bg-red-500/[0.12] text-red-600 dark:text-red-300"
                     : "border-border text-foreground hover:border-violet-400/40",
                 )}
               >
@@ -552,7 +552,7 @@ export function MatchSim({
                   type="button"
                   disabled={!pendingOff || subsMade.length >= 5}
                   onClick={() => pendingOff && makeSub(pendingOff, n)}
-                  className="rounded-full border border-emerald-400/40 bg-emerald-500/[0.08] px-2.5 py-1 text-[11px] text-emerald-100 transition-colors hover:bg-emerald-500/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-full border border-emerald-400/40 bg-emerald-500/[0.08] px-2.5 py-1 text-[11px] text-emerald-700 dark:text-emerald-100 transition-colors hover:bg-emerald-500/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {shortName(n)}
                 </button>
@@ -580,7 +580,7 @@ export function MatchSim({
           Live commentary
         </span>
         {aiModelled ? (
-          <span className="ml-auto rounded-full border border-violet-400/30 bg-violet-500/[0.08] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-violet-200">
+          <span className="ml-auto rounded-full border border-violet-400/30 bg-violet-500/[0.08] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-violet-500 dark:text-violet-300">
             AI-modelled
           </span>
         ) : null}
@@ -614,9 +614,9 @@ function SideHead({ team, align }: { team: SimTeam; align: "start" | "end" }) {
 
 const TONE_TEXT: Record<SimComment["tone"], string> = {
   goal: "font-semibold text-foreground",
-  card: "text-amber-300",
+  card: "text-amber-600 dark:text-amber-300",
   chance: "text-sky-300/90",
-  info: "text-violet-200",
+  info: "text-violet-500 dark:text-violet-300",
   color: "font-serif-italic text-muted-foreground",
 };
 const TONE_DOT: Record<SimComment["tone"], string> = {
@@ -720,11 +720,11 @@ function MatchReport({ result }: { result: SimResult }) {
       </div>
       {motm ? (
         <div className="mt-3 flex items-center gap-2 rounded-xl border border-amber-500/25 bg-amber-500/[0.05] p-2.5">
-          <ChampionIcon size={14} className="text-amber-300" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-300">MOTM</span>
+          <ChampionIcon size={14} className="text-amber-600 dark:text-amber-300" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300">MOTM</span>
           <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">{motm.player}</span>
           <FlagOrb code={motm.side === "home" ? home.code : away.code} size={16} />
-          <span className="font-mono text-[12px] font-semibold tabular-nums text-amber-300">{motm.rating.toFixed(1)}</span>
+          <span className="font-mono text-[12px] font-semibold tabular-nums text-amber-600 dark:text-amber-300">{motm.rating.toFixed(1)}</span>
         </div>
       ) : null}
     </div>

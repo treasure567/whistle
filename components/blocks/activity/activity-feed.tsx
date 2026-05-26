@@ -50,7 +50,7 @@ export function ActivityFeed({ initialAgent = "all", items = [] }: ActivityFeedP
 
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-10">
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-[#0B0B0E] p-2">
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card p-2">
         <Chip
           active={agent === "all"}
           onClick={() => setAgent("all")}
@@ -64,7 +64,7 @@ export function ActivityFeed({ initialAgent = "all", items = [] }: ActivityFeedP
             label={`${a.name} · ${counts[a.slug]}`}
           />
         ))}
-        <span className="mx-1 h-5 w-px bg-white/10" aria-hidden />
+        <span className="mx-1 h-5 w-px bg-foreground/10" aria-hidden />
         {KIND_OPTIONS.map((opt) => (
           <Chip
             key={opt.value}
@@ -76,7 +76,7 @@ export function ActivityFeed({ initialAgent = "all", items = [] }: ActivityFeedP
         ))}
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
         {filtered.length === 0 ? (
           <EmptyState
             label="No matching decisions"
@@ -115,9 +115,9 @@ function Chip({
         "rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors",
         active
           ? subtle
-            ? "border-violet-500/40 bg-violet-500/[0.08] text-violet-100"
-            : "border-white/25 bg-white/[0.08] text-zinc-100"
-          : "border-white/10 bg-transparent text-zinc-400 hover:border-white/25 hover:text-zinc-100",
+            ? "border-violet-500/40 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
+            : "border-foreground/30 bg-foreground/[0.08] text-foreground"
+          : "border-border bg-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground",
       )}
     >
       {label}

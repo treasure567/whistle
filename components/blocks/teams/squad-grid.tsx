@@ -48,14 +48,14 @@ function PlayerCard({ player, index }: { player: SquadPlayer; index: number }) {
           <PlayerAvatar src={player.photo} name={player.name} size={52} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] text-zinc-500">
+              <span className="font-mono text-[10px] text-muted-foreground">
                 #{player.number ?? "—"}
               </span>
-              <span className="truncate text-sm font-medium text-zinc-100">
+              <span className="truncate text-sm font-medium text-foreground">
                 {player.name}
               </span>
             </div>
-            <p className="mt-0.5 truncate text-[11px] text-zinc-500">
+            <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
               {player.position ?? "—"}
               {player.age != null && ` · ${player.age}y`}
             </p>
@@ -80,10 +80,10 @@ export function SquadGrid({ squad }: SquadGridProps) {
         return (
           <section key={key} className="space-y-3">
             <div className="flex items-baseline gap-3">
-              <h2 className="font-mono text-xs uppercase tracking-[0.22em] text-violet-300">
+              <h2 className="font-mono text-xs uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
                 {label}
               </h2>
-              <span className="font-mono text-xs text-zinc-600">{list.length}</span>
+              <span className="font-mono text-xs text-muted-foreground">{list.length}</span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((p, i) => (

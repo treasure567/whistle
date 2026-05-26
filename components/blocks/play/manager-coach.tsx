@@ -33,19 +33,19 @@ function coach(
 
 const MOOD_STYLES: Record<Mood, { wrap: string; dot: string; label: string }> = {
   setup: {
-    wrap: "border-white/10 dark:bg-[#0B0B0E]",
+    wrap: "border-border dark:bg-[#0B0B0E]",
     dot: "dot-live--idle",
-    label: "text-zinc-400",
+    label: "text-muted-foreground",
   },
   warn: {
     wrap: "border-amber-500/25 bg-amber-500/[0.04]",
     dot: "",
-    label: "text-amber-300",
+    label: "text-amber-600 dark:text-amber-300",
   },
   ready: {
     wrap: "border-emerald-500/25 bg-emerald-500/[0.04]",
     dot: "dot-live--ok",
-    label: "text-emerald-300",
+    label: "text-emerald-600 dark:text-emerald-300",
   },
 };
 
@@ -76,7 +76,7 @@ export function ManagerCoach({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold tracking-tight text-foreground">Tom</p>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
               Your manager
             </span>
             <span className={cn("dot-live ml-auto", style.dot)} style={{ position: "static" }} />

@@ -35,7 +35,7 @@ export function PitchView({
         <div className="absolute left-4 top-3 z-20 font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-200/80">
           Your starting XI
         </div>
-        <div className="absolute right-4 top-3 z-20 rounded-full border border-white/15 bg-black/40 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-100">
+        <div className="absolute right-4 top-3 z-20 rounded-full border border-white/15 bg-black/40 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-100">
           {starters.length}/11
         </div>
         <div className="relative z-10 flex aspect-[16/12] flex-col justify-evenly gap-1 px-2 py-8 sm:aspect-[16/10] sm:px-6">

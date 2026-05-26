@@ -111,18 +111,18 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
         <Dropdown.Content
           sideOffset={8}
           align="end"
-          className="z-50 w-64 rounded-2xl border border-white/10 bg-[#0B0B0E]/95 p-2 backdrop-blur-xl"
+          className="z-50 w-64 rounded-2xl border border-border bg-card/95 p-2 backdrop-blur-xl"
         >
-          <div className="px-3 py-3 border-b border-white/5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+          <div className="px-3 py-3 border-b border-border">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               Connected
             </p>
-            <p className="mt-1 font-mono text-sm text-zinc-100">
+            <p className="mt-1 font-mono text-sm text-foreground">
               {truncateAddress(address, 6)}
             </p>
           </div>
           <MenuRow
-            icon={copied ? <Tick02Icon size={14} className="text-emerald-300" /> : <Copy01Icon size={14} />}
+            icon={copied ? <Tick02Icon size={14} className="text-emerald-600 dark:text-emerald-300" /> : <Copy01Icon size={14} />}
             label={copied ? "Copied" : "Copy address"}
             onSelect={(e) => {
               e.preventDefault();
@@ -139,7 +139,7 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
             label="Manage spending limits"
             asLink="/dashboard#sessions"
           />
-          <div className="my-1 h-px bg-white/5" />
+          <div className="my-1 h-px bg-foreground/5" />
           <MenuRow
             icon={<Logout01Icon size={14} />}
             label="Disconnect"
@@ -167,10 +167,10 @@ function MenuRow({
   danger?: boolean;
 }) {
   const className = cn(
-    "flex items-center gap-2.5 rounded-md px-3 py-2 text-[12px] tracking-wide transition-colors data-[highlighted]:bg-white/5",
+    "flex items-center gap-2.5 rounded-md px-3 py-2 text-[12px] tracking-wide transition-colors data-[highlighted]:bg-foreground/5",
     danger
-      ? "text-red-300 hover:text-red-200"
-      : "text-zinc-300 hover:text-zinc-100",
+      ? "text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200"
+      : "text-muted-foreground hover:text-foreground",
   );
 
   if (asLink) {
@@ -224,24 +224,24 @@ function ConnectDialog({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.98 }}
                 transition={spring}
-                className="fixed left-1/2 top-1/2 z-50 w-[min(420px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/10 bg-[#0B0B0E]/95 p-6 backdrop-blur-xl"
+                className="fixed left-1/2 top-1/2 z-50 w-[min(420px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card/95 p-6 backdrop-blur-xl"
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
                       Connect to Whistle
                     </p>
-                    <Dialog.Title className="mt-2 text-xl font-semibold tracking-tight text-zinc-100">
+                    <Dialog.Title className="mt-2 text-xl font-semibold tracking-tight text-foreground">
                       Choose a wallet
                     </Dialog.Title>
-                    <Dialog.Description className="mt-1 text-xs text-zinc-500">
+                    <Dialog.Description className="mt-1 text-xs text-muted-foreground">
                       Fund AI helpers for World Cup matches.
                     </Dialog.Description>
                   </div>
                   <Dialog.Close asChild>
                     <button
                       aria-label="Close"
-                      className="flex size-8 items-center justify-center rounded-full border border-white/10 text-zinc-400 hover:text-zinc-100 hover:border-white/20"
+                      className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
                     >
                       <Cancel01Icon size={14} />
                     </button>
@@ -258,27 +258,27 @@ function ConnectDialog({
                         disabled={isPending}
                         onClick={() => connect({ connector })}
                         className={cn(
-                          "group flex items-center justify-between rounded-2xl border border-white/10 bg-[#111113] px-4 py-3.5 text-left transition-all",
-                          "hover:border-violet-400/40 hover:bg-[#15151A] disabled:cursor-not-allowed disabled:opacity-50",
+                          "group flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3.5 text-left transition-all",
+                          "hover:border-violet-400/40 hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50",
                         )}
                       >
                         <span className="flex items-center gap-3">
-                          <span className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-black text-violet-300">
+                          <span className="flex size-9 items-center justify-center rounded-xl border border-border bg-muted text-violet-500 dark:text-violet-300">
                             <Wallet01Icon size={16} />
                           </span>
                           <span className="flex flex-col">
-                            <span className="text-sm text-zinc-100">{labelFor(connector.name)}</span>
-                            <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                            <span className="text-sm text-foreground">{labelFor(connector.name)}</span>
+                            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                               {hintFor(connector.name)}
                             </span>
                           </span>
                         </span>
                         {isPendingThis ? (
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-violet-300">
+                          <span className="font-mono text-[10px] uppercase tracking-widest text-violet-500 dark:text-violet-300">
                             …signing
                           </span>
                         ) : (
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 transition-colors group-hover:text-violet-200">
+                          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-violet-500 dark:group-hover:text-violet-200">
                             connect
                           </span>
                         )}
@@ -287,7 +287,7 @@ function ConnectDialog({
                   })}
                 </div>
 
-                <p className="mt-5 text-[11px] leading-relaxed text-zinc-500">
+                <p className="mt-5 text-[11px] leading-relaxed text-muted-foreground">
                   By connecting, you agree to bounded session-key delegation per match. Whistle never custodies funds.
                 </p>
               </motion.div>

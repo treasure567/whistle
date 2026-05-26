@@ -17,14 +17,14 @@ export function AgentsSection() {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
               The team
             </span>
-            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-              Three helpers. <span className="font-serif-italic text-violet-200">One app.</span>
+            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
+              Three helpers. <span className="font-serif-italic text-violet-500 dark:text-violet-300">One app.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-zinc-400">
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
             Each one has a clear job and acts onchain: Emma mints moment NFTs,
             Jack places match bets, Tom drafts your fantasy team. You set the
             spending limit; they work inside it.

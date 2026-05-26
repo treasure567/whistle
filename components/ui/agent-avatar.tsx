@@ -26,8 +26,8 @@ export function AgentAvatar({ agent, size = 36, className, ring = false }: Agent
   return (
     <span
       className={cn(
-        "relative inline-flex shrink-0 overflow-hidden rounded-full border bg-[#0F0F12]",
-        ring ? "border-white/20" : "border-white/10",
+        "relative inline-flex shrink-0 overflow-hidden rounded-full border bg-card",
+        ring ? "border-border" : "border-border",
         className,
       )}
       style={{ width: size, height: size }}

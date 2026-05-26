@@ -11,7 +11,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <WhistleMark size={32} className="text-violet-300" />
+              <WhistleMark size={32} className="text-violet-500 dark:text-violet-300" />
               <span className="font-mono text-base tracking-tight text-foreground">whistle</span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">

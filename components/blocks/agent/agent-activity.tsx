@@ -28,10 +28,10 @@ export function AgentActivity({ agent, items: feed = [] }: AgentActivityProps) {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
               Recent decisions
             </span>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">
+            <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl">
               What {agent.name} did last.
             </h2>
           </div>
@@ -43,7 +43,7 @@ export function AgentActivity({ agent, items: feed = [] }: AgentActivityProps) {
           </Link>
         </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card">
           {items.length === 0 ? (
             <EmptyState
               label={`${agent.name} idle`}

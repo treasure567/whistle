@@ -43,7 +43,7 @@ export default function PlayPage() {
             Play along
           </span>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Your turn. <span className="font-serif-italic text-violet-200">Same matches.</span>
+            Your turn. <span className="font-serif-italic text-violet-500 dark:text-violet-300">Same matches.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Emma, Jack, and Tom do the work when you fund them. Want to play it yourself? Pick your
@@ -57,16 +57,16 @@ export default function PlayPage() {
             <Link
               key={href}
               href={href}
-              className="group flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0B0B0E] p-6 transition-colors hover:border-violet-400/40"
+              className="group flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 transition-colors hover:border-violet-400/40"
             >
-              <span className="flex size-11 items-center justify-center rounded-xl border border-white/10 text-violet-500 dark:text-violet-300">
+              <span className="flex size-11 items-center justify-center rounded-xl border border-border text-violet-500 dark:text-violet-300">
                 <Icon size={20} />
               </span>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold tracking-tight text-zinc-100">{title}</h2>
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">{hint}</p>
               </div>
-              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors group-hover:text-violet-200">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors group-hover:text-violet-500 dark:group-hover:text-violet-300">
                 Open
                 <ArrowRight01Icon size={13} />
               </span>

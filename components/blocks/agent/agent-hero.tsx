@@ -41,7 +41,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
         <div>
           <Link
             href="/agents"
-            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-violet-200"
+            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-violet-500 dark:hover:text-violet-200"
           >
             ← The team
           </Link>
@@ -57,7 +57,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
               <p className="font-mono text-[11px] uppercase tracking-[0.22em] agent-tint-text">
                 {agent.role}
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-zinc-50 md:text-5xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
                 {agent.name}
               </h1>
             </div>
@@ -67,7 +67,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.05 }}
-            className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300"
+            className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
           >
             {agent.tagline}
           </motion.p>
@@ -76,7 +76,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
-            className="mt-6 max-w-xl border-l-2 border-white/10 pl-4 font-mono text-[13px] italic text-zinc-400"
+            className="mt-6 max-w-xl border-l-2 border-border pl-4 font-mono text-[13px] italic text-muted-foreground"
           >
             “{agent.personaQuote}”
           </motion.p>
@@ -93,7 +93,7 @@ export function AgentHero({ agent }: AgentHeroProps) {
                 <ArrowRight01Icon size={14} />
               </Button>
             </Link>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               {agent.stats.allocatorsCount} people backing {agent.name}
             </span>
           </motion.div>
@@ -108,9 +108,9 @@ export function AgentHero({ agent }: AgentHeroProps) {
           <AgentCharacter3D
             agent={agent.slug}
             mode="single"
-            className="aspect-square w-full min-h-[280px] border border-white/10 md:min-h-[360px]"
+            className="aspect-square w-full min-h-[280px] border border-border md:min-h-[360px]"
           />
-          <div className="rounded-3xl border border-white/10 bg-[#0B0B0E] p-8 agent-tint-glow">
+          <div className="rounded-3xl border border-border bg-card p-8 agent-tint-glow">
           <div className="grid grid-cols-2 gap-y-6 gap-x-8">
             <Stat
               label="Decisions"
@@ -142,17 +142,17 @@ export function AgentHero({ agent }: AgentHeroProps) {
               }
             />
           </div>
-          <div className="mt-6 border-t border-white/5 pt-4">
+          <div className="mt-6 border-t border-border pt-4">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 Track record · 18 matches
               </span>
               {agent.slug !== "scout" ? (
-                <span className="font-mono text-[12px] text-emerald-300">
+                <span className="font-mono text-[12px] text-emerald-600 dark:text-emerald-300">
                   +{formatUsdt(agent.stats.pnlUsdt, { compact: true })}
                 </span>
               ) : (
-                <span className="font-mono text-[12px] text-zinc-400">
+                <span className="font-mono text-[12px] text-muted-foreground">
                   {agent.stats.totalDecisions} moments saved
                 </span>
               )}
@@ -175,11 +175,11 @@ export function AgentHero({ agent }: AgentHeroProps) {
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
         {label}
       </span>
-      <span className="font-mono text-2xl text-zinc-100 tabular-nums">{value}</span>
-      {hint ? <span className="text-[11px] text-zinc-500">{hint}</span> : null}
+      <span className="font-mono text-2xl text-foreground tabular-nums">{value}</span>
+      {hint ? <span className="text-[11px] text-muted-foreground">{hint}</span> : null}
     </div>
   );
 }

@@ -381,7 +381,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                         </span>
                       </span>
                     </span>
-                    <span className="font-mono text-[12px] tabular-nums text-violet-300">{p.price.toFixed(1)}</span>
+                    <span className="font-mono text-[12px] tabular-nums text-violet-500 dark:text-violet-300">{p.price.toFixed(1)}</span>
                   </button>
                 );
               })}
@@ -527,7 +527,7 @@ function Chip({ active, onClick, label }: { active: boolean; onClick: () => void
       className={cn(
         "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
         active
-          ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-100"
+          ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
           : "border-border text-muted-foreground hover:border-violet-400/30 hover:text-foreground",
       )}
     >

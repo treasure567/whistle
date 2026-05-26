@@ -17,7 +17,7 @@ export function TxLink({ hash, className, chars = 6 }: TxLinkProps) {
       target="_blank"
       rel="noreferrer noopener"
       className={cn(
-        "group inline-flex items-center gap-1 font-mono text-[11px] tracking-wide text-zinc-400 transition-colors hover:text-violet-200",
+        "group inline-flex items-center gap-1 font-mono text-[11px] tracking-wide text-muted-foreground transition-colors hover:text-violet-500 dark:hover:text-violet-300",
         className,
       )}
     >
@@ -40,7 +40,7 @@ export function AddressLink({ address, className, chars = 4 }: AddressLinkProps)
       target="_blank"
       rel="noreferrer noopener"
       className={cn(
-        "group inline-flex items-center gap-1 font-mono text-[11px] tracking-wide text-zinc-400 transition-colors hover:text-violet-200",
+        "group inline-flex items-center gap-1 font-mono text-[11px] tracking-wide text-muted-foreground transition-colors hover:text-violet-500 dark:hover:text-violet-300",
         className,
       )}
     >

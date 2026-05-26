@@ -37,7 +37,7 @@ export function LandingHero() {
             className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-3 py-1"
           >
             <span className="size-1.5 rounded-full bg-emerald-400" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
               Live on X Layer Testnet
             </span>
           </motion.div>
@@ -46,18 +46,18 @@ export function LandingHero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...heroSpring, delay: 0.05 }}
-            className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-50 md:text-6xl"
+            className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-6xl"
           >
             Three agents
             <br />
-            <span className="font-serif-italic text-violet-200">play for you.</span>
+            <span className="font-serif-italic text-violet-500 dark:text-violet-300">play for you.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...heroSpring, delay: 0.18 }}
-            className="mt-6 max-w-xl text-base leading-relaxed text-zinc-400"
+            className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground"
           >
             Whistle gives you three AI helpers for football. Emma mints the best moments as NFTs, Jack places match bets, and Tom drafts your fantasy team. You choose who to fund with test OKB; they act onchain while you watch.
           </motion.p>
@@ -86,7 +86,7 @@ export function LandingHero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...heroSpring, delay: 0.32 }}
-            className="mt-10 grid max-w-xl grid-cols-3 gap-6 border-t border-white/5 pt-6"
+            className="mt-10 grid max-w-xl grid-cols-3 gap-6 border-t border-border pt-6"
           >
             <HeroStat label="AI helpers" value="3" hint="Emma · Jack · Tom" />
             <HeroStat label="Every action" value="Onchain" hint="verify each tx" />
@@ -127,11 +127,11 @@ export function LandingHero() {
 function HeroStat({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
         {label}
       </span>
-      <span className="font-mono text-2xl text-zinc-100 tabular-nums">{value}</span>
-      <span className="text-[11px] text-zinc-500">{hint}</span>
+      <span className="font-mono text-2xl text-foreground tabular-nums">{value}</span>
+      <span className="text-[11px] text-muted-foreground">{hint}</span>
     </div>
   );
 }
@@ -148,10 +148,10 @@ function OrbitChip({
   return (
     <div className="flex items-center justify-center gap-2">
       <AgentAvatar agent={agent} size={24} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-200">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground">
         {name}
       </span>
-      <span className="font-mono text-[10px] text-zinc-500">{hint}</span>
+      <span className="font-mono text-[10px] text-muted-foreground">{hint}</span>
     </div>
   );
 }

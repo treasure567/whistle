@@ -51,18 +51,18 @@ export function HowItWorks() {
           viewport={{ once: true, margin: "-15%" }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
             How it works
           </span>
-          <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-5xl">
-            You fund. <span className="font-serif-italic text-violet-200">They play.</span> You own it.
+          <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
+            You fund. <span className="font-serif-italic text-violet-500 dark:text-violet-300">They play.</span> You own it.
           </h2>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-400">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Three AI helpers act for you during live World Cup matches. You stay in control of the money and keep everything they make.
           </p>
         </motion.div>
 
-        <div className="mt-12 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0E]">
+        <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-card">
           <div className="grid sm:grid-cols-2">
             {STEPS.map((step, i) => (
               <motion.div
@@ -72,23 +72,23 @@ export function HowItWorks() {
                 viewport={{ once: true, margin: "-15%" }}
                 transition={{ type: "spring", stiffness: 280, damping: 30, delay: i * 0.05 }}
                 className={cn(
-                  "flex h-full flex-col gap-5 border-b border-white/10 p-6 transition-colors hover:bg-white/[0.02]",
+                  "flex h-full flex-col gap-5 border-b border-border p-6 transition-colors hover:bg-foreground/[0.02]",
                   "sm:border-r sm:[&:nth-child(2n)]:border-r-0",
                   "sm:[&:nth-child(n+3)]:border-b-0",
                   "last:border-b-0",
                 )}
               >
                 <div className="flex items-start justify-between">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                     {step.n} · {step.label}
                   </span>
-                  <step.icon size={18} className="text-violet-300" />
+                  <step.icon size={18} className="text-violet-500 dark:text-violet-300" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold tracking-tight text-zinc-100">
+                  <h3 className="text-base font-semibold tracking-tight text-foreground">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-zinc-400">{step.body}</p>
+                  <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{step.body}</p>
                 </div>
               </motion.div>
             ))}

@@ -48,7 +48,7 @@ export function LeaguesView({ initialLeagues }: { initialLeagues: LeagueRecord[]
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
           Public leagues · {leagues.length}
         </h2>
         {leagues.length === 0 ? (
@@ -77,8 +77,8 @@ export function LeaguesView({ initialLeagues }: { initialLeagues: LeagueRecord[]
 function TeamBanner({ address, teamName }: { address: string | undefined; teamName: string | null }) {
   if (!address) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0B0B0E] p-4">
-        <p className="text-[13px] text-zinc-400">Connect your wallet to create or join leagues.</p>
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
+        <p className="text-[13px] text-muted-foreground">Connect your wallet to create or join leagues.</p>
         <ConnectButton compact />
       </div>
     );
@@ -86,7 +86,7 @@ function TeamBanner({ address, teamName }: { address: string | undefined; teamNa
   if (!teamName) {
     return (
       <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-4">
-        <p className="text-[13px] text-amber-100">Build a team before you join a league.</p>
+        <p className="text-[13px] text-amber-700 dark:text-amber-100">Build a team before you join a league.</p>
         <Link href="/play/team">
           <Button variant="outline" size="sm">
             Pick your team
@@ -98,8 +98,8 @@ function TeamBanner({ address, teamName }: { address: string | undefined; teamNa
   }
   return (
     <div className="flex items-center gap-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4">
-      <UserGroupIcon size={16} className="text-emerald-300" />
-      <p className="text-[13px] text-emerald-100">
+      <UserGroupIcon size={16} className="text-emerald-600 dark:text-emerald-300" />
+      <p className="text-[13px] text-emerald-700 dark:text-emerald-100">
         Playing as <span className="font-medium">{teamName}</span>
       </p>
     </div>
@@ -121,19 +121,19 @@ function LeagueRow({
 }) {
   const isPrivate = league.kind === "PRIVATE";
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#0B0B0E] p-5 transition-colors hover:border-white/20 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-foreground/30 md:flex-row md:items-center md:justify-between">
       <div className="flex items-center gap-3">
         <span
           className={cn(
             "flex size-9 items-center justify-center rounded-xl border",
-            isPrivate ? "border-white/10 text-zinc-400" : "border-violet-500/30 text-violet-300",
+            isPrivate ? "border-border text-muted-foreground" : "border-violet-500/30 text-violet-500 dark:text-violet-300",
           )}
         >
           {isPrivate ? <SquareLock02Icon size={16} /> : <Globe02Icon size={16} />}
         </span>
         <div>
-          <p className="text-sm font-medium text-zinc-100">{league.name}</p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-sm font-medium text-foreground">{league.name}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             {league.maxBudgetMillions.toFixed(0)}m budget · {league.transferDeadlineMinutes}m deadline
           </p>
         </div>
@@ -143,7 +143,7 @@ function LeagueRow({
           <span
             className={cn(
               "font-mono text-[10px] uppercase tracking-[0.18em]",
-              message.kind === "ok" ? "text-emerald-300" : "text-red-300",
+              message.kind === "ok" ? "text-emerald-600 dark:text-emerald-300" : "text-red-600 dark:text-red-300",
             )}
           >
             {message.text}

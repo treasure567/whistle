@@ -16,21 +16,21 @@ export function CTABand() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-20%" }}
           transition={{ type: "spring", stiffness: 280, damping: 30 }}
-          className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0B0B0E]"
+          className="overflow-hidden rounded-2xl border border-border bg-card"
         >
           <div className="grid items-stretch md:grid-cols-2">
             <div className="flex flex-col justify-center px-6 py-8 md:px-10 md:py-10">
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
                 The manifesto
               </span>
-              <p className="mt-2 max-w-xl text-balance text-2xl font-semibold leading-[1.15] tracking-tight text-zinc-50 md:text-4xl">
+              <p className="mt-2 max-w-xl text-balance text-2xl font-semibold leading-[1.15] tracking-tight text-foreground md:text-4xl">
                 We didn&apos;t build another betting app.
                 <br />
-                <span className="font-serif-italic text-violet-200">
+                <span className="font-serif-italic text-violet-500 dark:text-violet-300">
                   We built AI helpers that work while you watch the game.
                 </span>
               </p>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-zinc-500">
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
                 Three AI helpers for football. Public track records. Every
                 decision logged. You pick Emma, Jack, or Tom — they handle the rest.
               </p>
@@ -48,7 +48,7 @@ export function CTABand() {
                     <ArrowUpRight01Icon size={13} />
                   </Button>
                 </Link>
-                <p className="pt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+                <p className="pt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
                   Submission · OKX X Cup · May 28 12:00 UTC
                 </p>
               </div>
@@ -62,7 +62,7 @@ export function CTABand() {
                 className="object-cover object-right scale-110"
                 sizes="(max-width: 1280px) 50vw, 640px"
               />
-              <div className="absolute inset-y-0 left-0 w-24 bg-linear-to-r from-[#0B0B0E] to-transparent" />
+              <div className="absolute inset-y-0 left-0 w-24 bg-linear-to-r from-card to-transparent" />
             </div>
           </div>
         </motion.div>

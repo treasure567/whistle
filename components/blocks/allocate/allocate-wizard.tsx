@@ -69,7 +69,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
     <div className="relative mx-auto max-w-5xl px-6 md:px-10">
       <Stepper step={step} confirmed={confirmed} />
 
-      <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0E]">
+      <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-card">
         <AnimatePresence mode="wait">
           {step === 0 ? (
             <StepShell key="step-0" title="Pick Emma, Jack, or Tom" subtitle="Each one does a different job during the match.">
@@ -123,7 +123,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
                   <ReviewForm agent={agent} ceiling={ceiling} perMatch={perMatch} hours={hours} />
                   {busy ? <TxProgress state={state} /> : null}
                   {state.phase === "error" && state.error ? (
-                    <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-200">
+                    <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/[0.05] p-3 text-[12px] text-red-600 dark:text-red-300">
                       {state.error}
                     </p>
                   ) : null}
@@ -133,7 +133,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
           ) : null}
         </AnimatePresence>
 
-        <div className="flex items-center justify-between gap-3 border-t border-white/5 bg-[#0E0E12] px-6 py-4">
+        <div className="flex items-center justify-between gap-3 border-t border-border bg-muted px-6 py-4">
           {confirmed ? (
             <>
               <Link href="/dashboard">
@@ -184,8 +184,8 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
       </div>
 
       {!isConnected ? (
-        <div className="mt-6 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-4 text-[12px] text-amber-100">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-300">
+        <div className="mt-6 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-4 text-[12px] text-amber-700 dark:text-amber-100">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-600 dark:text-amber-300">
             Not connected
           </p>
           <p className="mt-1.5">
@@ -193,7 +193,7 @@ export function AllocateWizard({ initialAgent }: AllocateWizardProps) {
           </p>
         </div>
       ) : (
-        <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+        <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
           Funding from {truncateAddress(address ?? "")}
         </p>
       )}
@@ -213,22 +213,22 @@ function Stepper({ step, confirmed }: { step: StepIndex; confirmed: boolean }) {
               className={cn(
                 "flex h-7 items-center gap-2 rounded-full border px-3 font-mono text-[10px] uppercase tracking-[0.22em] transition-colors",
                 isPast
-                  ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-200"
+                  ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-600 dark:text-emerald-300"
                   : isActive
-                  ? "border-violet-500/40 bg-violet-500/[0.08] text-violet-100"
-                  : "border-white/10 bg-transparent text-zinc-500",
+                  ? "border-violet-500/40 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
+                  : "border-border bg-transparent text-muted-foreground",
               )}
             >
               <span
                 className={cn(
                   "size-1.5 rounded-full",
-                  isPast ? "bg-emerald-400" : isActive ? "bg-violet-400" : "bg-zinc-600",
+                  isPast ? "bg-emerald-400" : isActive ? "bg-violet-400" : "bg-muted-foreground",
                 )}
               />
               {label}
             </span>
             {i < STEP_LABELS.length - 1 ? (
-              <span aria-hidden className="h-px w-6 bg-white/10" />
+              <span aria-hidden className="h-px w-6 bg-foreground/10" />
             ) : null}
           </div>
         );
@@ -254,8 +254,8 @@ function StepShell({
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="px-6 py-8 md:px-10 md:py-10"
     >
-      <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">{title}</h2>
-      <p className="mt-1.5 text-sm text-zinc-400">{subtitle}</p>
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h2>
+      <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
       <div className="mt-8">{children}</div>
     </motion.div>
   );
@@ -278,28 +278,28 @@ function AgentPicker({
             key={agent.slug}
             onClick={() => onSelect(agent.slug)}
             className={cn(
-              "group flex flex-col gap-4 rounded-2xl border bg-[#0E0E12] p-5 text-left transition-all",
+              "group flex flex-col gap-4 rounded-2xl border bg-muted p-5 text-left transition-all",
               isSel
                 ? "border-violet-400/50"
-                : "border-white/10 hover:border-white/25",
+                : "border-border hover:border-foreground/30",
             )}
           >
             <div className="flex items-center gap-3">
               <AgentAvatar agent={agent.slug} size={40} />
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   {agent.glyph}
                 </p>
-                <p className="text-sm font-semibold text-zinc-100">{agent.name}</p>
+                <p className="text-sm font-semibold text-foreground">{agent.name}</p>
               </div>
               {isSel ? (
-                <span className="ml-auto inline-flex size-6 items-center justify-center rounded-full border border-violet-400/50 bg-violet-500/10 text-violet-200">
+                <span className="ml-auto inline-flex size-6 items-center justify-center rounded-full border border-violet-400/50 bg-violet-500/10 text-violet-500 dark:text-violet-200">
                   <Tick02Icon size={12} />
                 </span>
               ) : null}
             </div>
-            <p className="text-[12px] leading-relaxed text-zinc-400">{agent.tagline}</p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-[12px] leading-relaxed text-muted-foreground">{agent.tagline}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               {agent.tracks.join(" · ")}
             </p>
           </button>
@@ -354,19 +354,19 @@ function LimitField({
   suggestions: number[];
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#0E0E12] p-5">
-      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</p>
+    <div className="rounded-2xl border border-border bg-muted p-5">
+      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{label}</p>
       <div className="mt-3 flex items-baseline gap-2">
         <input
           type="number"
           min={1}
           value={value}
           onChange={(e) => onChange(Math.max(1, Number(e.target.value)))}
-          className="w-32 bg-transparent font-mono text-3xl tabular-nums tracking-tight text-zinc-100 outline-none"
+          className="w-32 bg-transparent font-mono text-3xl tabular-nums tracking-tight text-foreground outline-none"
         />
-        <span className="font-mono text-sm text-zinc-500">OKB</span>
+        <span className="font-mono text-sm text-muted-foreground">OKB</span>
       </div>
-      <p className="mt-2 text-[12px] text-zinc-500">{hint}</p>
+      <p className="mt-2 text-[12px] text-muted-foreground">{hint}</p>
       <div className="mt-4 flex flex-wrap gap-1.5">
         {suggestions.map((s) => (
           <button
@@ -376,8 +376,8 @@ function LimitField({
             className={cn(
               "rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors",
               value === s
-                ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-100"
-                : "border-white/10 bg-transparent text-zinc-400 hover:border-white/25 hover:text-zinc-100",
+                ? "border-violet-400/50 bg-violet-500/[0.08] text-violet-700 dark:text-violet-100"
+                : "border-border bg-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground",
             )}
           >
             {formatUsdt(s, { compact: true })}
@@ -396,7 +396,7 @@ function SessionForm({
   onHoursChange: (v: number) => void;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#0E0E12] p-6">
+    <div className="rounded-2xl border border-border bg-muted p-6">
       <div className="grid gap-2 md:grid-cols-4">
         {HOURS_OPTIONS.map((opt) => {
           const sel = opt.value === hours;
@@ -409,25 +409,25 @@ function SessionForm({
                 "flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition-colors",
                 sel
                   ? "border-violet-400/50 bg-violet-500/[0.06]"
-                  : "border-white/10 bg-transparent hover:border-white/25",
+                  : "border-border bg-transparent hover:border-foreground/30",
               )}
             >
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 Window
               </span>
-              <span className="font-mono text-lg text-zinc-100">{opt.label}</span>
+              <span className="font-mono text-lg text-foreground">{opt.label}</span>
             </button>
           );
         })}
       </div>
-      <div className="mt-6 rounded-xl border border-white/5 bg-[#08080A] p-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+      <div className="mt-6 rounded-xl border border-border bg-foreground/[0.02] p-4">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
           Session expires
         </p>
-        <p className="mt-1 font-mono text-base text-zinc-200">
+        <p className="mt-1 font-mono text-base text-foreground">
           in {hours < 24 ? `${hours} hours` : `${Math.round(hours / 24)} days`}
         </p>
-        <p className="mt-2 text-[12px] text-zinc-500">
+        <p className="mt-2 text-[12px] text-muted-foreground">
           Access expires automatically. You can also cancel early from your dashboard.
         </p>
       </div>
@@ -454,34 +454,34 @@ function ReviewForm({
   ];
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-white/10 bg-[#0E0E12]">
+      <div className="rounded-2xl border border-border bg-muted">
         {rows.map((row, i) => (
           <div
             key={row.label}
             className={cn(
               "grid grid-cols-[160px_1fr] items-center gap-4 px-5 py-4",
-              i < rows.length - 1 && "border-b border-white/[0.04]",
+              i < rows.length - 1 && "border-b border-border",
             )}
           >
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
               {row.label}
             </span>
-            <span className="font-mono text-sm text-zinc-200">{row.value}</span>
+            <span className="font-mono text-sm text-foreground">{row.value}</span>
           </div>
         ))}
       </div>
 
-      <ul className="space-y-2 rounded-2xl border border-white/5 bg-[#08080A] p-5 text-[12px] text-zinc-400">
+      <ul className="space-y-2 rounded-2xl border border-border bg-foreground/[0.02] p-5 text-[12px] text-muted-foreground">
         <li className="flex gap-2">
-          <ShieldBlockchainIcon size={14} className="mt-0.5 text-violet-300" />
+          <ShieldBlockchainIcon size={14} className="mt-0.5 text-violet-500 dark:text-violet-300" />
           Your money stays in your wallet. Whistle never holds it for you.
         </li>
         <li className="flex gap-2">
-          <Key01Icon size={14} className="mt-0.5 text-violet-300" />
+          <Key01Icon size={14} className="mt-0.5 text-violet-500 dark:text-violet-300" />
           {agent.name} cannot spend more than the limits you set here.
         </li>
         <li className="flex gap-2">
-          <Wallet01Icon size={14} className="mt-0.5 text-violet-300" />
+          <Wallet01Icon size={14} className="mt-0.5 text-violet-500 dark:text-violet-300" />
           One confirmation — no pop-ups during the match.
         </li>
       </ul>
@@ -499,7 +499,7 @@ function TxProgress({ state }: { state: FundState }) {
   const currentIndex = order.indexOf(state.phase);
   return (
     <div className="mt-6 rounded-2xl border border-violet-500/20 bg-violet-500/[0.04] p-4">
-      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
+      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-violet-500 dark:text-violet-300">
         {phaseLabel(state.phase)}…
       </p>
       <ul className="mt-3 space-y-2">
@@ -512,15 +512,15 @@ function TxProgress({ state }: { state: FundState }) {
                 className={cn(
                   "flex size-4 items-center justify-center rounded-full border",
                   done
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"
                     : active
-                      ? "border-violet-400/50 bg-violet-500/10 text-violet-200"
-                      : "border-white/10 text-zinc-600",
+                      ? "border-violet-400/50 bg-violet-500/10 text-violet-500 dark:text-violet-200"
+                      : "border-border text-muted-foreground",
                 )}
               >
-                {done ? <Tick02Icon size={9} /> : active ? <span className="size-1.5 animate-pulse rounded-full bg-violet-300" /> : null}
+                {done ? <Tick02Icon size={9} /> : active ? <span className="size-1.5 animate-pulse rounded-full bg-violet-500 dark:bg-violet-300" /> : null}
               </span>
-              <span className={cn(done ? "text-zinc-300" : active ? "text-violet-100" : "text-zinc-600")}>
+              <span className={cn(done ? "text-muted-foreground" : active ? "text-violet-700 dark:text-violet-100" : "text-muted-foreground")}>
                 {labels[phase]}
               </span>
             </li>
@@ -547,14 +547,14 @@ function Confirmed({
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-5">
-        <span className="inline-flex size-9 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] text-emerald-200">
+        <span className="inline-flex size-9 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] text-emerald-600 dark:text-emerald-300">
           <Tick02Icon size={14} />
         </span>
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-300">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
             Funding confirmed onchain
           </p>
-          <p className="mt-0.5 text-sm text-emerald-100">
+          <p className="mt-0.5 text-sm text-emerald-700 dark:text-emerald-100">
             {formatUsdt(ceiling)} allocated to {agent.name}. They can now work within your limits.
           </p>
         </div>
@@ -581,11 +581,11 @@ function Confirmed({
 
 function ReceiptRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0E0E12] px-4 py-3">
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+    <div className="flex items-center justify-between rounded-xl border border-border bg-muted px-4 py-3">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
         {label}
       </span>
-      <span className="font-mono text-sm text-zinc-200">{value}</span>
+      <span className="font-mono text-sm text-foreground">{value}</span>
     </div>
   );
 }

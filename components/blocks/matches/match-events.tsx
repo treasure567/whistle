@@ -47,7 +47,7 @@ function eventLabel(event: MatchEvent): string {
 
 function EventIcon({ type }: { type: MatchEvent["type"] }) {
   if (type === "goal" || type === "penalty" || type === "own-goal") {
-    return <FootballIcon className="size-3.5 text-zinc-200" aria-hidden />;
+    return <FootballIcon className="size-3.5 text-foreground" aria-hidden />;
   }
   if (type === "red-card") {
     return (
@@ -68,7 +68,7 @@ function EventIcon({ type }: { type: MatchEvent["type"] }) {
   return type === "substitution" ? (
     <ArrowUp01Icon className="size-3 text-emerald-400" aria-hidden />
   ) : (
-    <ArrowDown01Icon className="size-3 text-zinc-500" aria-hidden />
+    <ArrowDown01Icon className="size-3 text-muted-foreground" aria-hidden />
   );
 }
 
@@ -79,14 +79,14 @@ export function MatchEventsTimeline({
 }: MatchEventsTimelineProps) {
   if (events.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/10 bg-[#0B0B0E] p-8">
+      <div className="rounded-2xl border border-dashed border-border bg-card p-8">
         <div className="flex items-center gap-2">
           <span aria-hidden className="dot-live animate-pulse-glow" style={{ position: "static" }} />
-          <span className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">
+          <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
             No events yet
           </span>
         </div>
-        <p className="mt-3 text-sm text-zinc-500">
+        <p className="mt-3 text-sm text-muted-foreground">
           Goals, cards, and subs will appear here once the match gets going.
         </p>
       </div>
@@ -94,7 +94,7 @@ export function MatchEventsTimeline({
   }
 
   return (
-    <ol className="space-y-0 rounded-2xl border border-white/10 bg-[#111113]">
+    <ol className="space-y-0 rounded-2xl border border-border bg-card">
       {events.map((event, index) => {
         const sideLabel = event.team === "home" ? homeCode : awayCode;
         return (
@@ -102,18 +102,18 @@ export function MatchEventsTimeline({
             key={event.id}
             className={cn(
               "flex items-center gap-3 px-4 py-3",
-              index > 0 && "border-t border-white/10",
+              index > 0 && "border-t border-border",
             )}
           >
-            <span className="w-10 shrink-0 font-mono text-xs tabular-nums text-zinc-500">
+            <span className="w-10 shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
               {formatMatchMinute(event.minute)}
             </span>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-white/10 bg-[#0A0A0A]">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-muted">
               <EventIcon type={event.type} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-zinc-200">{eventLabel(event)}</p>
-              <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+              <p className="text-xs text-foreground">{eventLabel(event)}</p>
+              <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                 {sideLabel}
               </p>
             </div>

@@ -30,18 +30,18 @@ function StatRow({ label, home, away, format }: StatRowProps) {
         <span
           className={cn(
             "tabular-nums",
-            homeWinning ? "text-violet-300" : "text-zinc-400",
+            homeWinning ? "text-violet-500 dark:text-violet-300" : "text-muted-foreground",
           )}
         >
           {fmt(home)}
         </span>
-        <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+        <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
           {label}
         </span>
         <span
           className={cn(
             "tabular-nums",
-            !homeWinning ? "text-zinc-200" : "text-zinc-400",
+            !homeWinning ? "text-foreground" : "text-muted-foreground",
           )}
         >
           {fmt(away)}
@@ -76,10 +76,10 @@ export function MatchStatsView({
   }
 
   return (
-    <div className="space-y-5 rounded-2xl border border-white/10 bg-[#0E0E10] p-5">
-      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-400">
+    <div className="space-y-5 rounded-2xl border border-border bg-card p-5">
+      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         <span>{homeCode}</span>
-        <span className="text-zinc-600">vs</span>
+        <span className="text-muted-foreground">vs</span>
         <span>{awayCode}</span>
       </div>
       <div className="space-y-4">

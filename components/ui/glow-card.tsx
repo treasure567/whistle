@@ -25,7 +25,7 @@ export function GlowCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-white/10 bg-[#111113] transition-colors duration-200 hover:border-white/20",
+        "relative overflow-hidden rounded-2xl border border-border bg-card transition-colors duration-200 hover:border-foreground/30",
         PADDING_CLASSES[padding],
         className,
       )}

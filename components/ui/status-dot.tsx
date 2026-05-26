@@ -9,10 +9,10 @@ interface StatusDotProps {
 }
 
 const LABEL_CLASS: Record<StatusKind, string> = {
-  live: "text-red-200",
-  ok: "text-emerald-200",
-  idle: "text-zinc-400",
-  warn: "text-amber-200",
+  live: "text-red-600 dark:text-red-300",
+  ok: "text-emerald-600 dark:text-emerald-300",
+  idle: "text-muted-foreground",
+  warn: "text-amber-600 dark:text-amber-300",
 };
 
 export function StatusDot({ status = "live", label, className }: StatusDotProps) {

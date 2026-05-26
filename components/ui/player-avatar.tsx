@@ -20,7 +20,7 @@ export function PlayerAvatar({ src, name, size = 48, className }: PlayerAvatarPr
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 ring-1 ring-white/15",
+        "relative shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 ring-1 ring-border",
         className,
       )}
       style={{ width: size, height: size }}
@@ -37,7 +37,7 @@ export function PlayerAvatar({ src, name, size = 48, className }: PlayerAvatarPr
         />
       ) : (
         <div
-          className="flex h-full w-full items-center justify-center text-zinc-500"
+          className="flex h-full w-full items-center justify-center text-muted-foreground"
           role="img"
           aria-label={name}
         >

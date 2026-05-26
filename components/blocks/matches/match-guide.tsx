@@ -112,7 +112,7 @@ export function MatchGuide({
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">v</span>
             <Team code={awayCode} name={away} />
           </div>
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-violet-300">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-violet-500 dark:text-violet-300">
             <Calendar01Icon size={12} /> {dateFmt.format(match.kickoffAt)}
           </span>
         </div>
@@ -130,12 +130,12 @@ export function MatchGuide({
               <AgentAvatar agent="bookie" size={40} ring />
               <div>
                 <p className="text-sm font-semibold text-foreground">Jack&apos;s read</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-200/80">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-600/80 dark:text-amber-300/80">
                   Your bookie breaks it down
                 </p>
               </div>
               {read ? (
-                <span className="ml-auto inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-amber-300">
+                <span className="ml-auto inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-amber-600 dark:text-amber-300">
                   <SparklesIcon size={11} />
                   {read.source === "llm" ? "Live AI" : "Model"}
                 </span>
@@ -144,7 +144,7 @@ export function MatchGuide({
 
             {loading ? (
               <div className="flex items-center gap-2 rounded-2xl border border-border bg-card p-5 text-[13px] text-muted-foreground">
-                <Loading03Icon size={15} className="animate-spin text-amber-300" />
+                <Loading03Icon size={15} className="animate-spin text-amber-600 dark:text-amber-300" />
                 Jack is reading the match...
               </div>
             ) : read ? (
@@ -175,7 +175,7 @@ export function MatchGuide({
                     <div key={m.label} className="rounded-xl border border-border bg-card p-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[13px] text-foreground">{m.label}</span>
-                        <span className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/[0.08] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-amber-200">
+                        <span className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/[0.08] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-amber-600 dark:text-amber-300">
                           {m.lean}
                         </span>
                       </div>
@@ -312,7 +312,7 @@ function KeyPlayers({ code, name, players }: { code: string; name: string; playe
                   <p className="truncate text-[13px] text-foreground">{p.name}</p>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{p.position}</p>
                 </div>
-                <span className="font-mono text-[12px] tabular-nums text-violet-300">{p.priceMillions.toFixed(1)}m</span>
+                <span className="font-mono text-[12px] tabular-nums text-violet-500 dark:text-violet-300">{p.priceMillions.toFixed(1)}m</span>
               </div>
             ))}
           </div>
