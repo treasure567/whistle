@@ -1,0 +1,10 @@
+{
+  "network": "xlayerTestnet",
+  "deployedAt": "2026-05-26T11:55:52.196Z",
+  "MockERC20": "0x2CCfFdE9e4A425cb852f96CEC5fCd0Da2Be1b10A",
+  "AgentRegistry": "0x7bF81806085d7025e0ea69E59d5cDbEaA9727d32",
+  "PositionManager": "0x239bb278006Ec801888973e1A64ce3804Ac13B5e",
+  "MomentNFT": "0xBdEB594317B7D892Fed738e111c422cEea15085f",
+  "FantasyEntry": "0xe11a97417955301561572b8b00BF9822Fe329ee6",
+  "SettlementOracle": "0xB4363Ccb9D03784e5eff2766FD67B193D42EcEF0"
+}

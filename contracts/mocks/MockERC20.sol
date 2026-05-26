@@ -7,7 +7,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 /// @notice Test-only stablecoin stand-in with open minting. Never deployed
 ///         to production.
 contract MockERC20 is ERC20 {
-    constructor() ERC20("Mock USD", "mUSD") {}
+    constructor() ERC20("Whistle", "WHST") {}
 
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
