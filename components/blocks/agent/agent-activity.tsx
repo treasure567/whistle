@@ -7,15 +7,15 @@ import { ArrowRight01Icon } from "hugeicons-react";
 import { ActivityRow, ActivityTableHeader } from "@/components/ui/activity-row";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { Agent } from "@/types";
-import { RECENT_ACTIVITY } from "@/lib/mock";
+import type { Agent, ActivityItem } from "@/types";
 
 interface AgentActivityProps {
   agent: Agent;
+  items?: ReadonlyArray<ActivityItem>;
 }
 
-export function AgentActivity({ agent }: AgentActivityProps) {
-  const items = RECENT_ACTIVITY.filter((a) => a.agent === agent.slug).slice(0, 10);
+export function AgentActivity({ agent, items: feed = [] }: AgentActivityProps) {
+  const items = feed.filter((a) => a.agent === agent.slug).slice(0, 10);
 
   return (
     <section className="relative pb-20 md:pb-28">

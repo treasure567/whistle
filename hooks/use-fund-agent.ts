@@ -14,6 +14,7 @@ import {
   getContract,
 } from "@/lib/contracts";
 import { X_LAYER_CHAIN_ID } from "@/lib/chains";
+import { recordAllocation } from "@/lib/api/allocations";
 import type { AgentSlug } from "@/types";
 
 export type FundPhase =
@@ -142,6 +143,10 @@ export function useFundAgent() {
           chainId: X_LAYER_CHAIN_ID,
         });
         await waitForTransactionReceipt(wagmiConfig, { hash: txHash, chainId: X_LAYER_CHAIN_ID });
+
+        // Record the funding off-chain so the leaderboard's funded total reflects
+        // it. Non-blocking: the onchain allocate is the source of truth.
+        void recordAllocation(slug, address, amount.toString()).catch(() => undefined);
 
         setState({ phase: "success", txHash, approveHash, mintHash });
         return txHash;
