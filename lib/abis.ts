@@ -21,3 +21,10 @@ export const AGENT_REGISTRY_ABI = parseAbi([
   "function agentCount() view returns (uint256)",
   "function getAgent(uint256 agentId) view returns ((uint8 kind, string name, bytes32 strategyHash, address owner, bool active, uint64 registeredAt))",
 ]);
+
+export const MANAGER_LOG_ABI = parseAbi([
+  "function recordMatch(string nation, string opponent, uint8 ourScore, uint8 theirScore, string round, bool won) returns (uint256)",
+  "function totalMatches() view returns (uint256)",
+  "function matchesOf(address manager) view returns (uint256)",
+  "event ManagerMatchRecorded(address indexed manager, uint256 indexed matchNumber, string nation, string opponent, uint8 ourScore, uint8 theirScore, string round, bool won, uint64 playedAt)",
+]);

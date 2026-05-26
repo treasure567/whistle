@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { ArrowLeft01Icon, FootballIcon } from "hugeicons-react";
 
 import { Button } from "@/components/ui/button";
+import { ConnectButton } from "@/components/ui/connect-button";
+import { TxLink } from "@/components/ui/tx-link";
 import { CountryPicker } from "@/components/ui/country-picker";
 import { FlagOrb } from "@/components/ui/flag-orb";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
@@ -11,6 +13,8 @@ import { FlatPitch } from "@/components/blocks/manager/flat-pitch";
 import { MatchSim } from "@/components/blocks/simulate/match-sim";
 import { PenaltyShootout, type ShootoutResult } from "@/components/blocks/simulate/penalty-shootout";
 import { fetchManagerBrief } from "@/lib/api/manager";
+import { useRecordManagerMatch } from "@/hooks/use-record-manager-match";
+import { useAccount } from "wagmi";
 import type { ManagerBriefResult } from "@/lib/api/schemas";
 import type { SimTeam } from "@/lib/sim/engine";
 import { cn } from "@/lib/utils";
@@ -78,6 +82,8 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [shootout, setShootout] = useState(false);
   const [pens, setPens] = useState<{ h: number; a: number } | null>(null);
+  const { isConnected } = useAccount();
+  const { state: saveState, record: saveMatchOnchain, reset: resetSave } = useRecordManagerMatch();
 
   const squad = useMemo(() => byCode.get(country)?.players ?? [], [byCode, country]);
   const bench = useMemo(() => {
@@ -207,6 +213,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setAnalysis(null);
     setShootout(false);
     setPens(null);
+    resetSave();
     setPhase("match");
   }
 
@@ -653,7 +660,43 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                 </div>
               ) : null}
 
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <div className="mt-4 flex flex-col items-center gap-1.5">
+                {saveState.phase === "success" && saveState.txHash ? (
+                  <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300">
+                    Saved on-chain · <TxLink hash={saveState.txHash} chars={6} />
+                  </span>
+                ) : !isConnected ? (
+                  <ConnectButton compact />
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      lastScore &&
+                      void saveMatchOnchain({
+                        nation: homeSim.name,
+                        opponent: awaySim.name,
+                        ourScore: lastScore.h,
+                        theirScore: lastScore.a,
+                        round: ROUNDS[round] ?? "Knockout",
+                        won: outcome !== "eliminated",
+                      })
+                    }
+                    disabled={saveState.phase === "saving" || saveState.phase === "confirming"}
+                  >
+                    {saveState.phase === "saving"
+                      ? "Confirm in wallet…"
+                      : saveState.phase === "confirming"
+                        ? "Saving on-chain…"
+                        : "Save match on-chain"}
+                  </Button>
+                )}
+                {saveState.phase === "error" && saveState.error ? (
+                  <span className="text-[11px] text-destructive">{saveState.error}</span>
+                ) : null}
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                 <Button variant="outline" size="sm" onClick={askTomAnalysis} disabled={analysisLoading}>
                   {analysisLoading ? "Tom's reviewing the tape…" : analysis ? "Refresh analysis" : "Ask Tom for his analysis"}
                 </Button>

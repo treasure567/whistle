@@ -8,7 +8,8 @@ type ContractName =
   | "PositionManager"
   | "MomentNFT"
   | "FantasyEntry"
-  | "SettlementOracle";
+  | "SettlementOracle"
+  | "ManagerLog";
 
 type AddressBook = Record<ContractName, Address>;
 
@@ -23,6 +24,8 @@ const X_LAYER_TESTNET_ADDRESSES: AddressBook = {
     "0xe11a97417955301561572b8b00BF9822Fe329ee6") as Address,
   SettlementOracle: (process.env.NEXT_PUBLIC_SETTLEMENT_ORACLE_ADDRESS ??
     "0xB4363Ccb9D03784e5eff2766FD67B193D42EcEF0") as Address,
+  ManagerLog: (process.env.NEXT_PUBLIC_MANAGER_LOG_ADDRESS ??
+    "0x4Eb3D79345aB3fFEc5f1B9bBc36f84474BB2C85a") as Address,
 };
 
 export const CONTRACTS: Record<number, AddressBook> = {
