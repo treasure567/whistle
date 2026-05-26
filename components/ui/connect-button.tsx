@@ -17,6 +17,7 @@ import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } fro
 
 import { Button } from "@/components/ui/button";
 import { useOkbBalance } from "@/hooks/use-okb-balance";
+import { useWhstBalance } from "@/hooks/use-whst-balance";
 import { truncateAddress, explorerAddressUrl } from "@/lib/format";
 import { xLayer } from "@/lib/chains";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,7 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const chainId = useChainId();
   const { balance: okb } = useOkbBalance();
+  const { balance: whst } = useWhstBalance();
   const [copied, setCopied] = useState(false);
   const onCorrectChain = chainId === xLayer.id;
 
@@ -73,10 +75,19 @@ function ConnectedMenu({ address, compact }: { address: string; compact: boolean
 
   return (
     <div className="flex items-center gap-2">
-      {onCorrectChain && okb !== null ? (
+      {onCorrectChain && whst !== null ? (
         <span
           className="hidden items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-[11px] text-foreground sm:flex"
-          title="Your OKB balance on X Layer testnet"
+          title="Your WHST balance — the token you fund agents and bet with"
+        >
+          <span className="size-1.5 rounded-full bg-violet-400" />
+          {whst.toLocaleString(undefined, { maximumFractionDigits: 2 })} WHST
+        </span>
+      ) : null}
+      {onCorrectChain && okb !== null ? (
+        <span
+          className="hidden items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-[11px] text-foreground md:flex"
+          title="Your native OKB balance (gas) on X Layer testnet"
         >
           <span className="size-1.5 rounded-full bg-emerald-400" />
           {okb.toLocaleString(undefined, { maximumFractionDigits: 4 })} OKB
