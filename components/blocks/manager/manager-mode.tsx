@@ -34,6 +34,25 @@ const FORMATIONS: Record<string, { DEF: number; MID: number; FWD: number }> = {
 };
 const FORMATION_KEYS = Object.keys(FORMATIONS);
 
+// Tom (the LLM) may suggest shapes outside our chip set (e.g. "4-2-3-1").
+// Map any formation string to the nearest known chip by its line counts
+// (defenders / midfielders / forwards), so his plan still applies.
+function normalizeFormation(f: string | undefined): string | null {
+  if (!f) return null;
+  if (FORMATIONS[f]) return f;
+  const nums = f.split(/[^0-9]+/).filter(Boolean).map(Number);
+  if (nums.length < 2) return null;
+  const def = nums[0]!;
+  const fwd = nums[nums.length - 1]!;
+  const mid = nums.slice(1, -1).reduce((s, n) => s + n, 0);
+  return (
+    FORMATION_KEYS.find((k) => {
+      const shape = FORMATIONS[k]!;
+      return shape.DEF === def && shape.MID === mid && shape.FWD === fwd;
+    }) ?? null
+  );
+}
+
 const DIFFICULTY = [
   { id: "easy", label: "Easy", factor: 0.82 },
   { id: "normal", label: "Normal", factor: 1.0 },
@@ -185,8 +204,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   function applyPlan() {
     if (!brief) return;
     const norm = (s: string) => s.trim().toLowerCase();
-    const targetFormation =
-      brief.suggestedFormation && FORMATIONS[brief.suggestedFormation] ? brief.suggestedFormation : formation;
+    const targetFormation = normalizeFormation(brief.suggestedFormation) ?? formation;
     let next = bestXI(squad, targetFormation);
     let applied = 0;
     for (const ch of brief.suggestedChanges ?? []) {
@@ -426,7 +444,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
               <Button variant="outline" size="sm" onClick={askTom} disabled={briefLoading}>
                 {briefLoading ? "Tom's watching tape…" : brief ? "Refresh read" : "Ask Tom for his read"}
               </Button>
-              {brief && ((brief.suggestedFormation && FORMATIONS[brief.suggestedFormation]) || brief.suggestedChanges.length > 0) ? (
+              {brief && (normalizeFormation(brief.suggestedFormation) || brief.suggestedChanges.length > 0) ? (
                 <Button variant="violet" size="sm" onClick={applyPlan}>
                   Implement Tom&apos;s plan
                 </Button>
