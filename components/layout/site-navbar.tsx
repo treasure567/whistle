@@ -46,7 +46,7 @@ export function SiteNavbar() {
         initial={false}
         animate={{
           width: scrolled ? "94%" : "100%",
-          maxWidth: scrolled ? 1080 : 1440,
+          maxWidth: scrolled ? 1240 : 1440,
           marginTop: scrolled ? 14 : 0,
           borderRadius: scrolled ? 999 : 0,
           paddingLeft: scrolled ? 10 : 0,
@@ -72,7 +72,7 @@ export function SiteNavbar() {
             <span className="font-mono text-base tracking-tight text-foreground">whistle</span>
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">
             {NAV_LINKS.map((link) => {
               const isActive =
                 link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -81,7 +81,7 @@ export function SiteNavbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "rounded-full px-3.5 py-1.5 text-[13px] font-medium tracking-tight transition-all duration-200",
+                    "rounded-full px-3 py-1.5 text-[13px] font-medium tracking-tight transition-all duration-200",
                     isActive
                       ? "bg-foreground/[0.06] text-foreground"
                       : "text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground",
@@ -100,7 +100,7 @@ export function SiteNavbar() {
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-foreground/5 text-foreground lg:hidden"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-foreground/5 text-foreground xl:hidden"
             >
               <Menu03Icon className="size-4" />
             </button>
@@ -116,7 +116,7 @@ export function SiteNavbar() {
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -8, height: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 32 }}
-            className="mx-4 mt-2 w-[calc(100%-2rem)] max-w-[880px] overflow-hidden rounded-2xl border border-border bg-popover/95 backdrop-blur-2xl dark:border-white/10 dark:bg-[rgba(10,10,10,0.92)] lg:hidden"
+            className="mx-4 mt-2 w-[calc(100%-2rem)] max-w-[880px] overflow-hidden rounded-2xl border border-border bg-popover/95 backdrop-blur-2xl dark:border-white/10 dark:bg-[rgba(10,10,10,0.92)] xl:hidden"
           >
             <div className="flex flex-col gap-1 p-5">
               {NAV_LINKS.map((link, i) => (

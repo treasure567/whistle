@@ -197,7 +197,7 @@ export function MatchSim({
     if (bet) {
       if (settled) {
         return settled.won
-          ? `Get in! The ${pickLabel(bet.pick)} call lands +${settled.payout} OKB. Told you I knew this one.`
+          ? `Get in! The ${pickLabel(bet.pick)} call lands +${settled.payout} WHST. Told you I knew this one.`
           : `Cruel game. The ${pickLabel(bet.pick)} bet didn't come off. We dust ourselves down and go again.`;
       }
       const lead: Pick = homeScore > awayScore ? "home" : awayScore > homeScore ? "away" : "draw";
@@ -360,7 +360,7 @@ export function MatchSim({
                 </span>
               ) : null}
               <span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-600 dark:text-amber-300" suppressHydrationWarning>
-                {balance} OKB
+                {balance} WHST
               </span>
             </span>
           </div>
@@ -406,7 +406,7 @@ export function MatchSim({
                   disabled={Boolean(result)}
                   className="w-24 rounded-lg border border-border bg-background px-2 py-1.5 text-right font-mono text-sm text-foreground outline-none disabled:opacity-50"
                 />
-                <span className="font-mono text-[11px] text-muted-foreground">OKB</span>
+                <span className="font-mono text-[11px] text-muted-foreground">WHST</span>
                 <Button variant="violet" size="sm" onClick={placeBet} disabled={Boolean(result) || stake <= 0 || stake > balance} className="ml-auto">
                   Place · win {Math.round(stake * odds[pick])}
                 </Button>
@@ -420,7 +420,7 @@ export function MatchSim({
               )}
             >
               <span className={cn("font-mono text-[11px] uppercase tracking-[0.18em]", settled.won ? "text-emerald-600 dark:text-emerald-300" : "text-red-600 dark:text-red-300")}>
-                {settled.won ? `Won +${settled.payout} OKB` : `Lost ${bet.stake} OKB`}
+                {settled.won ? `Won +${settled.payout} WHST` : `Lost ${bet.stake} WHST`}
               </span>
               <span className="font-mono text-[11px] text-muted-foreground">
                 {pickLabel(bet.pick)} @ {bet.odds.toFixed(2)}
@@ -432,7 +432,7 @@ export function MatchSim({
             </Button>
           ) : (
             <div className="flex items-center justify-between rounded-xl border border-violet-400/30 bg-violet-500/[0.05] p-3">
-              <span className="font-mono text-[11px] text-violet-700 dark:text-violet-100">Live: {pickLabel(bet.pick)} · {bet.stake} OKB</span>
+              <span className="font-mono text-[11px] text-violet-700 dark:text-violet-100">Live: {pickLabel(bet.pick)} · {bet.stake} WHST</span>
               <span className="font-mono text-[11px] text-muted-foreground">to win {Math.round(bet.stake * bet.odds)}</span>
             </div>
           )}

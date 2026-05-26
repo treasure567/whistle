@@ -29,7 +29,7 @@ function readableError(err: unknown): string {
   return message.split("\n")[0]?.slice(0, 160) ?? "Transaction failed.";
 }
 
-// Mints the MockERC20 test OKB (open faucet token) straight to the connected
+// Mints the MockERC20 test WHST (open faucet token) straight to the connected
 // wallet. This is the spendable balance used to fund agents and place bets;
 // native OKB is only needed for gas.
 export function useMintToken() {

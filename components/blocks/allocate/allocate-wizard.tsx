@@ -364,7 +364,7 @@ function LimitField({
           onChange={(e) => onChange(Math.max(1, Number(e.target.value)))}
           className="w-32 bg-transparent font-mono text-3xl tabular-nums tracking-tight text-foreground outline-none"
         />
-        <span className="font-mono text-sm text-muted-foreground">OKB</span>
+        <span className="font-mono text-sm text-muted-foreground">WHST</span>
       </div>
       <p className="mt-2 text-[12px] text-muted-foreground">{hint}</p>
       <div className="mt-4 flex flex-wrap gap-1.5">
@@ -492,7 +492,7 @@ function ReviewForm({
 function TxProgress({ state }: { state: FundState }) {
   const order: FundPhase[] = ["minting", "approving", "allocating"];
   const labels: Record<string, string> = {
-    minting: "Mint test OKB",
+    minting: "Mint test WHST",
     approving: "Approve spend",
     allocating: "Fund agent onchain",
   };

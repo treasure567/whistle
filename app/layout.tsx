@@ -126,7 +126,7 @@ const structuredData = {
       offers: {
         "@type": "Offer",
         price: "0",
-        priceCurrency: "OKB",
+        priceCurrency: "WHST",
       },
       featureList: [
         "Three AI helpers: Emma, Jack, Tom",

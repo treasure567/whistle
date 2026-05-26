@@ -17,7 +17,7 @@ const allocationResultSchema = z.unknown();
 export async function recordAllocation(slug: AgentSlug, userAddress: string, amountWei: string): Promise<void> {
   await apiPost(
     "/allocations",
-    { kind: SLUG_TO_KIND[slug], userAddress, amount: amountWei, asset: "OKB" },
+    { kind: SLUG_TO_KIND[slug], userAddress, amount: amountWei, asset: "WHST" },
     allocationResultSchema,
   );
 }

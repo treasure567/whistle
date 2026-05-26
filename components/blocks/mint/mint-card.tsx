@@ -61,10 +61,10 @@ export function MintCard() {
         <div className="flex items-center justify-between gap-4 border-b border-border bg-foreground/[0.02] px-6 py-5">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              Your test OKB
+              Your test WHST
             </p>
             <p className="mt-1 font-mono text-2xl tabular-nums tracking-tight text-foreground">
-              {balanceLabel} <span className="text-sm text-muted-foreground">OKB</span>
+              {balanceLabel} <span className="text-sm text-muted-foreground">WHST</span>
             </p>
           </div>
           <span className="inline-flex size-11 items-center justify-center rounded-2xl border border-primary/30 bg-primary/[0.08] text-primary">
@@ -92,7 +92,7 @@ export function MintCard() {
                 disabled={busy}
                 className="w-40 bg-transparent font-mono text-4xl tabular-nums tracking-tight text-foreground outline-none disabled:opacity-50"
               />
-              <span className="font-mono text-sm text-muted-foreground">OKB</span>
+              <span className="font-mono text-sm text-muted-foreground">WHST</span>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-1.5">
@@ -126,7 +126,7 @@ export function MintCard() {
                     </>
                   ) : (
                     <>
-                      Mint {amount.toLocaleString()} test OKB
+                      Mint {amount.toLocaleString()} test WHST
                       <ArrowRight01Icon size={15} />
                     </>
                   )}
@@ -141,7 +141,7 @@ export function MintCard() {
             ) : null}
 
             <p className="mt-4 text-[12px] leading-relaxed text-muted-foreground">
-              Test OKB is free and only works on X Layer testnet. You need a small
+              Test WHST is free and only works on X Layer testnet. You need a small
               amount of native OKB for gas to mint.
             </p>
           </div>
@@ -168,7 +168,7 @@ function MintSuccess({ state, onMintMore }: { state: MintState; onMintMore: () =
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
             Minted onchain
           </p>
-          <p className="mt-0.5 text-sm text-foreground">Your test OKB is in your wallet.</p>
+          <p className="mt-0.5 text-sm text-foreground">Your test WHST is in your wallet.</p>
         </div>
       </div>
 

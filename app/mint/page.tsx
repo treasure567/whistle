@@ -4,9 +4,9 @@ import { MintCard } from "@/components/blocks/mint/mint-card";
 import { AmbientGlow } from "@/components/ui/ambient-glow";
 
 export const metadata = {
-  title: "Mint test OKB",
+  title: "Mint test WHST",
   description:
-    "Mint free test OKB on X Layer testnet. It's the balance you use to fund Emma, Jack, and Tom and to place bets.",
+    "Mint free test WHST on X Layer testnet. It's the balance you use to fund Emma, Jack, and Tom and to place bets.",
 };
 
 export default function MintPage() {
@@ -20,10 +20,10 @@ export default function MintPage() {
             Testnet faucet
           </span>
           <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">
-            Mint your <span className="font-serif-italic text-primary">test OKB.</span>
+            Mint your <span className="font-serif-italic text-primary">test WHST.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Test OKB is free play money on X Layer testnet. Mint as much as you
+            Test WHST is free play money on X Layer testnet. Mint as much as you
             need, then use it to fund Emma, Jack, and Tom or to back a call.
           </p>
         </div>

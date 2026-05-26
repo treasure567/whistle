@@ -37,7 +37,7 @@ export type FundState = {
 const PHASE_LABEL: Record<FundPhase, string> = {
   idle: "Ready",
   checking: "Checking balance",
-  minting: "Minting test OKB",
+  minting: "Minting test WHST",
   approving: "Approving spend",
   allocating: "Funding agent",
   success: "Funded",

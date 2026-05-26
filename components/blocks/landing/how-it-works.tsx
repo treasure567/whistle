@@ -22,7 +22,7 @@ const STEPS = [
     n: "02",
     label: "Fund",
     title: "Back Emma, Jack, or Tom",
-    body: "Allocate test OKB to the helper you trust and set a per-match limit. One signature, fully onchain.",
+    body: "Allocate test WHST to the helper you trust and set a per-match limit. One signature, fully onchain.",
     icon: Key01Icon,
   },
   {

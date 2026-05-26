@@ -12,7 +12,7 @@ function read(): number {
   return Number.isFinite(n) ? n : START;
 }
 
-// Sandbox OKB bankroll for betting on simulated matches. Persisted to
+// Sandbox WHST bankroll for betting on simulated matches. Persisted to
 // localStorage; lazy-read so there's no setState-in-effect. Kept off-chain
 // because simulated ties have no settlement oracle to pay out against.
 export function useVirtualWallet() {
