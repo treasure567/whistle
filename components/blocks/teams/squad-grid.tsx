@@ -45,7 +45,7 @@ function PlayerCard({ player, index }: { player: SquadPlayer; index: number }) {
     >
       <GlowCard padding="none" className="overflow-hidden">
         <div className="flex items-center gap-3 p-3">
-          <PlayerAvatar src={player.photo} name={player.name} size={52} />
+          <PlayerAvatar src={player.photo ?? undefined} name={player.name} size={52} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] text-muted-foreground">

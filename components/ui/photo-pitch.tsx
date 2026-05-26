@@ -52,7 +52,7 @@ function Token({ slot, side }: { slot: LineupPlayer; side: "home" | "away" }) {
   return (
     <div className="flex w-[60px] flex-col items-center gap-1">
       <div className={cn("relative rounded-full ring-2", accent)}>
-        <PlayerAvatar src={player?.photo} name={displayName} size={44} />
+        <PlayerAvatar src={player?.photo ?? undefined} name={displayName} size={44} />
         <span
           className={cn(
             "absolute -bottom-1 -right-1 inline-flex h-[18px] min-w-[20px] items-center justify-center rounded-full px-1 font-mono text-[10px] font-semibold leading-none tabular-nums shadow",

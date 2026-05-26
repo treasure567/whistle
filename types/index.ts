@@ -177,12 +177,12 @@ export interface MatchLineup {
 }
 
 export interface SquadPlayer {
-  id: number;
+  id: string | number;
   number: number | null;
   position: string | null;
   name: string;
   age: number | null;
-  photo: string;
+  photo: string | null;
 }
 
 export interface Squad {

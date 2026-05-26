@@ -51,7 +51,7 @@ function BenchSide({
         {bench.map((p) => (
           <GlowCard key={p.id} padding="none">
             <div className="flex items-center gap-2.5 p-2.5">
-              <PlayerAvatar src={p.photo} name={p.name} size={32} />
+              <PlayerAvatar src={p.photo ?? undefined} name={p.name} size={32} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[12px] text-foreground">{p.name}</p>
                 <p className="font-mono text-[10px] text-muted-foreground">
