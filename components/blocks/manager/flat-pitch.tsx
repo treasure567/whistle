@@ -21,11 +21,13 @@ function shortName(name: string): string {
 export function FlatPitch({
   players,
   activeId,
+  highlightIds,
   onSelect,
   className,
 }: {
   players: PitchPlayer[];
   activeId?: string | null;
+  highlightIds?: ReadonlyArray<string>;
   onSelect?: (player: PitchPlayer) => void;
   className?: string;
 }) {
@@ -55,6 +57,8 @@ export function FlatPitch({
                     key={p.id}
                     player={p}
                     active={activeId === p.id}
+                    valid={Boolean(highlightIds?.includes(p.id))}
+                    dim={Boolean(activeId) && activeId !== p.id && !highlightIds?.includes(p.id)}
                     onSelect={onSelect ? () => onSelect(p) : undefined}
                   />
                 ))
@@ -67,7 +71,19 @@ export function FlatPitch({
   );
 }
 
-function Token({ player, active, onSelect }: { player: PitchPlayer; active: boolean; onSelect?: () => void }) {
+function Token({
+  player,
+  active,
+  valid,
+  dim,
+  onSelect,
+}: {
+  player: PitchPlayer;
+  active: boolean;
+  valid?: boolean;
+  dim?: boolean;
+  onSelect?: () => void;
+}) {
   return (
     <button
       type="button"
@@ -75,14 +91,19 @@ function Token({ player, active, onSelect }: { player: PitchPlayer; active: bool
       disabled={!onSelect}
       title={player.name}
       className={cn(
-        "group flex w-[52px] shrink-0 flex-col items-center gap-1 sm:w-[60px]",
+        "group flex w-[52px] shrink-0 flex-col items-center gap-1 transition-opacity sm:w-[60px]",
         onSelect ? "cursor-pointer" : "cursor-default",
+        dim && "opacity-40",
       )}
     >
       <div
         className={cn(
           "relative rounded-full ring-2 transition-all",
-          active ? "scale-110 ring-violet-400" : "ring-white/30 group-hover:ring-violet-300 group-active:scale-95",
+          active
+            ? "scale-110 ring-violet-400"
+            : valid
+              ? "ring-emerald-400 group-hover:ring-emerald-300"
+              : "ring-white/30 group-hover:ring-violet-300 group-active:scale-95",
         )}
       >
         <PlayerAvatar src={player.photo ?? undefined} name={player.name} size={40} />

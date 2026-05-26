@@ -21,9 +21,12 @@ export type ManagerTeam = { code: string; name: string; players: ManagerPlayer[]
 const FORMATIONS: Record<string, { DEF: number; MID: number; FWD: number }> = {
   "4-4-2": { DEF: 4, MID: 4, FWD: 2 },
   "4-3-3": { DEF: 4, MID: 3, FWD: 3 },
+  "4-2-4": { DEF: 4, MID: 2, FWD: 4 },
+  "3-4-3": { DEF: 3, MID: 4, FWD: 3 },
   "3-5-2": { DEF: 3, MID: 5, FWD: 2 },
-  "5-3-2": { DEF: 5, MID: 3, FWD: 2 },
   "4-5-1": { DEF: 4, MID: 5, FWD: 1 },
+  "5-3-2": { DEF: 5, MID: 3, FWD: 2 },
+  "5-4-1": { DEF: 5, MID: 4, FWD: 1 },
 };
 const FORMATION_KEYS = Object.keys(FORMATIONS);
 
@@ -64,6 +67,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   const [formation, setFormation] = useState("4-3-3");
   const [xi, setXi] = useState<ManagerPlayer[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [planNote, setPlanNote] = useState<string | null>(null);
   const [opponent, setOpponent] = useState<string>("");
   const [round, setRound] = useState(0);
   const [outcome, setOutcome] = useState<null | "advanced" | "eliminated" | "champion">(null);
@@ -81,6 +85,30 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     return squad.filter((p) => !ids.has(p.id));
   }, [squad, xi]);
 
+  const selected = useMemo(
+    () => xi.find((p) => p.id === activeId) ?? bench.find((p) => p.id === activeId) ?? null,
+    [xi, bench, activeId],
+  );
+  const selectedInXi = selected ? xi.some((p) => p.id === selected.id) : false;
+  const validTargetIds = useMemo(() => {
+    if (!selected) return new Set<string>();
+    return new Set(
+      [...xi, ...bench]
+        .filter((p) => p.id !== selected.id && p.position === selected.position)
+        .map((p) => p.id),
+    );
+  }, [selected, xi, bench]);
+  const swapTargets = useMemo(() => {
+    if (!selected) return [] as ManagerPlayer[];
+    return (selectedInXi ? bench : xi).filter((p) => p.position === selected.position && p.id !== selected.id);
+  }, [selected, selectedInXi, bench, xi]);
+  const orderedBench = useMemo(() => {
+    if (!selected) return bench;
+    const valid = bench.filter((p) => validTargetIds.has(p.id));
+    const rest = bench.filter((p) => !validTargetIds.has(p.id));
+    return [...valid, ...rest];
+  }, [bench, selected, validTargetIds]);
+
   function pickOpponent() {
     const others = teams.filter((t) => t.code !== country);
     const opp = others[Math.floor(Math.random() * others.length)];
@@ -90,6 +118,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
   function startSquad() {
     setXi(bestXI(squad, formation));
     setActiveId(null);
+    setPlanNote(null);
     setBrief(null);
     setAnalysis(null);
     setRound(0);
@@ -101,13 +130,75 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setFormation(f);
     setXi(bestXI(squad, f));
     setActiveId(null);
+    setPlanNote(null);
   }
 
-  function swapIn(benchPlayer: ManagerPlayer) {
-    const active = xi.find((p) => p.id === activeId);
-    if (!active || active.position !== benchPlayer.position) return;
-    setXi((prev) => prev.map((p) => (p.id === active.id ? benchPlayer : p)));
+  function applySwap(a: ManagerPlayer, b: ManagerPlayer) {
+    setPlanNote(null);
+    const aInXi = xi.some((p) => p.id === a.id);
+    const bInXi = xi.some((p) => p.id === b.id);
+    if (aInXi && bInXi) {
+      setXi((prev) => {
+        const next = [...prev];
+        const i = next.findIndex((p) => p.id === a.id);
+        const j = next.findIndex((p) => p.id === b.id);
+        if (i < 0 || j < 0) return prev;
+        const tmp = next[i]!;
+        next[i] = next[j]!;
+        next[j] = tmp;
+        return next;
+      });
+    } else {
+      const field = aInXi ? a : b;
+      const sub = aInXi ? b : a;
+      setXi((prev) => prev.map((p) => (p.id === field.id ? sub : p)));
+    }
+  }
+
+  // Tap any player (pitch or bench) to select; tap a same-position player to
+  // swap them. Field<->bench is a substitution; field<->field repositions.
+  function tapPlayer(id: string) {
+    if (activeId === id) {
+      setActiveId(null);
+      return;
+    }
+    if (!activeId) {
+      setActiveId(id);
+      return;
+    }
+    const sel = xi.find((x) => x.id === activeId) ?? bench.find((x) => x.id === activeId);
+    const target = xi.find((x) => x.id === id) ?? bench.find((x) => x.id === id);
+    if (sel && target && sel.id !== target.id && sel.position === target.position) {
+      applySwap(sel, target);
+      setActiveId(null);
+    } else {
+      setActiveId(id);
+    }
+  }
+
+  function applyPlan() {
+    if (!brief) return;
+    const norm = (s: string) => s.trim().toLowerCase();
+    const targetFormation =
+      brief.suggestedFormation && FORMATIONS[brief.suggestedFormation] ? brief.suggestedFormation : formation;
+    let next = bestXI(squad, targetFormation);
+    let applied = 0;
+    for (const ch of brief.suggestedChanges ?? []) {
+      const inP = squad.find((p) => norm(p.name) === norm(ch.in));
+      const outP = next.find((p) => norm(p.name) === norm(ch.out));
+      if (inP && outP && inP.position === outP.position && !next.some((p) => p.id === inP.id)) {
+        next = next.map((p) => (p.id === outP.id ? inP : p));
+        applied += 1;
+      }
+    }
+    const changedFormation = targetFormation !== formation;
+    setFormation(targetFormation);
+    setXi(next);
     setActiveId(null);
+    const parts: string[] = [];
+    if (changedFormation) parts.push(`switched to ${targetFormation}`);
+    if (applied) parts.push(`${applied} change${applied > 1 ? "s" : ""}`);
+    setPlanNote(parts.length ? `Applied Tom's plan: ${parts.join(", ")}.` : "Tom's plan already matches your lineup.");
   }
 
   function kickOff() {
@@ -128,6 +219,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setLastScore(null);
     setBrief(null);
     setAnalysis(null);
+    setPlanNote(null);
     setShootout(false);
     setPens(null);
     setPhase("squad");
@@ -139,6 +231,7 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
     setLastScore(null);
     setBrief(null);
     setAnalysis(null);
+    setPlanNote(null);
     setShootout(false);
     setPens(null);
     pickOpponent();
@@ -322,9 +415,21 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                 Ask Tom to scout {awaySim?.name ?? "the opponent"} and suggest tweaks before kickoff.
               </p>
             )}
-            <Button variant="outline" size="sm" onClick={askTom} disabled={briefLoading} className="mt-3">
-              {briefLoading ? "Tom's watching tape…" : brief ? "Refresh read" : "Ask Tom for his read"}
-            </Button>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" onClick={askTom} disabled={briefLoading}>
+                {briefLoading ? "Tom's watching tape…" : brief ? "Refresh read" : "Ask Tom for his read"}
+              </Button>
+              {brief && ((brief.suggestedFormation && FORMATIONS[brief.suggestedFormation]) || brief.suggestedChanges.length > 0) ? (
+                <Button variant="violet" size="sm" onClick={applyPlan}>
+                  Implement Tom&apos;s plan
+                </Button>
+              ) : null}
+              {planNote ? (
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-300">
+                  {planNote}
+                </span>
+              ) : null}
+            </div>
           </div>
           <div className="grid items-start gap-6 md:grid-cols-[1fr_1fr]">
           <div className="flex flex-col gap-3">
@@ -342,34 +447,85 @@ export function ManagerMode({ teams }: { teams: ManagerTeam[] }) {
                 <Chip key={f} active={formation === f} onClick={() => changeFormation(f)} label={f} />
               ))}
             </div>
-            <FlatPitch players={xi} activeId={activeId} onSelect={(p) => setActiveId(p.id)} />
-            <p className="text-[11px] text-muted-foreground">
-              Tap a player on the pitch, then tap a sub of the same position to swap.
-            </p>
+            <FlatPitch
+              players={xi}
+              activeId={activeId}
+              highlightIds={[...validTargetIds]}
+              onSelect={(p) => tapPlayer(p.id)}
+            />
+            {selected ? (
+              <div className="rounded-xl border border-violet-400/30 bg-violet-500/[0.05] p-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-violet-700 dark:text-violet-200">
+                  {selectedInXi ? "Sub off" : "Bring on"} {selected.name} · {selected.position}
+                </p>
+                {swapTargets.length > 0 ? (
+                  <>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Tap {selectedInXi ? "a replacement" : "a starter"} below or any highlighted player to swap.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {swapTargets.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => tapPlayer(t.id)}
+                          className="flex items-center gap-1.5 rounded-full border border-violet-400/40 bg-violet-500/[0.06] py-1 pl-1 pr-2.5 transition-colors hover:bg-violet-500/[0.14]"
+                        >
+                          <PlayerAvatar src={t.photo ?? undefined} name={t.name} size={20} />
+                          <span className="max-w-[8rem] truncate text-[12px] text-foreground">{t.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    No same-position option available. Tap {selected.name} again to cancel.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-[11px] text-muted-foreground">
+                Tap any player on the pitch or bench, then tap another in the same position to swap or sub.
+              </p>
+            )}
             <Button variant="violet" size="lg" onClick={kickOff}>
               <FootballIcon size={14} /> Play your match
             </Button>
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              Bench · tap to sub in
-            </p>
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Bench · {bench.length}
+              </p>
+              {selected ? (
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-violet-700 dark:text-violet-200">
+                  {validTargetIds.size} {selected.position} option{validTargetIds.size === 1 ? "" : "s"}
+                </span>
+              ) : (
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                  tap to select
+                </span>
+              )}
+            </div>
             <div className="flex max-h-[26rem] flex-col gap-1.5 overflow-y-auto">
-              {bench.map((p) => {
-                const active = xi.find((s) => s.id === activeId);
-                const swappable = active && active.position === p.position;
+              {orderedBench.map((p) => {
+                const isSel = activeId === p.id;
+                const isValid = validTargetIds.has(p.id);
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => swapIn(p)}
-                    disabled={!swappable}
+                    onClick={() => tapPlayer(p.id)}
                     className={cn(
-                      "flex items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors",
-                      swappable
-                        ? "border-violet-400/40 bg-violet-500/[0.06] hover:bg-violet-500/[0.12]"
-                        : "border-border opacity-60",
+                      "flex items-center justify-between rounded-xl border px-3 py-2 text-left transition-all",
+                      isSel
+                        ? "border-violet-400 bg-violet-500/[0.14]"
+                        : isValid
+                          ? "border-violet-400/40 bg-violet-500/[0.06] hover:bg-violet-500/[0.12]"
+                          : selected
+                            ? "border-border opacity-50 hover:opacity-100"
+                            : "border-border hover:border-violet-400/30",
                     )}
                   >
                     <span className="flex min-w-0 items-center gap-2.5">

@@ -188,6 +188,8 @@ export const managerBriefSchema = z.object({
   verdict: z.string(),
   opponentRead: z.string(),
   suggestions: z.array(z.string()).default([]),
+  suggestedFormation: z.string().optional(),
+  suggestedChanges: z.array(z.object({ out: z.string(), in: z.string() })).default([]),
   source: z.enum(["llm", "heuristic"]),
 });
 export type ManagerBriefResult = z.infer<typeof managerBriefSchema>;
