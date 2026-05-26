@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { ChampionIcon, FootballIcon, VolumeHighIcon, VolumeOffIcon } from "hugeicons-react";
 
@@ -363,7 +364,7 @@ export function MatchSim({
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="flex items-center gap-2">
               <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-violet-500 font-mono text-[10px] font-semibold text-white">J</span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{"Jack's desk"}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{"Jack's desk · practice"}</span>
             </span>
             <span className="flex items-center gap-2">
               {onchainOkb !== null ? (
@@ -385,6 +386,14 @@ export function MatchSim({
             <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-violet-400" />
             <span className="text-[12px] leading-relaxed text-violet-700 dark:text-violet-100">{jackAdvice}</span>
           </div>
+
+          <p className="mb-2 text-[11px] leading-relaxed text-muted-foreground">
+            Practice bets only — your real WHST isn&apos;t staked here.{" "}
+            <Link href="/play/predict" className="text-violet-600 underline-offset-2 hover:underline dark:text-violet-300">
+              Back a real call on Predict
+            </Link>
+            .
+          </p>
 
           {!bet ? (
             <>

@@ -22,6 +22,8 @@ import { useMyTeam } from "@/hooks/use-my-team";
 import { useOnchainAllocations } from "@/hooks/use-onchain-allocations";
 import { useOkbBalance } from "@/hooks/use-okb-balance";
 import { useWhstBalance } from "@/hooks/use-whst-balance";
+import { useWithdrawAllocation } from "@/hooks/use-withdraw-allocation";
+import type { AgentSlug } from "@/types";
 import { fetchPredictions } from "@/lib/api/predictions";
 import type { FantasyTeamRecord, PredictionRecord } from "@/lib/api/schemas";
 import { AGENTS } from "@/lib/mock";
@@ -32,10 +34,18 @@ const spring = { type: "spring" as const, stiffness: 280, damping: 30 };
 
 export function DashboardShell() {
   const { isConnected, address } = useAccount();
-  const { allocations, totalFunded, fundedCount } = useOnchainAllocations();
+  const { allocations, totalFunded, fundedCount, refetch: refetchAllocations } = useOnchainAllocations();
   const { team } = useMyTeam();
   const { balance: whst } = useWhstBalance();
   const { balance: okb } = useOkbBalance();
+  const { state: withdrawState, withdraw } = useWithdrawAllocation();
+  const [withdrawingSlug, setWithdrawingSlug] = useState<AgentSlug | null>(null);
+
+  async function handleWithdraw(slug: AgentSlug) {
+    setWithdrawingSlug(slug);
+    const tx = await withdraw(slug);
+    if (tx) void refetchAllocations();
+  }
   const [predictions, setPredictions] = useState<PredictionRecord[]>([]);
 
   useEffect(() => {
@@ -177,20 +187,46 @@ export function DashboardShell() {
                     {funded ? "funded" : "idle"}
                   </span>
                 </div>
-                <div className="flex items-end justify-between border-t border-border pt-4">
-                  <div>
+                <div className="flex items-end justify-between gap-2 border-t border-border pt-4">
+                  <div className="min-w-0">
                     <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                       Allocated
                     </p>
                     <p className="mt-1 font-mono text-lg tabular-nums text-foreground">
                       {formatUsdt(a.fundedUsdt)}
                     </p>
+                    {withdrawingSlug === a.slug && withdrawState.phase === "success" && withdrawState.txHash ? (
+                      <span className="mt-1 inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-300">
+                        Withdrawn · <TxLink hash={withdrawState.txHash} chars={5} />
+                      </span>
+                    ) : withdrawingSlug === a.slug && withdrawState.phase === "error" && withdrawState.error ? (
+                      <span className="mt-1 block text-[10px] text-destructive">{withdrawState.error}</span>
+                    ) : null}
                   </div>
-                  <Link href={`/allocate?agent=${a.slug}`}>
-                    <Button variant="outline" size="sm">
-                      {funded ? "Top up" : "Fund"}
-                    </Button>
-                  </Link>
+                  <div className="flex shrink-0 gap-2">
+                    {funded ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => void handleWithdraw(a.slug)}
+                        disabled={
+                          withdrawingSlug === a.slug &&
+                          (withdrawState.phase === "withdrawing" || withdrawState.phase === "confirming")
+                        }
+                      >
+                        {withdrawingSlug === a.slug && withdrawState.phase === "withdrawing"
+                          ? "Confirm…"
+                          : withdrawingSlug === a.slug && withdrawState.phase === "confirming"
+                            ? "Withdrawing…"
+                            : "Withdraw"}
+                      </Button>
+                    ) : null}
+                    <Link href={`/allocate?agent=${a.slug}`}>
+                      <Button variant="outline" size="sm">
+                        {funded ? "Top up" : "Fund"}
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             );
