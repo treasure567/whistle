@@ -30,7 +30,7 @@ GET /v1/agents/:kind
 <CodeGroup>
 
 ```bash curl
-curl https://api.whistle.app/v1/agents/emma \
+curl https://whistle.cfz.ng/v1/agents/emma \
   -H "x-service-auth: sk_live_••••••••••••"
 ```
 
@@ -121,7 +121,7 @@ GET  /v1/allocations
 <CodeGroup>
 
 ```bash curl
-curl -X POST https://api.whistle.app/v1/allocations \
+curl -X POST https://whistle.cfz.ng/v1/allocations \
   -H "Content-Type: application/json" \
   -H "x-service-auth: sk_live_••••••••••••" \
   -d '{ "agentKind": "jack", "amount": 10 }'

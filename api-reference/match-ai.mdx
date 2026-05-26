@@ -107,7 +107,7 @@ Simulate a match minute-by-minute and return a full event timeline, stats, and M
 <CodeGroup>
 
 ```bash curl
-curl -X POST https://api.whistle.app/v1/sim/match \
+curl -X POST https://whistle.cfz.ng/v1/sim/match \
   -H "Content-Type: application/json" \
   -H "x-service-auth: sk_live_••••••••••••" \
   -d '{
@@ -207,7 +207,7 @@ Tom the Manager analyses your XI and returns a tactical verdict, an opponent rea
 <CodeGroup>
 
 ```bash Pre-match
-curl -X POST https://api.whistle.app/v1/manager/brief \
+curl -X POST https://whistle.cfz.ng/v1/manager/brief \
   -H "Content-Type: application/json" \
   -H "x-service-auth: sk_live_••••••••••••" \
   -d '{
@@ -243,7 +243,7 @@ curl -X POST https://api.whistle.app/v1/manager/brief \
 ```
 
 ```bash Post-match
-curl -X POST https://api.whistle.app/v1/manager/brief \
+curl -X POST https://whistle.cfz.ng/v1/manager/brief \
   -H "Content-Type: application/json" \
   -H "x-service-auth: sk_live_••••••••••••" \
   -d '{
