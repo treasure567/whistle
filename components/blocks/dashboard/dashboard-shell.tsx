@@ -20,6 +20,8 @@ import { StatBlock } from "@/components/ui/stat-block";
 import { TxLink } from "@/components/ui/tx-link";
 import { useMyTeam } from "@/hooks/use-my-team";
 import { useOnchainAllocations } from "@/hooks/use-onchain-allocations";
+import { useOkbBalance } from "@/hooks/use-okb-balance";
+import { useWhstBalance } from "@/hooks/use-whst-balance";
 import { fetchPredictions } from "@/lib/api/predictions";
 import type { FantasyTeamRecord, PredictionRecord } from "@/lib/api/schemas";
 import { AGENTS } from "@/lib/mock";
@@ -32,6 +34,8 @@ export function DashboardShell() {
   const { isConnected, address } = useAccount();
   const { allocations, totalFunded, fundedCount } = useOnchainAllocations();
   const { team } = useMyTeam();
+  const { balance: whst } = useWhstBalance();
+  const { balance: okb } = useOkbBalance();
   const [predictions, setPredictions] = useState<PredictionRecord[]>([]);
 
   useEffect(() => {
@@ -88,6 +92,22 @@ export function DashboardShell() {
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
             {truncateAddress(address, 6)} · X Layer
           </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-[11px] text-foreground"
+              title="Your WHST balance — the token you fund agents and bet with"
+            >
+              <span className="size-1.5 rounded-full bg-violet-400" />
+              {whst !== null ? whst.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "—"} WHST
+            </span>
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-[11px] text-foreground"
+              title="Your native OKB (gas) on X Layer testnet"
+            >
+              <span className="size-1.5 rounded-full bg-emerald-400" />
+              {okb !== null ? okb.toLocaleString(undefined, { maximumFractionDigits: 4 }) : "—"} OKB
+            </span>
+          </div>
         </div>
         <Link href="/allocate">
           <Button variant="violet" size="pill">

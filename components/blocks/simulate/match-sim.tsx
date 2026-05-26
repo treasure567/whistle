@@ -12,6 +12,7 @@ import { LiveField } from "./live-field";
 import { buildCommentary, type SimComment } from "@/lib/sim/commentary";
 import { useVirtualWallet } from "@/hooks/use-virtual-wallet";
 import { useOkbBalance } from "@/hooks/use-okb-balance";
+import { useWhstBalance } from "@/hooks/use-whst-balance";
 import { useStadiumAudio } from "@/hooks/use-stadium-audio";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +66,8 @@ export function MatchSim({
 
   const { balance, setBalance } = useVirtualWallet();
   const { balance: onchainOkb } = useOkbBalance();
+  const { balance: whst } = useWhstBalance();
+  const seededWallet = useRef(false);
   const { enabled: soundOn, toggle: toggleSound, cheer } = useStadiumAudio();
   const odds = useMemo(() => matchOdds(home.strength, away.strength), [home.strength, away.strength]);
   const [pick, setPick] = useState<Pick>("home");
@@ -121,6 +124,15 @@ export function MatchSim({
       onResult?.({ homeScore: result.homeScore, awayScore: result.awayScore });
     }
   }, [done, result, onResult]);
+
+  // Anchor the practice bankroll to the player's real WHST balance once it
+  // loads, so the simulate desk reflects what they actually hold.
+  useEffect(() => {
+    if (!seededWallet.current && whst !== null) {
+      seededWallet.current = true;
+      setBalance(Math.round(whst));
+    }
+  }, [whst, setBalance]);
 
   const availableBench = bench ? bench.home.filter((n) => !lineup.includes(n)) : [];
 
@@ -355,11 +367,15 @@ export function MatchSim({
             </span>
             <span className="flex items-center gap-2">
               {onchainOkb !== null ? (
-                <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-300" title="Your real OKB on X Layer testnet">
-                  {onchainOkb.toLocaleString(undefined, { maximumFractionDigits: 4 })} onchain
+                <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-300" title="Your native OKB (gas) on X Layer testnet">
+                  {onchainOkb.toLocaleString(undefined, { maximumFractionDigits: 4 })} OKB
                 </span>
               ) : null}
-              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-600 dark:text-amber-300" suppressHydrationWarning>
+              <span
+                className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[11px] text-amber-600 dark:text-amber-300"
+                title="Practice balance, seeded from your WHST. Simulate bets don't move real tokens."
+                suppressHydrationWarning
+              >
                 {balance} WHST
               </span>
             </span>
