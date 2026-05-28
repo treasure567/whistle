@@ -153,6 +153,7 @@ See the [AI Layer docs](https://whistle-5786c29b.mintlify.app/architecture/ai-la
 |---|---|
 | **Live app** | https://whistle-one.vercel.app |
 | **Docs** | https://whistle-5786c29b.mintlify.app |
+| **X / Twitter** | [@xdev_hack](https://x.com/xdev_hack) |
 | **Explorer** | https://www.okx.com/web3/explorer/xlayer-test |
 
 ---
