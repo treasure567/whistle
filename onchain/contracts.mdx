@@ -18,6 +18,50 @@ All whistle contracts were deployed to X Layer Testnet (chainId 1952) on 2026-05
 | SettlementOracle | [`0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4`](https://www.okx.com/web3/explorer/xlayer-test/address/0x7Eb2135760B63d6f58dC33344bcd37DaF75936C4) | 2-of-3 multisig for posting match results. A challenge window must pass before a result becomes final. |
 | MockERC20 (test OKB) | [`0x487F536593b1680B8247E67254Fc8D0394D137D7`](https://www.okx.com/web3/explorer/xlayer-test/address/0x487F536593b1680B8247E67254Fc8D0394D137D7) | Open-mint ERC-20 test token (18 decimals) used for funding agents and backing predictions. Testnet only — not deployed to mainnet. |
 
+## Contract relationships
+
+```mermaid
+flowchart TB
+  U([User wallet])
+
+  subgraph Chain["X Layer testnet (chainId 1952)"]
+    direction TB
+    AR[AgentRegistry]
+    M20[MockERC20<br/>test OKB]
+    PM[PositionManager]
+    MN[MomentNFT]
+    FE[FantasyEntry]
+    SO[SettlementOracle<br/>2-of-3 multisig]
+  end
+
+  E((Emma #1<br/>MINTER_ROLE))
+  J((Jack #2<br/>session key))
+  T((Tom #3<br/>MANAGER_ROLE))
+
+  AR -. registered .-> E
+  AR -. registered .-> J
+  AR -. registered .-> T
+
+  U -->|mint| M20
+  U -->|approve| M20
+  U -->|"allocate(agentId, amount)"| PM
+  M20 -. transferFrom .-> PM
+
+  E -->|"safeMint(uri)"| MN
+  J -->|open / settle position| PM
+  T -->|finalize roster| FE
+
+  SO -->|"post result + challenge window"| PM
+  PM -->|settle to user| U
+
+  classDef contracts fill:#0a0a0c,stroke:#8B5CF6,color:#fff
+  classDef agents fill:#0a0a0c,stroke:#A78BFA,color:#fff
+  class AR,M20,PM,MN,FE,SO contracts
+  class E,J,T agents
+```
+
+The solid arrows are direct user / agent transactions; the dotted arrows are reads or internal `transferFrom` movements that depend on the prior `approve`. No backend server appears in this picture — every write is signed either by the user's wallet or by an agent's session key.
+
 ## Agent registry IDs
 
 Agents are identified onchain by integer IDs in the AgentRegistry. The mapping is fixed at deployment.

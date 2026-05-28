@@ -6,6 +6,50 @@ description: "Frontend on Vercel, backend via GitHub Actions to a VPS with atomi
 
 whistle deploys across three distinct targets: the Next.js frontend lives on Vercel, the backend monorepo (`apps/api` + `apps/agents`) runs on a VPS managed by GitHub Actions, and the smart contracts are deployed to X Layer testnet via Hardhat Ignition.
 
+## Pipeline at a glance
+
+```mermaid
+flowchart LR
+  GH([GitHub push to main])
+
+  subgraph FEpipe["Frontend pipeline"]
+    direction TB
+    Vercel["Vercel build & deploy<br/>(Next.js)"]
+    VLive([Vercel app live])
+  end
+
+  subgraph BEpipe["Backend pipeline (GitHub Actions → VPS)"]
+    direction TB
+    Build["pnpm install --frozen-lockfile<br/>pnpm turbo build"]
+    Bundle["Bundle into<br/>~/releases/&lt;timestamp&gt;"]
+    Link["Atomic symlink swap<br/>~/current → new release"]
+    PM2["pm2 reload<br/>apps/api + apps/agents"]
+    Health{"GET /healthz<br/>both 200 within 30s?"}
+    Live([API + agents live])
+    Rollback["Repoint ~/current<br/>to previous release"]
+  end
+
+  subgraph SCpipe["Contracts pipeline"]
+    direction TB
+    Ig["hardhat ignition deploy<br/>--network xlayer-testnet --verify"]
+    XL["X Layer testnet (chainId 1952)"]
+    Addr["Update<br/>packages/chain/src/addresses.ts<br/>+ Vercel NEXT_PUBLIC_* env"]
+  end
+
+  GH --> Vercel --> VLive
+  GH --> Build --> Bundle --> Link --> PM2 --> Health
+  Health -- yes --> Live
+  Health -- no --> Rollback --> PM2
+  Ig --> XL --> Addr
+
+  classDef ok fill:#0a0a0c,stroke:#8B5CF6,color:#fff
+  classDef warn fill:#0a0a0c,stroke:#A78BFA,color:#fff
+  class Build,Bundle,Link,PM2,Vercel,Ig,Addr,XL ok
+  class Rollback warn
+```
+
+CI runs `gitleaks` (secret scanning) and `osv-scanner` (dependency CVEs) on every push; a blocking finding from either stops the deploy.
+
 ## Frontend — Vercel
 
 The Next.js app deploys automatically on every push to the main branch via the Vercel Git integration. The BFF proxy at `/api/v1/[...path]` is a Next.js Route Handler: it runs server-side on Vercel and injects the service master key before forwarding requests to the backend. The browser never receives or stores the service key.
